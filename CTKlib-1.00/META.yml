@@ -1,0 +1,62 @@
+--- #YAML:1.0
+name:         CTKlib
+version:      1.00
+abstract:     CTKlib - Command-line ToolKit library (CTK). Command line interface (CLI)
+author:
+    - Lepenkov Sergey (Serz Minus) C<minus@mail333.com>
+license:            lgpl
+distribution_type: module
+installdirs:  perl
+requires:
+    ExtUtils::MakeMaker:    6.62,
+    File::Spec:             0.82,
+    Test::More:             0.94,
+    Config::General:        2.00,
+    Time::Local:            1.20,
+    MIME::Base64:           3.00,
+    MIME::Lite:             3.00,
+    Net::FTP:               2.60,
+    File::Path:             2.00,
+    IPC::Open3:             1.00,
+    Term::ReadKey:          2.10,
+    IO::Handle:             1.20,
+    File::Copy:             2.00,
+    Archive::Tar:           1.80,
+    Archive::Zip:           1.30,
+    Archive::Extract:       0.58,
+    Moose:                  2.00,
+    namespace::autoclean:   0.13,
+    URI:                    1.58,
+    LWP:                    5.80,
+    LWP::MediaTypes:        6.00,
+    LWP::UserAgent:         5.80,
+    HTTP::Headers:          5.80,
+    HTTP::Request:          5.80,
+    HTTP::Response:         5.80,
+recommends:
+    DBI:                    0
+    Data::Dumper:           0
+configure_requires:
+    ExtUtils::MakeMaker:    6.40
+build_requires:
+    ExtUtils::MakeMaker:    6.40
+    Test::More:             0.94
+no_index:
+    directory:
+        - t
+        - inc
+        - src
+generated_by: ExtUtils::MakeMaker version 6.40
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+resources:
+  homepage: http://serzik.ru/
+  license: http://opensource.org/licenses/lgpl-license.php
+  repository: http://svn.serzik.ru/CTKlib/trunk
+
+
+
+
+
+

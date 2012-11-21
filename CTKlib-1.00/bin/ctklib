@@ -1,0 +1,160 @@
+#!/usr/bin/perl -w
+use strict;
+
+=head1 NAME
+
+ctklib - CTKlib project helper
+
+=head1 VERSION
+
+$Id: ctklib 31 2012-11-21 07:23:06Z minus $
+
+=head1 SYNOPSIS
+
+    ctklib [-hvdt] [PROJECTNAME]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d, --debug>
+
+Debug mode without logging in log-file
+
+=item B<-h, --help>
+
+Help page
+
+=item B<-v, --ver, --version>
+
+Version of CTK module
+
+=item B<-t, --tiny>
+
+Tiny project create
+
+=back
+
+=head1 DESCRIPTION
+
+Creating PROJECTNAME project
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+
+=head1 COPYRIGHT
+
+    This program is distributed under the GNU GPL v3.
+
+    Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+=cut
+
+use constant {
+    PROJECTNAME     => 'foo',
+
+    DIRS => [qw/
+            log
+            inc
+            conf
+            data
+            src
+        /],
+
+};
+use Getopt::Long;
+use Pod::Usage;
+use Cwd;
+
+# Packages
+use CTK;
+use CTK::Helper;
+
+# Режимы команд
+Getopt::Long::Configure ("bundling");
+GetOptions(\%OPT, 
+    "help|usage|h|u|man|?", # Помощь
+    "version|ver|v",        # Текущая версия CTK
+    "debug|d",              # Отладка
+    "tiny|simple|t",        # Tiny
+) || pod2usage(-exitval => 1, -verbose => 0);
+pod2usage(-exitval => 1, -verbose => 2) if $OPT{help};
+
+if ($OPT{version}) {
+    say "CTK Version: ", CTK->VERSION;
+    exit 0;
+}
+
+# Аргемент
+my $projectname   = @ARGV ? shift @ARGV : ''; # имя проекта
+
+START:  debug "-"x16, " START ", tms," ","-"x16;
+#########################
+### START
+#########################
+
+my $c = new CTK;
+$projectname =~ s/[^a-zA-Z0-9_\-]//g;
+$projectname = $c->cli_prompt("Please enter name of Your project in unix style:", PROJECTNAME) unless $projectname;
+exception("Invalid project name") if $projectname =~ /[^a-z0-9_\-]/i;
+debug "Creating project \"$projectname\"...";
+
+# Preparing directories and Log Clear 
+my $ds = DIRS;
+my $cd = cwd();
+foreach (@$ds) { $_ = CTK::catfile($cd,$projectname,$_) }
+push @$ds, CTK::catfile($cd,$projectname);
+CTK::preparedir($ds,0777);
+
+my %replace = (
+    PROJECTNAME  => $projectname,
+    PODSIG       => '=',
+);
+
+# Пишем сам файл
+my $data = $OPT{tiny} ? get_projectcontent_tiny() : get_projectcontent();
+my $f = CTK::catfile($cd,$projectname,$projectname.'.pl');
+my $overwrite = 'yes';
+$overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;
+if ($overwrite =~ /^y/i) {
+    CTK::fsave($f,_ff($data,\%replace)) ;
+    chmod(0755,$f);
+}
+
+# Пишем библиотеку
+$f = CTK::catfile($cd,$projectname,'inc',$projectname.'.pm');
+$overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;
+CTK::fsave($f,_ff(get_projectcontent_inc(),\%replace)) if $overwrite =~ /^y/i;
+
+# пишем файл конфигурации
+$f = CTK::catfile($cd,$projectname,$projectname.'.conf');
+$overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;
+CTK::fsave($f,_ff(get_projectcontent_conf(),\%replace)) if $overwrite =~ /^y/i;
+
+debug "Project \"$projectname\" created.";
+
+#########################
+### FINISH
+#########################
+FINISH: debug "-"x16, " FINISH ", tms," ","-"x16;
+exit(0);
+sub _ff {
+    my $d = shift || '';
+    my $h = shift || {};
+    $d =~ s/\%(\w+?)\%/(defined $h->{$1} ? $h->{$1} : '')/eg;
+    return $d
+}
+1;
+
+__END__
