@@ -8,7 +8,7 @@ CTK::Status - Progressbar's system
 
 1.20
 
-$Id: Status.pm 33 2012-11-21 08:54:56Z minus $
+$Id: Status.pm 36 2012-11-21 14:04:44Z minus $
 
 =head1 HISTORY
 
@@ -22,23 +22,31 @@ Init version
 
 On base BeeCDR
 
+=item B<1.21>
+
+Documentation modified
+
 =back
 
 =head1 SYNOPSIS
 
-use Time::HiRes qw ( sleep );
-use CTK::Status;
+    use Time::HiRes qw ( sleep );
+    use CTK::Status;
 
-my $a = 100;
+    my $a = 100;
 
-print "start...\n";
-CTK::Status::begin('Message blah-blah-blah', *STDOUT); # *STDOUT -- default value
-foreach (1..$a) {
-    sleep 0.1;
-    CTK::Status::tick($_/$a);
-}
-CTK::Status::end();
-print "finish!!!\n";
+    print "start...\n";
+    CTK::Status::begin('Message blah-blah-blah', *STDOUT); # *STDOUT -- default value
+    foreach (1..$a) {
+        sleep 0.1;
+        CTK::Status::tick($_/$a);
+    }
+    CTK::Status::end();
+    print "finish!!!\n";
+
+=head1 DESCRIPTION
+
+Progressbar's system of your transactions and processes
 
 =head1 AUTHOR
 
@@ -46,7 +54,7 @@ Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
 
 =head1 SEE ALSO
 
-C<perl>
+C<perl>, L<Moose>
 
 =head1 DIAGNOSTICS
 
@@ -54,13 +62,19 @@ The usual warnings if it can't read or write the files involved.
 
 =head1 COPYRIGHT
 
-    This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
 
-    Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+
+This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+
+See C<LICENSE> file
 
 =cut
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 use Time::HiRes qw(time);
 use Term::ReadKey qw(GetTerminalSize);
 use IO::Handle;

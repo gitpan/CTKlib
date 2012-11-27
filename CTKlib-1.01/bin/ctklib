@@ -7,7 +7,7 @@ ctklib - CTKlib project helper
 
 =head1 VERSION
 
-$Id: ctklib 31 2012-11-21 07:23:06Z minus $
+$Id: ctklib 36 2012-11-21 14:04:44Z minus $
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ Tiny project create
 
 =head1 DESCRIPTION
 
-Creating PROJECTNAME project
+Creating PROJECTNAME project with CTK
 
 =head1 AUTHOR
 
@@ -45,19 +45,15 @@ Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
 
 =head1 COPYRIGHT
 
-    This program is distributed under the GNU GPL v3.
+Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
 
-    Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+=head1 LICENSE
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
+This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+
+See C<LICENSE> file
 
 =cut
 

@@ -3,22 +3,89 @@
 # Module : CTK::DBI
 # Style  : OOP
 #
-# DATE   : 31.10.2012
+# DATE   : 27.11.2012
 #
 # ƒосутп к базам данных на основе модул€ DBI. модуль облегчает доступ к данным и несколько схож
 # с модулем multistore в проекте MPMinus
 #
-# ћодуль оснащен оболочкой контрол€ времени выполнени€ запросов
+# ћодуль оснащен оболочкой контрол€ времени выполнени€ запросов: Sys::SigAction
 #
 # Copyright (c) 1998-2012 D&D Corporation. All rights reserved
 # Copyright (C) 1998-2012 Lepenkov Sergej (Serz Minus) <minus@mail333.com>
 #
-# Version: $Id: DBI.pm 23 2012-11-18 07:50:25Z minus $
+# Version: $Id: DBI.pm 38 2012-11-27 10:16:36Z minus $
 #
 ################################################
 
 package CTK::DBI;
 use strict;
+
+=head1 NAME
+
+CTK::DBI - Database independent interface for CTKlib
+
+=head1 VERSION
+
+1.00
+
+$Id: DBI.pm 38 2012-11-27 10:16:36Z minus $
+
+=head1 SYNOPSIS
+
+    use CTK::DBI;
+
+    # MySQL connect
+    my $mso = new CTK::DBI(
+            -dsn  => 'DBI:mysql:database=TEST;host=192.168.1.1',
+            -user => 'login',
+            -pass => 'password',
+            #-attr => {},
+        );
+    
+    my $dbh = $mso->connect;
+    
+    # Table select (as array)
+    my @result = $mso->table($sql, @inargs);
+
+    # Table select (as hash)
+    my %result = $mso->tableh($key, $sql, @inargs); # $key - primary index field name
+
+    # Record (as array)
+    my @result = $mso->record($sql, @inargs);
+
+    # Record (as hash)
+    my %result = $mso->recordh($sql, @inargs);
+
+    # Fiels (as scalar)
+    my $result = $mso->field($sql, @inargs);
+
+    # SQL
+    my $sth = $mso->execute($sql, @inargs);
+    ...
+    $sth->finish;
+
+=head1 DESCRIPTION
+
+For example: debug($oracle->field("select sysdate() from dual"));
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+
+This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+
+See C<LICENSE> file
+
+=cut
+
 use CTK::Util qw( :API );
 
 use constant {
@@ -27,7 +94,7 @@ use constant {
 };
 
 use vars qw($VERSION);
-our $VERSION = q/$Revision: 23 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+our $VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 my $LOAD_SigAction = 0;
 eval 'use Sys::SigAction';

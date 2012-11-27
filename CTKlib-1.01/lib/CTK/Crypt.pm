@@ -1,4 +1,4 @@
-package CTK::Crypt; # $Revision: 29 $
+package CTK::Crypt; # $Revision: 38 $
 use Moose; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -9,15 +9,39 @@ CTK::Crypt - Cryptography
 
 1.00
 
-$Id: Crypt.pm 29 2012-11-20 14:50:39Z minus $
+$Id: Crypt.pm 38 2012-11-27 10:16:36Z minus $
 
 =head1 SYNOPSIS
 
-blah-blah-blah
+    $c->gpg_decript(
+            -in      => CTK::catfile($DATADIR,'in','test.txt.asc'), # Source encripted-file
+            -out     => CTK::catfile($DATADIR,'out','test.txt'),    # Destination decripted-file
+            -gpghome => '', # RESERVED
+            -certdir => '', # Certificate directory. Default: ./data/cert
+            -pubkey  => '', # Public key file. Default: ./data/cert/public.key
+            -privkey => '', # Private key file. Default: ./data/cert/private.key
+            -pass    => '', # Passphrase
+        );
 
 =head1 DESCRIPTION
 
-blah-blah-blah
+See L<http://www.gnupg.org> (GPG4Win - L<http://gpg4win.org>) for details
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+
+This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+
+See C<LICENSE> file
 
 =cut
 
@@ -31,7 +55,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 29 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API :FORMAT :UTIL);
 

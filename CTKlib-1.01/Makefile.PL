@@ -6,6 +6,10 @@ use constant {
     WIN       => $^O =~ /mswin/i ? 1 : 0,
 };
 
+my $build_requires = {
+        'ExtUtils::MakeMaker'   => 6.60,
+        'Test::More'            => 0.94,
+    };
 my $prereq_pm = {
         'ExtUtils::MakeMaker'   => 6.60,
         'File::Spec'            => 0.82,
@@ -16,6 +20,7 @@ my $prereq_pm = {
         'MIME::Lite'            => 3.00,
         'Net::FTP'              => 2.60,
         'File::Path'            => 2.00,
+        'File::Pid'             => 1.00,
         'IPC::Open3'            => 1.00,
         'Term::ReadKey'         => 2.10,
         'IO::Handle'            => 1.20,
@@ -47,6 +52,7 @@ WriteMakefile(
     'MIN_PERL_VERSION'      => 5.008001,
     'VERSION_FROM'          => 'lib/CTK.pm', 
     'ABSTRACT_FROM'         => 'lib/CTK.pm',
+    'BUILD_REQUIRES'        => $build_requires,
     'PREREQ_PM'             => $prereq_pm,
     'EXE_FILES'             => $exefiles,
     'AUTHOR'                => 'Lepenkov Sergey (Serz Minus) <minus@mail333.com>',

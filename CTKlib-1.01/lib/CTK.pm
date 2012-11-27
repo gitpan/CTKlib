@@ -1,15 +1,15 @@
-package CTK; # $Revision: 31 $
+package CTK; # $Revision: 36 $
 use Moose; #use strict;
 
 =head1 NAME
 
-CTK - Command-line ToolKit library (CTKlib)
+CTK - Command-line ToolKit
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
-$Id: CTK.pm 31 2012-11-21 07:23:06Z minus $
+$Id: CTK.pm 36 2012-11-21 14:04:44Z minus $
 
 =head1 SYNOPSIS
 
@@ -17,9 +17,9 @@ $Id: CTK.pm 31 2012-11-21 07:23:06Z minus $
   use CTK (
         prefix     => 'myprogram',
         suffix     => 'sample',
-        cfgfile    => ...path to conf file... ,
-        voidfile   => ...path to void file... ,
-        needconfig => 1, # need create conf file
+        cfgfile    => '/path/to/conf/file.conf',
+        voidfile   => '/path/to/void/file.txt',
+        needconfig => 1, # need creating empty config file
     );
   
 =head1 ABSTRACT
@@ -30,7 +30,7 @@ CTKlib - Command-line ToolKit library (CTKlib). Command line interface (CLI)
 
 Sorry. Detail manual is preparing now and it will be available later
 
-* See L<README> file
+See C<README> file
 
 =head1 HISTORY
 
@@ -42,7 +42,7 @@ Init version
 
 =back
 
-See L<CHANGES> file for details
+See C<CHANGES> file for details
 
 =head1 DEPENDENCIES
 
@@ -78,7 +78,7 @@ Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
 
 =head1 TO DO
 
-* See L<TODO> file
+See C<TODO> file
 
 =head1 BUGS
 
@@ -102,14 +102,14 @@ This program is free software; you can redistribute it and/or modify it under th
 
 This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
 
-See L<LICENSE> file
+See C<LICENSE> file
 
 =cut
 use vars qw/
         $VERSION
         $TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %ARGS %OPT @OPTSYSDEF
     /;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use constant {
     DEBUG     => 1, # 0 - off, 1 - on, 2 - all (+ http headers and other)
@@ -274,7 +274,6 @@ sub BUILD { # new
     #debug Dumper(\@_);
     return 1;
 };
-
 sub AUTOLOAD {
     # Это своего рода интерфейс ко всем функциям через объектную модель
     # если такого метода не окажится, то значит ругаемся карпом 

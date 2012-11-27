@@ -2,9 +2,9 @@ NAME
     CTKlib - Command-line ToolKit library (CTK). Command line interface (CLI)
 
 VERSION
-    Version 1.00
+    Version 1.01
     
-    $Id: README 29 2012-11-20 14:50:39Z minus $
+    $Id: README 36 2012-11-21 14:04:44Z minus $
 
 SYNOPSIS
     

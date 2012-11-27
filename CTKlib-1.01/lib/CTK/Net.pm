@@ -1,4 +1,4 @@
-package CTK::Net; # $Revision: 33 $
+package CTK::Net; # $Revision: 38 $
 use Moose;
 #use Data::Dumper; $Data::Dumper::Deparse = 1;
 
@@ -10,20 +10,105 @@ CTK::Net - Network working
 
 1.00
 
-$Id: Net.pm 33 2012-11-21 08:54:56Z minus $
+$Id: Net.pm 38 2012-11-27 10:16:36Z minus $
 
 =head1 SYNOPSIS
 
-blah-blah-blah
+    my %ftpct = (
+        ftphost     => '192.168.1.1',
+        ftpuser     => 'login',
+        ftppassword => 'password',
+        ftpdir      => '~/dir01',
+        #ftpattr     => {},
+    );
+    
+    my %uaopt = (
+        agent                   => "Mozilla/4.0",
+        max_redirect            => 10,
+        requests_redirectable   => ['GET','HEAD','POST'],
+        keep_alive              => 1,
+        env_proxy               => 1,
+    );
+    
+    my %httpct = (
+        method     => 'GET',
+        url        => 'http://example.com',
+        #login      => 'login',
+        #password   => 'password',
+        #utf8       => 1,
+    );
+    
+    $c->fetch(
+            -connect  => {%ftpct},   # Connect data
+            -protocol => 'ftp',      # Protocol: ftp / sftp
+            -dir      => $DATADIR,   # Destination directory
+            -cmd      => 'copyuniq', # Command: copy / copyuniq / move / moveuniq
+            -mode     => 'bin',      # Transfer mode: ascii / binary (bin) 
+            -list     => qr//, # Source mask (regular expression, filename or ArrayRef of files)
+        );
+
+    my $stat = $c->fetch(
+            -connect  => {%httpct},  # Connect data
+            -uaopt    => {%uaopt},   # Options UserAgent (optional)
+            -protocol => 'http',     # Protocol: http / https
+            -dir      => $DATADIR,   # Destination directory
+            #-file    => '123.html', # Filename (optional)
+            #-uacode  => sub { },    # Handler (code) of LWP::UserAgent (optional)
+            #-reqcode => sub { },    # Handler (code) of HTTP::Request (optional)
+            #-rescode => sub { },    # Handler (code) of HTTP::Response (optional)
+        );
+    debug("STATUS: ",$stat); 
+    
+    # Simple sample
+    my $html = $c->fetch(
+            -connect  => {
+                    method     => 'GET',
+                    url        => 'http://google.com/robots.txt',
+                },
+            -protocol => 'http',
+            #-utf8     => 1,
+        );
+    debug("DATA:\n\n",$html,"\n");
+    
+    $c->store(
+            -connect  => {%ftpct},   # Connect data
+            -protocol => 'ftp',      # Protocol: ftp / sftp
+            -dir      => $DATADIR,   # Destination directory
+            -cmd      => 'copyuniq', # Command: copy / copyuniq / move / moveuniq
+            -mode     => 'bin',      # Transfer mode: ascii / binary (bin) 
+            -file     => 'sample.t', # Source mask (regular expression, filename or ArrayRef of files)
+        );
 
 =head1 DESCRIPTION
 
-blah-blah-blah
+Using handlers, for sample: 
+
+    -rescode => sub { debug(CTK::Net::_debug_http(@_))  },
+
+=head1 TO DO
+
+    * Use SSH (SFTP)
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+
+This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+
+See C<LICENSE> file
 
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 33 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API :FORMAT :ATOM :FILE);
 use URI;

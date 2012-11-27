@@ -1,4 +1,4 @@
-package CTK::Arc; # $Revision: 29 $
+package CTK::Arc; # $Revision: 38 $
 use Moose; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -9,15 +9,108 @@ CTK::Arc - Archives working
 
 1.00
 
-$Id: Arc.pm 29 2012-11-20 14:50:39Z minus $
+$Id: Arc.pm 38 2012-11-27 10:16:36Z minus $
 
 =head1 SYNOPSIS
 
-blah-blah-blah
+    # External extracting
+    $c->fextract(
+            -in     => CTK::catfile($CTK::DATADIR,'in'),  # Source directory (archives)
+            -out    => CTK::catfile($CTK::DATADIR,'out'), # Destination directory (files)
+            -method => 'ext',
+            -list   => qr/rar/, # Source mask (regular expression, filename or ArrayRef of files)
+            -arcdef => $config->{arc}, # Archive attributes (Hashref)
+        );
+        
+    # Internal extracting
+    $c->fextract(
+            -in     => CTK::catfile($CTK::DATADIR,'in'),  # Source directory (archives)
+            -out    => CTK::catfile($CTK::DATADIR,'out'), # Destination directory (files)
+            -method => 'zip', # Zip archive
+            -list   => qr/zip/, # Source mask (regular expression, filename or ArrayRef of files)
+            -arcdef => $config->{arc}, # Archive attributes (Hashref)
+        );        
+        
+    
+    
+    # External files compressing 
+    $c->fcompress(
+            -in     => CTK::catfile($CTK::DATADIR,'in'), # Source directory (files)
+            -out    => CTK::catfile($CTK::DATADIR,'out','ttt.rar'), # Archive name (filename)
+            -list   => qr//, # Source mask (regular expression, filename or ArrayRef of files)
+            -arcdef => $config->{arc}, # Archive attributes (Hashref)
+        );
 
 =head1 DESCRIPTION
 
-blah-blah-blah
+Sample of $config->{arc} records:
+
+    ARC => { 
+        tgz   =>  {
+            "type"       => "tar", # name 
+            "ext"        => "tgz", # extension
+            "create"     => "tar -zcpf [FILE] [LIST]", # create command
+            "extract"    => "tar -zxpf [FILE] [DIRDST]", # extract command
+            "exclude"    => "--exclude-from ",
+            "list"       => "tar -ztf [FILE]",
+            "nocompress" => "tar -cpf [FILE]"
+        },
+        ...
+    }
+
+=head2 KEYS
+
+=over 8
+
+=item B<FILE>
+
+Path and filename
+
+=item B<FILENAME>
+
+Filename only
+
+=item B<DIRSRC>
+
+Source directory. Path only
+
+=item B<DIRIN>
+
+See DIRSRC
+
+=item B<DIRDST>
+
+Destination directory. Path only
+
+=item B<DIROUT>
+
+See DIRDST
+
+=item B<EXC>
+
+Reserved
+
+=item B<LIST>
+
+Reserved
+
+=back
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+
+This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+
+See C<LICENSE> file
 
 =cut
 
@@ -63,7 +156,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 29 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API :FORMAT :ATOM);
 use Archive::Tar;
@@ -88,7 +181,7 @@ sub fextract {
     
     $method   ||= 'ext'; # Метод извлечение файлов zip / tar / ext
     $dirin    ||= ''; # Входная директория
-    $dirout   ||= ''; # Директория обработчки
+    $dirout   ||= ''; # Директория обработки
     $listmsk  ||= ''; # Список имен файлов для процесса или маска
     $arcdef   ||= ''; # Секция (ссылка на хэш) для ручного опредления параметра arc (поиск по расширению)
     my $list;

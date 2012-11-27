@@ -1,4 +1,4 @@
-package CTK::File; # $Revision: 29 $
+package CTK::File; # $Revision: 38 $
 use Moose; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -9,24 +9,93 @@ CTK::File - Files and direcries working
 
 1.00
 
-$Id: File.pm 29 2012-11-20 14:50:39Z minus $
+$Id: File.pm 38 2012-11-27 10:16:36Z minus $
 
 =head1 SYNOPSIS
 
-blah-blah-blah
+    $c->fsplit(
+            -in     => CTK::catfile($CTK::DATADIR,'in'),  # Source directory (big files)
+            -out    => CTK::catfile($CTK::DATADIR,'out'), # Destination directory (splitted files)
+            -n      => 100, # Lines count
+            -format => '[FILENAME]_%03d.[FILEEXT]', # Format
+            -list   => qr//, # Source mask (regular expression, filename or ArrayRef of files)
+        );
+    
+    $c->fcopy(
+            -in     => CTK::catfile($CTK::DATADIR,'in'),  # Source directory (source files)
+            -out    => CTK::catfile($CTK::DATADIR,'out'), # Destination directory
+            -format => '[FILE].copy', # Format
+            -list   => qr//, # Source mask (regular expression, filename or ArrayRef of files)
+        );
+    
+    $c->fmv(
+            -in     => CTK::catfile($CTK::DATADIR,'in'),  # Source directory (source files)
+            -out    => CTK::catfile($CTK::DATADIR,'out'), # Destination directory
+            -format => '[FILE].copy', # Format
+            -list   => qr//, # Source mask (regular expression, filename or ArrayRef of files)
+        );
+    
+    $c->frm(
+            -in     => CTK::catfile($CTK::DATADIR,'in'), # Source directory (source files)
+            -list   => qr//, # Source mask (regular expression, filename or ArrayRef of files)
+        );
 
 =head1 DESCRIPTION
 
-blah-blah-blah
+=head2 KEYS
+
+=over 8
+
+=item B<FILE>
+
+Path and filename
+
+=item B<FILENAME>
+
+Filename only
+
+=item B<FILEEXT>
+
+File extension only
+
+=item B<COUNT>
+
+Current number of file in sequence (for fcopy and fmove methods)
+
+Gor fsplit method please use perl mask %i
+
+=item B<Time>
+
+Current time value (time())
+
+=back
+
+=head2 NOTES
 
 For copying paths: use File::Copy::Recursive qw(dircopy dirmove);
 
 For TEMP dirs/files working: use File::Temp qw/tempfile tempdir/;
 
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+
+This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+
+See C<LICENSE> file
+
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 29 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API :FORMAT :ATOM);
 use File::Copy;

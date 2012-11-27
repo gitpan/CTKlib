@@ -1,4 +1,4 @@
-package CTK::CLI; # $Revision: 29 $
+package CTK::CLI; # $Revision: 38 $
 use Moose; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -9,21 +9,68 @@ CTK::CLI - Command line interface
 
 1.00
 
-$Id: CLI.pm 29 2012-11-20 14:50:39Z minus $
+$Id: CLI.pm 38 2012-11-27 10:16:36Z minus $
 
 =head1 SYNOPSIS
 
-blah-blah-blah
+    my $v = $c->cli_prompt('Your name:', 'anonymous');
+    debug( "Your name: $v" );
+
+    my $v = $c->cli_prompt3('Your name:');
+    debug( "Your name: $v" );
+
+    my $v = $c->cli_select('Your select:',[qw/foo bar baz/],'bar');
+    debug( "Your select: $v" );
+    
+    my $v = $c->cli_select3('Your select:',[qw/foo bar baz/]);
+    debug( "Your select: $v" );
 
 =head1 DESCRIPTION
 
-blah-blah-blah
+Command line interface. Prompt and select methods
+
+=head1 TO DO
+
+  * Use Term::ReadLine module. Sample:
+    
+    BEGIN { $ENV{TERM} = "dumb" if $^O eq "MSWin32" }
+    use Term::ReadLine ();
+    use Text::ParseWords qw(shellwords);
+
+    my $term = new Term::ReadLine 'T01';
+    my $prompt = "T> ";
+    my $OUT = $term->OUT || \*STDOUT;
+    while ( defined ($_ = $term->readline($prompt)) ) {
+        last if /^(quit|exit)$/;
+        my @w = shellwords($_);
+        if (@w) {
+        print join(" ",@w),"\n";
+            $term->addhistory($_);
+        }
+    }
+    print "\n";
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+
+This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+
+See C<LICENSE> file
 
 =cut
 
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 29 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API);
 use ExtUtils::MakeMaker qw/prompt/;

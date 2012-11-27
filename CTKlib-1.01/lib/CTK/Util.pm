@@ -1,4 +1,4 @@
-package CTK::Util; # $Revision: 33 $
+package CTK::Util; # $Revision: 38 $
 use strict;
 # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
@@ -10,15 +10,93 @@ CTK::Util - Utilities
 
 1.00
 
-$Id: Util.pm 33 2012-11-21 08:54:56Z minus $
+$Id: Util.pm 38 2012-11-27 10:16:36Z minus $
 
 =head1 SYNOPSIS
 
-blah-blah-blah
+    my $sent = send_mail(
+        -to       => 'to@example.com',
+        -cc       => 'cc@example.com',     ### OPTIONAL
+        -from     => 'from@example.com',
+        -subject  => 'my subject',
+        -message  => 'my message',
+        -type     => 'text/plain',
+        -sendmail => '/usr/sbin/sendmail', ### OPTIONAL
+        -charset  => 'windows-1251',
+        -flags    => '-t',                 ### OPTIONAL
+        -smtp     => '192.168.1.1',        ### OPTIONAL
+        -authuser => '',                   ### OPTIONAL
+        -authpass => '',                   ### OPTIONAL
+        -attach   => [                     ### OPTIONAL
+            { 
+                Type=>'text/plain', 
+                Data=>'document 1 content', 
+                Filename=>'doc1.txt', 
+                Disposition=>'attachment',
+            },
+            {
+                Type=>'text/plain', 
+                Data=>'document 2 content', 
+                Filename=>'doc2.txt', 
+                Disposition=>'attachment',
+            },
+            {
+                Type=>'text/html', 
+                Data=>'blah-blah-blah', 
+                Filename=>'response.htm', 
+                Disposition=>'attachment',
+            },
+            {
+                Type=>'image/gif', 
+                Path=>'aaa000123.gif',
+                Filename=>'logo.gif', 
+                Disposition=>'attachment',
+            },
+            ### ... ###
+          ],
+    );
+    debug($sent ? 'mail is sent :)' : 'mail was not sent :(');
+    
+    # General API
+    my @args = @_;
+    my ($content, $maxcnt, $timeout, $timedie, $base, $login, $password, $host, $table_tmp);
+    ($content, $maxcnt, $timeout, $timedie, $base, $login, $password, $host, $table_tmp) =
+    read_attributes([
+        ['DATA','CONTENT','USERDATA'],
+        ['COUNT','MAXCOUNT','MAXCNT'],
+        ['TIMEOUT','FORBIDDEN','INTERVAL'],
+        ['TIMEDIE','TIME'],
+        ['BD','DB','BASE','DATABASE'],
+        ['LOGIN','USER'],
+        ['PASSWORD','PASS'],
+        ['HOST','HOSTNAME','ADDRESS','ADDR'],
+        ['TABLE','TABLENAME','NAME','SESSION','SESSIONNAME']
+    ],@args) if defined $args[0];
+
 
 =head1 DESCRIPTION
 
-blah-blah-blah
+no public subroutines
+
+=head1 SEE ALSO
+
+L<MIME::Lite>, L<CGI::Util>
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+
+This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+
+See C<LICENSE> file
 
 =cut
 
@@ -27,7 +105,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 33 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw(catfile rootdir tmpdir updir);
@@ -114,42 +192,11 @@ our %EXPORT_TAGS = (
     );
 
 sub send_mail {
-# Version 3.01 (with UTF-8 as default character set and attachment support)    
-#
-# Отправка письма посредством модуля MIME::Lite в кодировке UTF-8
-#
-
-=pod synopsis
-    # возвращает статус отправки. 1 - удача, 0 - неудача. Данные записались в лог
-
-    send_mail(
-        -to=>'to@example.com',
-        -cc=>'cc@example.com',         ### OPTIONAL
-        -from=>'from@example.com',
-        -subject=>'моя тема',
-        -message=>'мое сообщение',
-        -type=>'text/plain',
-        -sendmail=>'/usr/sbin/sendmail',    ### OPTIONAL
-        -charset=>'windows-1251',
-        -flags=>'-t',                       ### OPTIONAL
-        -smtp=>'192.168.1.1',             ### OPTIONAL
-        -authuser=>'',                      ### OPTIONAL
-        -authpass=>'',                      ### OPTIONAL
-        -attach => [                        ### OPTIONAL
-                {Type=>'text/plain', Data=>'document 1 content', Filename=>'doc1.txt', Disposition=>'attachment',},
-                {Type=>'text/plain', Data=>'document 2 content', Filename=>'doc2.txt', Disposition=>'attachment',},
-                ### ... ###
-            ],
-    );
-
-    Если нужно отправить письмо только с одним вложением:
-    
-    -attach=>{Type=>'text/html', Data=>$att, Filename=>'response.htm', Disposition=>'attachment',},
-    -attach=>{Type=>'image/gif', Path=>'aaa000123.gif',Filename=>'logo.gif', Disposition=>'attachment',},
-    
-    О пораметрах см. MIME::Lite часть attach
-    
-=cut
+    # Version 3.01 (with UTF-8 as default character set and attachment support)    
+    #
+    # Отправка письма посредством модуля MIME::Lite в кодировке UTF-8
+    # Возвращает статус отправки. 1 - удача, 0 - неудача. Данные записались в лог
+    #
     
     my @args = @_;
     my ($to, $cc, $from, $subject, $message, $type, 
@@ -722,22 +769,18 @@ sub scanfiles {
 # ftp ftprwtest ftpgetlist getlist getdirlist procexec procexe proccommand proccmd procrun
 #
 sub ftp {
-=head2 b<ftp>
-    Упрощенная работа с FTP
+    # Упрощенная работа с FTP
+    #my %ftpct = (
+    #    ftphost     => '192.168.1.1',
+    #    ftpuser     => 'login',
+    #    ftppassword => 'password',
+    #    ftpdir      => '~/',
+    #    #ftpattr     => {},
+    #);
+    #my $rfiles = CTK::ftp(\%ftpct, 'ls');
+    #my @remotefiles = $rfiles ? grep {!(/^\./)} @$rfiles : ();
+    #ftp(\%ftpct, 'put', catfile($dirin,$file), $file);
 
-    my %ftpct = (
-        ftphost     => '192.168.1.1',
-        ftpuser     => 'login',
-        ftppassword => 'password',
-        ftpdir      => '~/',
-        #ftpattr     => {},
-    );
-
-    my $rfiles = CTK::ftp(\%ftpct, 'ls');
-    my @remotefiles = $rfiles ? grep {!(/^\./)} @$rfiles : ();
-    ftp(\%ftpct, 'put', catfile($dirin,$file), $file);
-    
-=cut
     my $ftpconnect  = shift || {}; # Параметры коннекта {}
     my $cmd         = shift || ''; # Команда
     my $lfile       = shift || ''; # Локальный файл (с путем)
@@ -894,26 +937,9 @@ sub execute { procexec(@_) }
 #
 # Утилитарные процедуры модуля
 #
-=head1 SYNOPSIS
-
-  my @args = @_;
-  my ($content, $maxcnt, $timeout, $timedie, $base, $login, $password, $host, $table_tmp);
-  
-  ($content, $maxcnt, $timeout, $timedie, $base, $login, $password, $host, $table_tmp) =
-  read_attributes([
-        ['DATA','CONTENT','USERDATA'],
-        ['COUNT','MAXCOUNT','MAXCNT'],
-        ['TIMEOUT','FORBIDDEN','INTERVAL'],
-        ['TIMEDIE','TIME'],
-        ['BD','DB','BASE','DATABASE'],
-        ['LOGIN','USER'],
-        ['PASSWORD','PASS'],
-        ['HOST','HOSTNAME','ADDRESS','ADDR'],
-        ['TABLE','TABLENAME','NAME','SESSION','SESSIONNAME']
-  ],@args) if defined $args[0];
-
-=cut
-
+# Smart rearrangement of parameters to allow named parameter calling.
+# See CGI::Util
+#
 sub read_attributes {
     my($order,@param) = @_;
     return () unless @param;
