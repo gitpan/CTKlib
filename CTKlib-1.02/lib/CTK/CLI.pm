@@ -1,5 +1,5 @@
-package CTK::CLI; # $Revision: 38 $
-use Moose; # use Data::Dumper; $Data::Dumper::Deparse = 1;
+package CTK::CLI; # $Revision: 41 $
+use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
 
@@ -9,7 +9,7 @@ CTK::CLI - Command line interface
 
 1.00
 
-$Id: CLI.pm 38 2012-11-27 10:16:36Z minus $
+$Id: CLI.pm 41 2012-11-28 13:19:05Z minus $
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ See C<LICENSE> file
 
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 41 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API);
 use ExtUtils::MakeMaker qw/prompt/;
@@ -161,8 +161,9 @@ sub _cli_select {
         return [0,''];
     }
 }
-no Moose;
-__PACKAGE__->meta->make_immutable;
+
+#no Moose;
+#__PACKAGE__->meta->make_immutable;
 1;
 __END__
 

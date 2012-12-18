@@ -13,7 +13,7 @@
 # Copyright (c) 1998-2012 D&D Corporation. All rights reserved
 # Copyright (C) 1998-2012 Lepenkov Sergej (Serz Minus) <minus@mail333.com>
 #
-# Version: $Id: DBI.pm 38 2012-11-27 10:16:36Z minus $
+# Version: $Id: DBI.pm 50 2012-12-18 10:33:15Z minus $
 #
 ################################################
 
@@ -28,7 +28,7 @@ CTK::DBI - Database independent interface for CTKlib
 
 1.00
 
-$Id: DBI.pm 38 2012-11-27 10:16:36Z minus $
+$Id: DBI.pm 50 2012-12-18 10:33:15Z minus $
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,7 @@ use constant {
 };
 
 use vars qw($VERSION);
-our $VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+our $VERSION = q/$Revision: 50 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 my $LOAD_SigAction = 0;
 eval 'use Sys::SigAction';
@@ -105,7 +105,7 @@ if ($es) {
         sub set_sig_handler($$;$$) { 1 };
         1;
     ';
-    _debug("Package Sys::SigAction don't installed! Please install this package") unless CTK::WIN;
+    _error("Package Sys::SigAction don't installed! Please install this package") unless CTK::WIN;
 } else {
     $LOAD_SigAction = 1;
 }
@@ -372,6 +372,9 @@ sub DBI_EXECUTE {
     
     return $sth_ex || undef;
 }
-sub _debug { CTK::debug(@_) }
+sub _debug { 
+    #CTK::debug(@_) 
+    1;
+}
 sub _error { carp(@_) }
 1;

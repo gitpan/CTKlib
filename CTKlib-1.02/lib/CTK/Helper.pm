@@ -7,7 +7,7 @@ package CTK::Helper;
 # %PROJECTNAME% -- имя проекта в Unix стиле
 #
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 32 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 46 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use base qw/Exporter/;
 our @EXPORT = qw(
@@ -119,7 +119,7 @@ blah-blah-blah
 
 %PODSIG%over 8
 
-%PODSIG%item B<1.00 / 24.10.2012>
+%PODSIG%item B<1.00 / %GMT%>
 
 Init version
 
@@ -136,7 +136,7 @@ Moose
 
 %PODSIG%head1 AUTHOR
 
-Yor Name E<lt>your@email.comE<gt>.
+Yor Name E<lt>your@email.comE<gt>
 
 %PODSIG%head1 TO DO
 
@@ -152,7 +152,7 @@ The usual warnings if it can't read or write the files involved.
 
 %PODSIG%head1 COPYRIGHT
 
-Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
 
 %PODSIG%head1 LICENSE
 
@@ -174,6 +174,7 @@ use constant {
     PIDFILE   => '%PROJECTNAME%.pid', # Файл PID по умолчанию
 
     # Команды и их параметры.
+    CMDDEFAULT => '',
     CMD => {
         void => {
             pidcheck => 0, # 0 - OFF, 1 - ON
@@ -212,18 +213,18 @@ GetOptions(\%OPT, @OPTSYSDEF, # humvdlcyt?
     "baz|z=s",            # BAZ
     
 ) || pod2usage(-exitval => 1, -verbose => 0, -output => \*CTK::CTKCP);
-pod2usage(-exitval => 1, -verbose => 0, -output => \*CTK::CTKCP) if $OPT{help};
-pod2usage(-exitval => 1, -verbose => 99, -sections => 'NAME|VERSION', -output => \*CTK::CTKCP) if $OPT{version};
-pod2usage(-exitval => 1, -verbose => 2, -output => \*CTK::CTKCP) if $OPT{man};
+pod2usage(-exitval => 0, -verbose => 0, -output => \*CTK::CTKCP) if $OPT{help};
+pod2usage(-exitval => 0, -verbose => 99, -sections => 'NAME|VERSION', -output => \*CTK::CTKCP) if $OPT{version};
+pod2usage(-exitval => 0, -verbose => 2, -output => \*CTK::CTKCP) if $OPT{man};
 
 # VARS
 my %cmddata;
 
 # Команды
-my $command   = @ARGV ? shift @ARGV : ''; # Команда
+my $command   = @ARGV ? shift @ARGV : CMDDEFAULT; # Команда
 my @arguments = @ARGV ? @ARGV : (); # Аргументы команд
 my @commands  = keys %{sub{CMD}->()}; # @{sub{COMMANDS}->()}
-pod2usage(-exitval => 0, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS', -output => \*CTK::CTKCP)
+pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS', -output => \*CTK::CTKCP)
     if ( (grep {$_ eq $command} @commands) ? 0 : 1 );
     
 # Preparing directories and Log Clear 

@@ -1,6 +1,5 @@
-package CTK::Net; # $Revision: 38 $
-use Moose;
-#use Data::Dumper; $Data::Dumper::Deparse = 1;
+package CTK::Net; # $Revision: 50 $
+use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
 
@@ -10,7 +9,7 @@ CTK::Net - Network working
 
 1.00
 
-$Id: Net.pm 38 2012-11-27 10:16:36Z minus $
+$Id: Net.pm 50 2012-12-18 10:33:15Z minus $
 
 =head1 SYNOPSIS
 
@@ -73,7 +72,7 @@ $Id: Net.pm 38 2012-11-27 10:16:36Z minus $
     $c->store(
             -connect  => {%ftpct},   # Connect data
             -protocol => 'ftp',      # Protocol: ftp / sftp
-            -dir      => $DATADIR,   # Destination directory
+            -dir      => $DATADIR,   # Source directory
             -cmd      => 'copyuniq', # Command: copy / copyuniq / move / moveuniq
             -mode     => 'bin',      # Transfer mode: ascii / binary (bin) 
             -file     => 'sample.t', # Source mask (regular expression, filename or ArrayRef of files)
@@ -108,7 +107,7 @@ See C<LICENSE> file
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 50 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API :FORMAT :ATOM :FILE);
 use URI;
@@ -169,14 +168,14 @@ sub fetch { # fetch (get, download)
     }
     
     if ($protocol eq 'ftp') {
-        CTK::debug("Get files from ftp://$connect->{ftphost}...");
+        #CTK::debug("Get files from ftp://$connect->{ftphost}...");
         my $ftph = ftp($connect, 'connect');
         
         my $i = 0;
         my $c = scalar(@$list) || 0;
         foreach my $fn (@$list) {$i++;
             my $fs = $ftph->size($fn) || 0;
-            CTK::debug("   Get file $i/$c $fn [".correct_number($fs)." b]...");
+            #CTK::debug("   Get file $i/$c $fn [".correct_number($fs)." b]...");
             
             my $fndst = catfile($dirdst,$fn);
             
@@ -188,7 +187,7 @@ sub fetch { # fetch (get, download)
             if (($command =~ /uniq/) && (-e $fndst) && (-s $fndst) == $fs) {
                 # Файл уже есть, нет смысла его копировать
                 $statget = 1;
-                CTK::debug("   --- SKIPPED: Файл уже есть, размеры совпадают, смысла принимать нет!")
+                #CTK::debug("   --- SKIPPED: Файл уже есть, размеры совпадают, смысла принимать нет!")
             } else {
                 $statget = $ftph->get($fn,$fndst);
             }
@@ -198,15 +197,15 @@ sub fetch { # fetch (get, download)
                 # Все хорошо
                 if ($command =~ /move/) {
                     # Удаляем, если у нас перенос файла
-                    CTK::debug("   Deleting file $i/$c $fn...");
+                    #CTK::debug("   Deleting file $i/$c $fn...");
                     $ftph->delete($fn) or 
-                        _error( "   --- ERROR: Can't delete file \"$fn\": ", $ftph->message );
+                        _error( "FETCHING FTP ERROR: Can't delete file \"$fn\": ", $ftph->message );
                 }
             } else {
                 if ($statget) {
-                    _error("   --- ERROR: Can't get file \"$fn\": ", $ftph->message); 
+                    _error("FETCHING FTP ERROR: Can't get file \"$fn\": ", $ftph->message); 
                 } else {
-                    _error("   --- ERROR: File size \"$fn\" ($fs) < \"$fndst\" ($fsdst) ");
+                    _error("FETCHING FTP ERROR: File size \"$fn\" ($fs) < \"$fndst\" ($fsdst) ");
                 }
             }
         }
@@ -244,7 +243,7 @@ sub fetch { # fetch (get, download)
                 $html = '' unless defined $html;
             }
         } else {
-            _error("ERROR: An error occurred while trying to obtain the resource \"$url\" (",$res->status_line,")");
+            _error("FETCHING HTTP ERROR: An error occurred while trying to obtain the resource \"$url\" (",$res->status_line,")");
         }
         
         # Пишем в файл или вывод взад
@@ -330,15 +329,15 @@ sub store { # store (put, upload)
     }
 
     if ($protocol eq 'ftp') {
-        CTK::debug("Store files to ftp://$connect->{ftphost}...");
+        #CTK::debug("Store files to ftp://$connect->{ftphost}...");
         my $ftph = ftp($connect,'connect');
         
         my $i = 0;
         my $c = scalar(@$list) || 0;
         foreach my $fn (@$list) {$i++;
-            my $fsrc = catfile($dirsrc,$fn);
+            my $fsrc = $dirsrc ? catfile($dirsrc,$fn) : $fn;
             my $fs   = -e $fsrc ? (-s $fsrc) : 0; # Размер файла
-            CTK::debug("   Store file $i/$c $fn [".correct_number($fs)." b]...");
+            #CTK::debug("   Store file $i/$c $fn [".correct_number($fs)." b]...");
 
             $ftph->binary if $mode eq 'binary';
             $ftph->binary if $mode eq 'bin';
@@ -349,7 +348,7 @@ sub store { # store (put, upload)
             if (($command =~ /uniq/) && (-e $fsrc) && $fsdsta == $fs) {
                 # Файл уже есть, нет смысла его копировать
                 $statput = 1;
-                CTK::debug("   --- SKIPPED: Файл уже есть, размеры совпадают, смысла отправлять нет!")
+                #CTK::debug("   --- SKIPPED: Файл уже есть, размеры совпадают, смысла отправлять нет!")
             } else {
                 $statput = $ftph->put($fsrc,$fn);
             }
@@ -359,15 +358,15 @@ sub store { # store (put, upload)
                 # Все хорошо
                 if ($command eq 'move') {
                     # Удаляем, если у нас перенос файла
-                    CTK::debug("   Deleting file $i/$c $fn...");
+                    #CTK::debug("   Deleting file $i/$c $fn...");
                     unlink($fsrc) or 
-                        _error( "   --- ERROR: Cannot delete file \"$fn\": $!");
+                        _error( "STORING FTP ERROR: Cannot delete file \"$fn\": $!");
                 }
             } else {
                 if ($statput) {
-                    _error("   --- ERROR: Cannot put file \"$fn\": ", $ftph->message); 
+                    _error("STORING FTP ERROR: Cannot put file \"$fn\": ", $ftph->message); 
                 } else {
-                    _error("   --- ERROR: File size \"$fn\" ($fsdst) < \"$fsrc\" ($fs) ");
+                    _error("STORING FTP ERROR: File size \"$fn\" ($fsdst) < \"$fsrc\" ($fs) ");
                 }
             }
         }
@@ -394,11 +393,11 @@ sub _debug_http {
 	"\n\nRESPONSE:\n\n",$res->code," ",$res->message,"\n",$res->headers_as_string;	
 }
 sub _error {
-    CTK::debug(@_);
-    carp(@_) unless CTK::debugmode();
+    #CTK::debug(@_);
+    carp(@_); #unless CTK::debugmode();
 }
 
-no Moose;
-__PACKAGE__->meta->make_immutable;
+#no Moose;
+#__PACKAGE__->meta->make_immutable;
 1;
 __END__

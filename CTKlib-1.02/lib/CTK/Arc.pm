@@ -1,5 +1,5 @@
-package CTK::Arc; # $Revision: 38 $
-use Moose; # use Data::Dumper; $Data::Dumper::Deparse = 1;
+package CTK::Arc; # $Revision: 50 $
+use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
 
@@ -9,7 +9,7 @@ CTK::Arc - Archives working
 
 1.00
 
-$Id: Arc.pm 38 2012-11-27 10:16:36Z minus $
+$Id: Arc.pm 50 2012-12-18 10:33:15Z minus $
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 50 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API :FORMAT :ATOM);
 use Archive::Tar;
@@ -199,47 +199,47 @@ sub fextract {
 
     # На этом этапе имеем линейный список фалов
     if ($method eq 'tar') {
-        CTK::debug("Извлечение TAR-архивов каталога \"$dirin\" в каталог \"$dirout\"...");
+        #CTK::debug("Извлечение TAR-архивов каталога \"$dirin\" в каталог \"$dirout\"...");
         my $tar = Archive::Tar->new;
         my $i = 0;
         my $c = scalar(@$list) || 0;
         foreach my $fn (@$list) {$i++;
-            my $fin = catfile($dirin,$fn);
+            my $fin = $dirin ? catfile($dirin,$fn) : $fn;
             my $fs   = -e $fin ? (-s $fin) : 0; # Размер файла архива
-            CTK::debug("   Разархивируется файл $i/$c $fn [".correct_number($fs)." b]...");
+            #CTK::debug("   Разархивируется файл $i/$c $fn [".correct_number($fs)." b]...");
             $tar->read($fin);
             foreach my $fan ( $tar->list_files() ) {
-                CTK::debug("   --- Extracting \"$fan\"...");
-                $tar->extract_file( $fan, catfile($dirout,$fan) );
+                #CTK::debug("   --- Extracting \"$fan\"...");
+                $tar->extract_file( $fan, $dirout ? catfile($dirout,$fan) : $fan );
             }
         
         }
     } elsif ($method eq 'zip') {
-        CTK::debug("Извлечение ZIP-архивов каталога \"$dirin\" в каталог \"$dirout\"...");
+        #CTK::debug("Извлечение ZIP-архивов каталога \"$dirin\" в каталог \"$dirout\"...");
         my $i = 0;
         my $c = scalar(@$list) || 0;
         foreach my $fn (@$list) {$i++;
-            my $fin = catfile($dirin,$fn);
+            my $fin = $dirin ? catfile($dirin,$fn) : $fn;
             my $fs   = -e $fin ? (-s $fin) : 0; # Размер файла архива
-            CTK::debug("   Разархивируется файл $i/$c $fn [".correct_number($fs)." b]...");
+            #CTK::debug("   Разархивируется файл $i/$c $fn [".correct_number($fs)." b]...");
             my $ae = Archive::Extract->new( archive => $fin );
             my $ok = $ae->extract( to => $dirout );
             if ( $ok ) {
-                my $filesok = $ae->files;
-                foreach (@$filesok) {CTK::debug("   --- File \"$_\": OK")};
+                #my $filesok = $ae->files;
+                #foreach (@$filesok) {CTK::debug("   --- File \"$_\": OK")};
             } else {
-                CTK::debug("   --- ERROR: File extract FAILED: ".$ae->error);
-                carp("   --- ERROR: File extract FAILED: ".$ae->error) unless CTK::debugmode();
+                #CTK::debug("   --- ERROR: File extract FAILED: ".$ae->error);
+                carp("ZIP EXTRACTION ERROR: File extract FAILED: ".$ae->error); # unless CTK::debugmode();
             }
         }
     } elsif ($method eq 'ext') {
-        CTK::debug("Внешнее извлечение \"$dirin\" в каталог \"$dirout\"...");
+        #CTK::debug("Внешнее извлечение \"$dirin\" в каталог \"$dirout\"...");
         my $i = 0;
         my $c = scalar(@$list) || 0;
         foreach my $fn (@$list) {$i++;
-            my $fin = catfile($dirin,$fn);
+            my $fin = $dirin ? catfile($dirin,$fn) : $fn;
             my $fs   = -e $fin ? (-s $fin) : 0; # Размер файла архива
-            CTK::debug("   Разархивируется файл $i/$c $fn [".correct_number($fs)." b]...");
+            #CTK::debug("   Разархивируется файл $i/$c $fn [".correct_number($fs)." b]...");
             my $arc = _getarc(
                     FILE     => $fin,
                     FILENAME => $fn,
@@ -258,15 +258,14 @@ sub fextract {
                 #push @C, ::WIN &&  $arc->{type} eq 'zip' ? "-d $dirproc" : $dirproc;
                 procexec(\@C);
             } else {
-                CTK::debug("   --- ERROR: Неудалось определить формат архива по расширению: $fn");
-                carp("   --- ERROR: Unknow format $fn") 
-                    unless CTK::debugmode();
+                #CTK::debug("   --- ERROR: Неудалось определить формат архива по расширению: $fn");
+                carp("EXTERNAL EXTRACTION ERROR: Unknow format $fn"); #unless CTK::debugmode();
             }
         }    
             
     } else {
-        CTK::debug("ERROR: Неизвестный формат (метод) архива: $method");
-        carp("ERROR: Unknow archive's format or method: $method") unless CTK::debugmode();
+        #CTK::debug("ERROR: Неизвестный формат (метод) архива: $method");
+        carp("ERROR: Unknow archive's format or method: $method"); #unless CTK::debugmode();
     }
 }
 sub fcompress {
@@ -314,10 +313,10 @@ sub fcompress {
     # Сжимаем:
     # $arc{create} $bfile ".join(" ",@dirlist)." $exclude ";
     #
-    CTK::debug("Внешнее сжатие \"$dirin\" в файл \"$fout\"...");
+    #CTK::debug("Внешнее сжатие \"$dirin\" в файл \"$fout\"...");
     my @reallist;
     foreach (@$list,@$dlist) {
-        push @reallist, catfile($dirin,$_);
+        push @reallist, $dirin ? catfile($dirin,$_) : $_;
     }
 
     my $arc = _getarc(
@@ -335,8 +334,8 @@ sub fcompress {
         push @C, $arc->{create};
         procexec(\@C);
     } else {
-        CTK::debug("   ERROR: Неудалось определить формат архива по расширению: $fout");
-        carp("   ERROR: Format undefined by $fout") unless CTK::debugmode();
+        #CTK::debug("   ERROR: Неудалось определить формат архива по расширению: $fout");
+        carp("EXTERNAL COMPRESSING ERROR: Format undefined by $fout"); # unless CTK::debugmode();
     }    
 }
 sub _getarc {
@@ -357,8 +356,8 @@ sub _getarc {
     }
     
     unless( $sec ) {
-        CTK::debug( "Error: unknown archive format of file \"$file\": $ext" );
-        carp("Error: unknown archive format of file \"$file\": $ext") unless CTK::debugmode();
+        #CTK::debug( "Error: unknown archive format of file \"$file\": $ext" );
+        carp("ERROR: Unknown archive format of file \"$file\": $ext"); # unless CTK::debugmode();
         return undef;
     }
     my %arc = %$sec;
@@ -371,7 +370,7 @@ sub _getarc {
 	return {%arc}; # ссылка на анонимный хэш
 }
 
-no Moose;
-__PACKAGE__->meta->make_immutable;
+#no Moose;
+#__PACKAGE__->meta->make_immutable;
 1;
 __END__

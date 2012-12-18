@@ -1,10 +1,10 @@
 =head1 NAME
 
-CTK::CPX
+CTK::CPX - Converter between windows-1251 and your terminal encoding
 
 =head1 VERSION
 
-$Id: CPX.pm 36 2012-11-21 14:04:44Z minus $
+$Id: CPX.pm 40 2012-11-27 13:00:45Z minus $
 
 Based on BeeCDR project
 

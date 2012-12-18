@@ -1,4 +1,4 @@
-package CTK; # $Revision: 36 $
+package CTK; # $Revision: 41 $
 use Moose; #use strict;
 
 =head1 NAME
@@ -7,14 +7,23 @@ CTK - Command-line ToolKit
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
-$Id: CTK.pm 36 2012-11-21 14:04:44Z minus $
+$Id: CTK.pm 41 2012-11-28 13:19:05Z minus $
 
 =head1 SYNOPSIS
 
   use CTK;
-  use CTK (
+  
+  use CTK qw( :BASE ); # :SUBS and :VARS tags to export
+  
+  use CTK qw( :SUBS ); # :SUBS tag only to export
+  
+  use CTK qw( :VARS ); # :VARS tag only to export
+  
+  my $c = new CTK;
+  
+  my $c = new CTK (
         prefix     => 'myprogram',
         suffix     => 'sample',
         cfgfile    => '/path/to/conf/file.conf',
@@ -109,7 +118,7 @@ use vars qw/
         $VERSION
         $TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %ARGS %OPT @OPTSYSDEF
     /;
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 use constant {
     DEBUG     => 1, # 0 - off, 1 - on, 2 - all (+ http headers and other)
@@ -128,7 +137,7 @@ use constant {
     CFGFILE   => '[PREFIX].conf', # Файл конфигурации
 };
 
-use base qw /Exporter CTK::CLI CTK::Net CTK::File CTK::Arc CTK::Crypt/; # extends qw/CTK::Arc/;
+use base qw /Exporter/; # extends qw/CTK::Arc/;
 our @EXPORT = qw(
         say debug tms exception testmode debugmode logmode
         $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %OPT @OPTSYSDEF
@@ -146,7 +155,7 @@ our %EXPORT_TAGS = (
         SUBS    => [qw(say debug tms exception testmode debugmode logmode)],
         VARS    => [qw($TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %OPT @OPTSYSDEF)],
     );
-    
+
 use Time::HiRes qw(gettimeofday);
 use FindBin qw($RealBin $Script);
 
@@ -229,6 +238,12 @@ sub logmode { return CTK::LOG && $OPT{log} } # Возвращаем статус LOG как единый!
 ########################
 ## Основные методы Moose
 ########################
+
+with 'CTK::CLI';
+with 'CTK::File';
+with 'CTK::Crypt';
+with 'CTK::Arc';
+with 'CTK::Net';
 
 has 'script'   => (is => 'ro', isa => 'Str', default => $Script);
 has 'prefix'   => (is => 'rw', isa => 'Str', default => ($Script =~ /^(.+?)\./ ? $1 : $Script));

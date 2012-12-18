@@ -1,5 +1,5 @@
-package CTK::File; # $Revision: 38 $
-use Moose; # use Data::Dumper; $Data::Dumper::Deparse = 1;
+package CTK::File; # $Revision: 50 $
+use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
 
@@ -9,7 +9,7 @@ CTK::File - Files and direcries working
 
 1.00
 
-$Id: File.pm 38 2012-11-27 10:16:36Z minus $
+$Id: File.pm 50 2012-12-18 10:33:15Z minus $
 
 =head1 SYNOPSIS
 
@@ -95,7 +95,7 @@ See C<LICENSE> file
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 50 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API :FORMAT :ATOM);
 use File::Copy;
@@ -138,11 +138,11 @@ sub fsplit {
     # На этом этапе имеем линейный список фалов
     my $c = scalar(@$list) || 0;
     my $i = 0;
-    CTK::debug("Разбиение файлов каталога \"$dirin\" по ".correct_number($limit)." строк...");
+    #CTK::debug("Разбиение файлов каталога \"$dirin\" по ".correct_number($limit)." строк...");
     foreach my $fnin (@$list) {$i++;
-        CTK::debug("   Разбивается файл $i/$c $fnin...");
-        my $filein = catfile($dirin,$fnin);
-        open FIN, "<",$filein or _error("   --- Can't open file $filein: $!") && next;
+        #CTK::debug("   Разбивается файл $i/$c $fnin...");
+        my $filein = $dirin ? catfile($dirin,$fnin) : $fnin;
+        open FIN, "<",$filein or _error("SPLIT ERROR: Can't open file $filein: $!") && next;
             my $fpart = 0; # Части
             my $fline = $limit; # строка, номер (условная!!!)
             open FOUT, ">-";
@@ -153,10 +153,10 @@ sub fsplit {
                     $fpart++;
                     my $fformat  = fformat($format,$fnin);
                     my $fnproc   = sprintf($fformat,$fpart); # Выходной файл (имя)
-                    my $fileproc = catfile($dirout,$fnproc); #  Выходной файл
-                    CTK::debug("   - Сохраняется часть $fpart в файл $fnproc...");
+                    my $fileproc = $dirout ? catfile($dirout,$fnproc) : $fnproc; #  Выходной файл
+                    #CTK::debug("   - Сохраняется часть $fpart в файл $fnproc...");
                     close FOUT;
-                    open FOUT, ">", $fileproc or _error("   --- Can't open file $fileproc: $!") && next;
+                    open FOUT, ">", $fileproc or _error("SPLIT ERROR: Can't open file $fileproc: $!") && next;
                 } else {
                     # Читается факл
                     $fline++;
@@ -164,7 +164,7 @@ sub fsplit {
                 print FOUT; # print FOUT "\n";
             }
             close FOUT;
-        close FIN or _error("   --- Can't close file $filein: $!");
+        close FIN or _error("SPLIT ERROR: Can't close file $filein: $!");
     }
     
     return 1;
@@ -203,10 +203,18 @@ sub fcopy {
     # На этом этапе имеем линейный список фалов
     my $c = scalar(@$list) || 0;
     my $i = 0;
-    CTK::debug("Копирование файлов каталога \"$dirin\" в \"$dirout\"...");
+    #CTK::debug("Копирование файлов каталога \"$dirin\" в \"$dirout\"...");
     foreach my $fn (@$list) {$i++;
-        CTK::debug("   Копируется файл $i/$c $fn...");
-        copy(catfile($dirin,$fn),catfile($dirout,dformat($format,{FILE=>$fn,COUNT=>$i,TIME=>time()})));
+        #CTK::debug("   Копируется файл $i/$c $fn...");
+        my $dfd = dformat($format,{
+                FILE  => $fn,
+                COUNT => $i,
+                TIME  => time()
+            });
+        copy(
+                $dirin ? catfile($dirin,$fn) : $fn,
+                $dirout ? catfile($dirout,$dfd) : $dfd,
+            );
     }
     
     return 1;
@@ -246,10 +254,18 @@ sub fmove {
     # На этом этапе имеем линейный список фалов  ::debug(join "; ", @$list);
     my $c = scalar(@$list) || 0;
     my $i = 0;
-    CTK::debug("Перенос файлов каталога \"$dirin\" в \"$dirout\"...");
+    #CTK::debug("Перенос файлов каталога \"$dirin\" в \"$dirout\"...");
     foreach my $fn (@$list) {$i++;
-        CTK::debug("   Переносится файл $i/$c $fn...");
-        move(catfile($dirin,$fn),catfile($dirout,dformat($format,{FILE=>$fn,COUNT=>$i,TIME=>time()})));
+        #CTK::debug("   Переносится файл $i/$c $fn...");
+        my $dfd = dformat($format,{
+                FILE  => $fn,
+                COUNT => $i,
+                TIME  => time()
+            });
+        move(
+                $dirin ? catfile($dirin,$fn) : $fn,
+                $dirout ? catfile($dirout,$dfd) : $dfd,
+            );
     }
     
     return 1;
@@ -285,20 +301,20 @@ sub fdelete {
     # На этом этапе имеем линейный список фалов
     my $c = scalar(@$list) || 0;
     my $i = 0;
-    CTK::debug("Удаление файлов каталога \"$dirin\"...");
+    #CTK::debug("Удаление файлов каталога \"$dirin\"...");
     foreach my $fn (@$list) {$i++;
-        CTK::debug("   удаляется файл $i/$c $fn...");
-        unlink(catfile($dirin,$fn));
+        #CTK::debug("   удаляется файл $i/$c $fn...");
+        unlink( $dirin ? catfile($dirin,$fn) : $fn);
     }
 }
 sub fdel { fdelete(@_) }
 sub frm { fdelete(@_) }
 sub _error {
-    CTK::debug(@_);
-    carp(@_) unless CTK::debugmode();
+    #CTK::debug(@_);
+    carp(@_); # unless CTK::debugmode();
 }
 
-no Moose;
-__PACKAGE__->meta->make_immutable;
+#no Moose;
+#__PACKAGE__->meta->make_immutable;
 1;
 __END__

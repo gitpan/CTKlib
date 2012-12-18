@@ -1,4 +1,4 @@
-package CTK::Util; # $Revision: 38 $
+package CTK::Util; # $Revision: 50 $
 use strict;
 # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
@@ -10,7 +10,7 @@ CTK::Util - Utilities
 
 1.00
 
-$Id: Util.pm 38 2012-11-27 10:16:36Z minus $
+$Id: Util.pm 50 2012-12-18 10:33:15Z minus $
 
 =head1 SYNOPSIS
 
@@ -55,7 +55,7 @@ $Id: Util.pm 38 2012-11-27 10:16:36Z minus $
             ### ... ###
           ],
     );
-    debug($sent ? 'mail is sent :)' : 'mail was not sent :(');
+    debug($sent ? 'mail has been sent :)' : 'mail was not sent :(');
     
     # General API
     my @args = @_;
@@ -105,7 +105,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 50 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw(catfile rootdir tmpdir updir);
@@ -131,7 +131,7 @@ our @EXPORT = qw(
         current_date current_date_time localtime2date localtime2date_time correct_date date2localtime
         datetime2localtime visokos date2dig dig2date date_time2dig dig2date_time basetime
         
-        load_file save_file file_load file_save fsave fload bsave bload
+        load_file save_file file_load file_save fsave fload bsave bload touch
         
         preparedir
         sendmail send_mail
@@ -153,7 +153,7 @@ our %EXPORT_TAGS = (
                 unescape slash tag tag_create cdata dformat fformat splitformat
                 correct_number correct_dig
                 translate variant_stf randomize
-                load_file save_file file_load file_save fsave fload bsave bload
+                load_file save_file file_load file_save fsave fload bsave bload touch
                 sendmail send_mail
                 scandirs scanfiles
                 read_attributes
@@ -168,7 +168,7 @@ our %EXPORT_TAGS = (
                 current_date current_date_time localtime2date localtime2date_time correct_date date2localtime
                 datetime2localtime visokos date2dig dig2date date_time2dig dig2date_time basetime
             )],
-        FILE    => [qw(load_file save_file file_load file_save fsave fload bsave bload)],
+        FILE    => [qw(load_file save_file file_load file_save fsave fload bsave bload touch)],
         UTIL    => [qw(
                 preparedir
                 sendmail send_mail
@@ -290,7 +290,7 @@ sub send_mail {
         _debug("[SENDMAIL: bad send message ($smtp)!] $@") if $@;
         _debug("[SENDMAIL: bad method send($smtp)!] $!") unless $sendstat; 
     }
-    _debug("[SENDMAIL: The mail has been successfully sent to $to ",::tms(),"]") if $sendstat;
+    #_debug("[SENDMAIL: The mail has been successfully sent to $to ",::tms(),"]") if $sendstat;
 
     return $sendstat ? 1 : 0;    
 }
@@ -438,14 +438,30 @@ sub localtime2date {
 
     my $dandt=shift || time;
     my @dt=localtime($dandt);
-    my $cdt= (($dt[3]>9)?$dt[3]:'0'.$dt[3]).'.'.(($dt[4]+1>9)?$dt[4]+1:'0'.($dt[4]+1)).'.'.($dt[5]+1900);
-    return $cdt;
+    #my $cdt= (($dt[3]>9)?$dt[3]:'0'.$dt[3]).'.'.(($dt[4]+1>9)?$dt[4]+1:'0'.($dt[4]+1)).'.'.($dt[5]+1900);
+    #return $cdt;
+    return sprintf (
+        "%02d.%02d.%04d",
+        $dt[3], # День
+        $dt[4]+1, # Месяц
+        $dt[5]+1900 # Год
+    );
 }
 sub localtime2date_time {
     my $dandt=shift || time;
     my @dt=localtime($dandt);
-    my $cdt= (($dt[3]>9)?$dt[3]:'0'.$dt[3]).'.'.(($dt[4]+1>9)?$dt[4]+1:'0'.($dt[4]+1)).'.'.($dt[5]+1900)." ".(($dt[2]>9)?$dt[2]:'0'.$dt[2]).":".(($dt[1]>9)?$dt[1]:'0'.$dt[1]).':'.(($dt[0]>9)?$dt[0]:'0'.$dt[0]);
-    return $cdt;
+    #my $cdt= (($dt[3]>9)?$dt[3]:'0'.$dt[3]).'.'.(($dt[4]+1>9)?$dt[4]+1:'0'.($dt[4]+1)).'.'.($dt[5]+1900)." ".(($dt[2]>9)?$dt[2]:'0'.$dt[2]).":".(($dt[1]>9)?$dt[1]:'0'.$dt[1]).':'.(($dt[0]>9)?$dt[0]:'0'.$dt[0]);
+    #return $cdt;
+    return sprintf (
+        "%02d.%02d.%04d %02d:%02d:%02d",
+        $dt[3], # День
+        $dt[4]+1, # Месяц
+        $dt[5]+1900, # Год
+        $dt[2], # Час
+        $dt[1], # Мин
+        $dt[0]  # Сек
+    );
+
 }
 sub correct_date {
     #
@@ -693,6 +709,23 @@ sub fsave {save_file(@_)} # текстовая запись
 sub fload {load_file(@_)} # текстовое чтение
 sub bsave {file_save(@_)} # двоичная запись
 sub bload {file_load(@_)} # двоичное чтение
+
+sub touch {
+    # Трогаем файл (взято с ExtUtils::Command)
+    my $fn  = shift || '';
+    return 0 unless $fn;
+    my $t   = time;
+    my $OUT;
+    my $ostat = open $OUT, '>>', $fn;
+    unless ($ostat) {
+        _error("[TOUCH: Can't open file to write] $!");
+        return 0;
+    }
+        
+    close $OUT if $ostat;
+    utime($t,$t,$fn);
+    return 1;
+}
 
 sub preparedir {
 	# Подготовка директории к работе
@@ -989,7 +1022,7 @@ sub _make_attributes {
     }
     return @att;
 }
-sub _debug { CTK::debug(@_) } # Просто пишем дебаггером
+sub _debug { carp(@_) } # Просто пишем дебаггером
 sub _error { carp(@_) } # Пишем в стандартный вывод STDERROR, ТОЛЬКО ДЛЯ СИСТЕМНЫХ ПРОБЛЕМ!!!
 sub _exception { confess(@_) } # Пишем в стандартный вывод STDERROR и убиваем, ТОЛЬКО ДЛЯ СИСТЕМНЫХ ПРОБЛЕМ!!!
 1;

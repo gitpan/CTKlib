@@ -2,9 +2,7 @@
 use strict;
 use ExtUtils::MakeMaker;
 
-use constant {
-    WIN       => $^O =~ /mswin/i ? 1 : 0,
-};
+my $MSWIN = $^O =~ /mswin/i ? 1 : 0;
 
 my $build_requires = {
         'ExtUtils::MakeMaker'   => 6.60,
@@ -38,13 +36,13 @@ my $prereq_pm = {
         'HTTP::Request'         => 5.80,
         'HTTP::Response'        => 5.80,
     };
-$prereq_pm->{'Sys::SigAction'}  =  0.15 unless WIN;
+$prereq_pm->{'Sys::SigAction'}  =  0.15 unless $MSWIN;
 
 my $exefiles = [qw(
         bin/ctklib
         bin/ctklib-tiny
     )];
-push @$exefiles, (qw(bin/pv.exe)) if WIN;
+push @$exefiles, (qw(bin/pv.exe)) if $MSWIN;
 
 WriteMakefile(
     'NAME'                  => 'CTK',

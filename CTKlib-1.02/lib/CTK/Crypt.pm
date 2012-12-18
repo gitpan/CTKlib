@@ -1,5 +1,5 @@
-package CTK::Crypt; # $Revision: 38 $
-use Moose; # use Data::Dumper; $Data::Dumper::Deparse = 1;
+package CTK::Crypt; # $Revision: 50 $
+use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
 
@@ -9,7 +9,7 @@ CTK::Crypt - Cryptography
 
 1.00
 
-$Id: Crypt.pm 38 2012-11-27 10:16:36Z minus $
+$Id: Crypt.pm 50 2012-12-18 10:33:15Z minus $
 
 =head1 SYNOPSIS
 
@@ -55,7 +55,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 38 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 50 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API :FORMAT :UTIL);
 
@@ -110,18 +110,18 @@ sub gpg_decript {
     my $rprresult = procexec(\@cmd);
     
     if (-e $ofile) {
-        CTK::debug("OK: File GnuPG decription to \"$ofile\"");
+        #CTK::debug("OK: File GnuPG decription to \"$ofile\"");
         return 1;
     } else {
-        CTK::debug("FAILED: File GnuPG decription to \"$ofile\"\n");
-        CTK::debug($rprresult);
-        carp("FAILED: File GnuPG decription to \"$ofile\"\n$rprresult") unless CTK::debugmode();
+        #CTK::debug("FAILED: File GnuPG decription to \"$ofile\"\n");
+        #CTK::debug($rprresult);
+        carp("FAILED: File GnuPG decription to \"$ofile\"\n$rprresult"); #unless CTK::debugmode();
         return 0;
     }
 }
 
-no Moose;
-__PACKAGE__->meta->make_immutable;
+#no Moose;
+#__PACKAGE__->meta->make_immutable;
 1;
 __END__
 
