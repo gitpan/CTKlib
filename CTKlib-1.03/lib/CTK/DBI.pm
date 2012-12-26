@@ -13,7 +13,7 @@
 # Copyright (c) 1998-2012 D&D Corporation. All rights reserved
 # Copyright (C) 1998-2012 Lepenkov Sergej (Serz Minus) <minus@mail333.com>
 #
-# Version: $Id: DBI.pm 50 2012-12-18 10:33:15Z minus $
+# Version: $Id: DBI.pm 58 2012-12-26 10:45:15Z minus $
 #
 ################################################
 
@@ -28,7 +28,7 @@ CTK::DBI - Database independent interface for CTKlib
 
 1.00
 
-$Id: DBI.pm 50 2012-12-18 10:33:15Z minus $
+$Id: DBI.pm 58 2012-12-26 10:45:15Z minus $
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ For example: debug($oracle->field("select sysdate() from dual"));
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
@@ -94,7 +94,7 @@ use constant {
 };
 
 use vars qw($VERSION);
-our $VERSION = q/$Revision: 50 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+our $VERSION = q/$Revision: 58 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 my $LOAD_SigAction = 0;
 eval 'use Sys::SigAction';

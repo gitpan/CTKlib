@@ -1,4 +1,4 @@
-package CTK; # $Revision: 41 $
+package CTK; # $Revision: 59 $
 use Moose; #use strict;
 
 =head1 NAME
@@ -7,9 +7,9 @@ CTK - Command-line ToolKit
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
-$Id: CTK.pm 41 2012-11-28 13:19:05Z minus $
+$Id: CTK.pm 59 2012-12-26 11:06:51Z minus $
 
 =head1 SYNOPSIS
 
@@ -24,11 +24,14 @@ $Id: CTK.pm 41 2012-11-28 13:19:05Z minus $
   my $c = new CTK;
   
   my $c = new CTK (
-        prefix     => 'myprogram',
-        suffix     => 'sample',
-        cfgfile    => '/path/to/conf/file.conf',
-        voidfile   => '/path/to/void/file.txt',
-        needconfig => 1, # need creating empty config file
+        prefix       => 'myprogram',
+        suffix       => 'sample',
+        cfgfile      => '/path/to/conf/file.conf',
+        voidfile     => '/path/to/void/file.txt',
+        needconfig   => 1, # need creating empty config file
+        loglevel     => 'info', # or '1'
+        logfile      => CTK::catfile($LOGDIR,'foo.log'),
+        logseparator => ' ', # as default
     );
   
 =head1 ABSTRACT
@@ -81,10 +84,6 @@ L<HTTP::Headers>,
 L<HTTP::Request>,
 L<HTTP::Response>
 
-=head1 AUTHOR
-
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
-
 =head1 TO DO
 
 See C<TODO> file
@@ -100,6 +99,10 @@ C<perl>, L<Moose>
 =head1 DIAGNOSTICS
 
 The usual warnings if it can't read or write the files involved.
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
@@ -118,7 +121,7 @@ use vars qw/
         $VERSION
         $TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %ARGS %OPT @OPTSYSDEF
     /;
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 use constant {
     DEBUG     => 1, # 0 - off, 1 - on, 2 - all (+ http headers and other)
@@ -132,9 +135,14 @@ use constant {
     
     TERMCHSET => 'utf8', # Кодировка терминала для конвертирования
     
-    VOIDFILE  => 'void.txt', # Файл VOID (для тестирования записи и прочего)
-    CFGFILED  => 'ctklib.conf', # Файл конфигурации по умолчанию
+    LOGFILED  => 'ctklib.log',    # Файл лога по умолчанию
+    CFGFILED  => 'ctklib.conf',   # Файл конфигурации по умолчанию
     CFGFILE   => '[PREFIX].conf', # Файл конфигурации
+    VOIDFILE  => 'void.txt',      # Файл VOID (для тестирования записи и прочего)
+    
+    DATADIRD  => 'data', # Имя каталога данных по умолчанию
+    CONFDIRD  => 'conf', # Имя каталога конфигурации по умолчанию
+    LOGDIRD   => 'log',  # Имя каталога логов по умолчанию
 };
 
 use base qw /Exporter/; # extends qw/CTK::Arc/;
@@ -154,6 +162,7 @@ our %EXPORT_TAGS = (
         SUB     => [qw(say debug tms exception testmode debugmode logmode)],
         SUBS    => [qw(say debug tms exception testmode debugmode logmode)],
         VARS    => [qw($TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %OPT @OPTSYSDEF)],
+        NONE    => [qw()],
     );
 
 use Time::HiRes qw(gettimeofday);
@@ -169,16 +178,16 @@ use CTK::Util;
 sub init {
     # GLOBAL VARS
     $TM       = gettimeofday();
-    $EXEDIR   = $RealBin; # Каталог где скрипт
-    $DATADIR  = catfile($EXEDIR,"data"); # Место где хранятся данные и отчеты
-    $CONFDIR  = catfile($EXEDIR,"conf"); # Место где хранятся конфигурационные файлы
-    $CONFFILE = catfile($EXEDIR,CFGFILED); # там где конфигурация лежит (УМОЛЧАНИЕ). См. BUILD()
-    $LOGDIR   = catfile($EXEDIR,"log"); # Место где хранятся данные и отчеты
-    $LOGFILE  = catfile($LOGDIR,"ctklib.log"); # там где логи лежат
-    %OPT = (
-        debug     => DEBUG    ? 0 : 1, 
-        log       => LOG      ? 0 : 1,
-        testmode  => TESTMODE ? 0 : 1,
+    $EXEDIR   = $RealBin; # Каталог где скрипт (не модифицируемый)
+    $DATADIR  = catfile($EXEDIR, DATADIRD); # Место где хранятся данные и отчеты
+    $CONFDIR  = catfile($EXEDIR, CONFDIRD); # Место где хранятся конфигурационные файлы (не главные)
+    $LOGDIR   = catfile($EXEDIR, LOGDIRD);  # Место где хранятся данные и отчеты
+    $CONFFILE = catfile($EXEDIR, CFGFILED); # Файл конфигурации (УМОЛЧАНИЕ). См. BUILD()
+    $LOGFILE  = catfile($LOGDIR, LOGFILED); # Файл лога
+    %OPT = (                                # Опции командной строки
+        'debug'     => DEBUG    ? 0 : 1, 
+        'log'       => LOG      ? 0 : 1,
+        'testmode'  => TESTMODE ? 0 : 1,
     );
     @OPTSYSDEF = ( # Параметры по умолчанию. Используются ключевые буквы: humvdlcyt?
         # Параметры справки
@@ -212,7 +221,7 @@ if (WIN) {
 sub say { print CTKCP @_ ? @_ : '',"\n"}
 sub debug { 
     unshift(@_,$OPT{signature}." ") if defined $OPT{signature};
-    if (LOG && $OPT{log}) {
+    if (LOG && $OPT{'log'}) {
         my @dt=localtime(time());
         if (open(FD, ">>", $LOGFILE)) {
             flock FD, 2 or carp("Can't lock file: $!");
@@ -233,27 +242,142 @@ sub exception {
 }
 sub testmode { return CTK::TESTMODE && $OPT{testmode} } # Возвращаем статус TESTMODE как единый!
 sub debugmode { return (CTK::DEBUG && $OPT{debug}) ? DEBUG : undef } # Возвращаем статус DEBUG!
-sub logmode { return CTK::LOG && $OPT{log} } # Возвращаем статус LOG как единый!
+sub logmode { return CTK::LOG && $OPT{'log'} } # Возвращаем статус LOG как единый!
 
 ########################
 ## Основные методы Moose
 ########################
 
-with 'CTK::CLI';
-with 'CTK::File';
-with 'CTK::Crypt';
-with 'CTK::Arc';
-with 'CTK::Net';
+with 'CTK::CLI' => {
+            -excludes => [qw/_cli_select/],
+        },
+     'CTK::File' => { 
+            -excludes => [qw/_error/], 
+        },
+     'CTK::Crypt' => {},
+     'CTK::Arc' => {
+            -excludes => [qw/_getarc/],
+        },
+     'CTK::Net' => {
+            -alias    => {
+                    _debug_http => 'debug_http',
+                },
+            -excludes => [qw/_error/], 
+        },
+     'CTK::Log' => { 
+            -excludes => [qw/_flush/], 
+        };
 
-has 'script'   => (is => 'ro', isa => 'Str', default => $Script);
-has 'prefix'   => (is => 'rw', isa => 'Str', default => ($Script =~ /^(.+?)\./ ? $1 : $Script));
-has 'suffix'   => (is => 'rw', isa => 'Str', default => '');
-has 'cfgfile'  => (is => 'rw', isa => 'Str', default => CFGFILE);
-has 'voidfile' => (is => 'rw', isa => 'Str', default => VOIDFILE);
-has 'config'   => (is => 'rw', isa => 'HashRef'); # Конфигурационный хэш (Config::General)
-has 'options'  => (is => 'rw', isa => 'HashRef', default => sub { \%OPT } ); # Хэш опций командной строки (Getopt::Long)
-has 'needconfig' => (is => 'rw', isa => 'Bool', default => 0); # Нужно ли создавать пустой конфиг?
+has 'script'    => ( # Имя скрипта
+        is      => 'ro', 
+        isa     => 'Str', 
+        default => $Script,
+    );
+has 'prefix'    => ( # Префикс (для нужд проектов на базе CTKlib)
+        is      => 'rw', 
+        isa     => 'Str', 
+        default => ($Script =~ /^(.+?)\./ ? $1 : $Script),
+    );
+has 'suffix'    => ( # Суфикс (для нужд проектов на базе CTKlib)
+        is      => 'rw', 
+        isa     => 'Str', 
+        default => '',
+    );
+has 'cfgfile'   => ( # Полное имя файла конфигурации
+        is      => 'rw', 
+        isa     => 'Str', 
+        default => CFGFILE,
+        trigger => sub {
+                my $self = shift;
+                my $val = shift || '';
+                my $old_val = shift || '';
+                #debug "TRIGGER: $self, $val, $old_val";
+                $self->{cfgfile} = dformat($val,{ 
+                        PREFIX   => $self->prefix(),
+                        SUFFIX   => $self->suffix(),
+                        EXT      => 'conf',
+                        DEFAULT  => CFGFILED,
+                    }) if $val;
+                $CONFFILE = $self->{cfgfile};
+            },
+    );
+has 'voidfile'  => ( # ТОЛЬКО имя файла пустого файла, для нужд тестов
+        is      => 'rw', 
+        isa     => 'Str', 
+        default => VOIDFILE,
+        trigger => sub {
+                my $self = shift;
+                my $val = shift || '';
+                my $old_val = shift || '';
+                # debug "TRIGGER: $self, $val, $old_val";
+                $self->{voidfile} = dformat($val,{ 
+                        PREFIX   => $self->prefix(),
+                        SUFFIX   => $self->suffix(),
+                        EXT      => 'txt',
+                        DEFAULT  => VOIDFILE,
+                    }) if $val; # if $val ne $old_val
+            },
+    );
+has 'config'    => ( # Конфигурационный хэш (Config::General)
+        is      => 'rw', 
+        isa     => 'HashRef',
+    ); 
+has 'options'   => ( # Хэш опций командной строки (Getopt::Long)
+        is      => 'rw', 
+        isa     => 'HashRef', 
+        default => sub { \%OPT } ,
+    ); 
+has 'needconfig'=> ( # Нужно ли создавать пустой конфиг в случае отсутствия данного?
+        is      => 'rw', 
+        isa     => 'Bool', 
+        default => 0,
+    ); 
+has 'exedir'    => ( # Возврат значения глобального параметра директории исполнения
+        is      => 'ro', 
+        isa     => 'Str', 
+        default => sub { $EXEDIR },
+        lazy    => 1,
+    );
+has 'datadir'   => ( # Возврат значения глобального параметра рабочей директории
+        is      => 'rw', 
+        isa     => 'Str', 
+        default => sub { $DATADIR },
+        lazy    => 1,
+        trigger => sub {
+                my $self = shift;
+                my $val = shift || '';
+                # debug "TRIGGER: $self, $val";
+                $DATADIR = $val;
+            },
+        
+    );
+has 'confdir'   => ( # Возврат значения глобального параметра директории конфигурационных файлов
+        is      => 'rw', 
+        isa     => 'Str', 
+        default => sub { $CONFDIR },
+        lazy    => 1,
+        trigger => sub {
+                my $self = shift;
+                my $val = shift || '';
+                # debug "TRIGGER: $self, $val";
+                $CONFDIR = $val;
+            },
 
+    );
+has 'logdir'    => ( # Возврат значения глобального параметра директории логов
+        is      => 'rw', 
+        isa     => 'Str', 
+        default => sub { $LOGDIR },
+        lazy    => 1,
+        trigger => sub {
+                my $self = shift;
+                my $val = shift || '';
+                # debug "TRIGGER: $self, $val";
+                $LOGDIR = $val;
+            },
+
+    );
+    
 sub BUILD { # new
     my $self = shift;
     my $options = shift || {};
@@ -264,27 +388,12 @@ sub BUILD { # new
     
     # Пробегаемся по опциям и строим пути исходя из масок конфигурации
     my $oldcfgfile = $self->cfgfile();
-    $self->cfgfile(dformat($oldcfgfile,{ # CFGFILE
-            PREFIX   => $prefix,
-            SUFFIX   => $suffix,
-            EXT      => 'conf',
-            DEFAULT  => CFGFILED,
-        }));
-    $self->voidfile(dformat($self->voidfile(),{ # VOIDFILE
-            PREFIX   => $prefix,
-            SUFFIX   => $suffix,
-            EXT      => 'txt',
-            DEFAULT  => VOIDFILE,
-        }));
-
+    $oldcfgfile = ($oldcfgfile eq CFGFILE) ? catfile($EXEDIR,$self->cfgfile()) : $self->cfgfile();
+    $self->cfgfile($oldcfgfile); # CFGFILE rebuilding
+    $self->voidfile($self->voidfile()); # VOIDFILE rebuilding
     
-    # Определяем конфигурацию
-    if ($oldcfgfile eq CFGFILE) {
-        $CONFFILE = catfile($EXEDIR,$self->cfgfile()); # там где конфигурация лежит
-    } else {
-        $CONFFILE = $self->cfgfile(); # изменился вручную, значит не меняем вовсе !!
-    }
-    $self->config({_loadconfig($CONFFILE, $self->needconfig())});
+    # Определяем новую конфигурацию
+    $self->config({_loadconfig($self->cfgfile(), $self->needconfig())});
         
     #debug Dumper(\@_);
     return 1;
@@ -352,8 +461,6 @@ sub _loadconfig {
 
     return %config;
 }
-
-
 
 #
 ## Временные процедуры и методы, при переходе на боевой режим -- нужно от них избавиться перенеся

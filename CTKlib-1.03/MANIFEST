@@ -8,7 +8,9 @@ lib/CTK/CPX.pm
 lib/CTK/Crypt.pm
 lib/CTK/DBI.pm
 lib/CTK/File.pm
+lib/CTK/FilePid.pm
 lib/CTK/Helper.pm
+lib/CTK/Log.pm
 lib/CTK/Net.pm
 lib/CTK/Status.pm
 lib/CTK/Util.pm

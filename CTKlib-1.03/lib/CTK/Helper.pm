@@ -7,7 +7,7 @@ package CTK::Helper;
 # %PROJECTNAME% -- имя проекта в Unix стиле
 #
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 46 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 53 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use base qw/Exporter/;
 our @EXPORT = qw(
@@ -40,7 +40,7 @@ Version 1.00
     %PROJECTNAME%.pl [--help | --version | --man]
     
     %PROJECTNAME%.pl [[--debug | --nodebug] [--log | --nolog] [--logclear] [--testmode | --notestmode]]
-          [ test | void ]
+           [ test | void ]
 
 %PODSIG%head1 OPTIONS
 
@@ -127,12 +127,7 @@ Init version
 
 %PODSIG%head1 DEPENDENCIES
 
-Time::HiRes
-Getopt::Long
-Pod::Usage
-File::Spec
-Data::Dumper
-Moose
+L<Moose>
 
 %PODSIG%head1 AUTHOR
 
@@ -194,13 +189,12 @@ use FindBin qw($RealBin);
 
 # Others:
 use Data::Dumper;
-use File::Copy;
-use File::Pid;
 
-# Packages
+# CTK Packages
 use lib "$RealBin/inc";
 use base '%PROJECTNAME%';
 use CTK;
+use CTK::FilePid;
 
 # Режимы команд
 Getopt::Long::Configure ("bundling");
@@ -247,7 +241,7 @@ foreach my $curcmd (@commands) {
             $cmddata{arguments} = [@arguments];
 
             # Определение PID файла и получение состояния
-            my $pidfile = File::Pid->new({ file => CTK::catfile($DATADIR, $cmddata{pidfile} || PIDFILE) });
+            my $pidfile = new CTK::FilePid({ file => CTK::catfile($DATADIR, $cmddata{pidfile} || PIDFILE) });
             my $pidstat = $pidfile->running || 0;
             
             debug "";
@@ -255,7 +249,6 @@ foreach my $curcmd (@commands) {
             
             if ($cmddata{pidcheck}) {
                 exception("PID STATE (".$pidfile->file()."): ALREADY EXISTS (PID: $pidstat)" ) if $pidstat;
-                debug("PID STATE (".$pidfile->file()."): OK");
                 $pidfile->write;
             }
 
@@ -412,6 +405,15 @@ sub get_projectcontent_conf {return <<'CONTENT';
 #    LIST     -- Список файлов через пробел
 #
 ######################
+<Arc tar>
+    type       tar
+    ext        tar
+    create     tar -cpf [FILE] [LIST]
+    extract    tar -xpf [FILE] [DIRDST]
+    exclude    --exclude-from
+    list       tar -tf [FILE]
+    nocompress tar -cpf [FILE]
+</Arc>
 <Arc tgz>
     type       tar
     ext        tgz
@@ -422,23 +424,23 @@ sub get_projectcontent_conf {return <<'CONTENT';
     nocompress tar -cpf [FILE]
 </Arc>
 <Arc gz>
-    type       tar
+    type       gz
     ext        gz
-    create     tar -zcpf [FILE] [LIST]
-    extract    tar -zxpf [FILE] -C [DIRDST]
+    create     gzip --best [FILE] [LIST]
+    extract    gzip -d [FILE]
     exclude    --exclude-from
-    list       tar -ztf [FILE]
-    nocompress tar -cpf [FILE]
+    list       gzip -l [FILE]
+    nocompress gzip -0 [FILE]
 </Arc>
 <Arc zip>
     type       zip
     ext        zip
     # Win
-    #create     zip -rqq [FILE] [LIST]
-    create    zip -rqqy [FILE] [LIST]
+    #create    zip -rqq [FILE] [LIST]
+    create     zip -rqqy [FILE] [LIST]
     # Win
-    #extract    unzip -uqqoX [FILE] -d [DIRDST]
-    extract   unzip -uqqoX [FILE] [DIRDST]
+    #extract   unzip -uqqoX [FILE] -d [DIRDST]
+    extract    unzip -uqqoX [FILE] [DIRDST]
     exclude    -x\@
     list       unzip -lqq
     nocompress zip -qq0
@@ -447,8 +449,8 @@ sub get_projectcontent_conf {return <<'CONTENT';
     type       rar
     ext        rar
     # Win
-    #create     rar a -r -y -ep1 [FILE] [LIST]
-    create    rar a -r -ol -y [FILE] [LIST]
+    #create    rar a -r -y -ep2 [FILE] [LIST]
+    create     rar a -r -ol -y [FILE] [LIST]
     extract    rar x -y [FILE] [DIRDST]
     exclude    -x\@
     list       rar vb

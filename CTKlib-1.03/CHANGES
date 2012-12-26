@@ -8,7 +8,14 @@
    
    * Documentation modified
 
-1.02 Wed Nov 28 16:14:40 MSK 2012
+1.02 Wed Nov 28 16:14:40 2012 MSK
    
    * Documentation modified
    * Added Moose::Role
+
+1.03 Wed Dec 19 16:11:55 2012 MSK
+   
+   * Documentation modified
+   * Verbose and Silent mode support
+   * CTK::FilePid patch added
+

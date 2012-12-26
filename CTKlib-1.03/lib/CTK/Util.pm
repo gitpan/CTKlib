@@ -1,4 +1,4 @@
-package CTK::Util; # $Revision: 50 $
+package CTK::Util; # $Revision: 58 $
 use strict;
 # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
@@ -10,7 +10,7 @@ CTK::Util - Utilities
 
 1.00
 
-$Id: Util.pm 50 2012-12-18 10:33:15Z minus $
+$Id: Util.pm 58 2012-12-26 10:45:15Z minus $
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ L<MIME::Lite>, L<CGI::Util>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
@@ -105,7 +105,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 50 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 58 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw(catfile rootdir tmpdir updir);

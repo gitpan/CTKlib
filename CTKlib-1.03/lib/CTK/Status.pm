@@ -8,7 +8,7 @@ CTK::Status - Progressbar's system
 
 1.20
 
-$Id: Status.pm 36 2012-11-21 14:04:44Z minus $
+$Id: Status.pm 58 2012-12-26 10:45:15Z minus $
 
 =head1 HISTORY
 
@@ -50,7 +50,7 @@ Progressbar's system of your transactions and processes
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 SEE ALSO
 
@@ -146,7 +146,6 @@ sub tick {
         $last_c = $c;
     }
     }
-
 
     STDOUT->flush;
 }

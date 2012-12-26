@@ -4,7 +4,7 @@ CTK::CPX - Converter between windows-1251 and your terminal encoding
 
 =head1 VERSION
 
-$Id: CPX.pm 40 2012-11-27 13:00:45Z minus $
+$Id: CPX.pm 58 2012-12-26 10:45:15Z minus $
 
 Based on BeeCDR project
 
@@ -20,7 +20,7 @@ Converter between windows-1251 and your terminal encoding
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 SEE ALSO
 

@@ -14,6 +14,7 @@ my $prereq_pm = {
         'Test::More'            => 0.94,
         'Config::General'       => 2.00,
         'Time::Local'           => 1.20,
+        'Time::HiRes'           => 1.97,
         'MIME::Base64'          => 3.00,
         'MIME::Lite'            => 3.00,
         'Net::FTP'              => 2.60,
@@ -35,6 +36,8 @@ my $prereq_pm = {
         'HTTP::Headers'         => 5.80,
         'HTTP::Request'         => 5.80,
         'HTTP::Response'        => 5.80,
+        'Term::ReadLine'        => 1.04,
+        'Text::ParseWords'      => 3.27,
     };
 $prereq_pm->{'Sys::SigAction'}  =  0.15 unless $MSWIN;
 

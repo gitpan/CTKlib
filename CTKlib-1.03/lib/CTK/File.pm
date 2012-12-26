@@ -1,4 +1,4 @@
-package CTK::File; # $Revision: 50 $
+package CTK::File; # $Revision: 58 $
 use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -9,7 +9,7 @@ CTK::File - Files and direcries working
 
 1.00
 
-$Id: File.pm 50 2012-12-18 10:33:15Z minus $
+$Id: File.pm 58 2012-12-26 10:45:15Z minus $
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ For TEMP dirs/files working: use File::Temp qw/tempfile tempdir/;
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
@@ -95,7 +95,7 @@ See C<LICENSE> file
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 50 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 58 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API :FORMAT :ATOM);
 use File::Copy;

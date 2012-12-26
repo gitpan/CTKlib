@@ -1,4 +1,4 @@
-package CTK::Net; # $Revision: 50 $
+package CTK::Net; # $Revision: 60 $
 use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -9,7 +9,7 @@ CTK::Net - Network working
 
 1.00
 
-$Id: Net.pm 50 2012-12-18 10:33:15Z minus $
+$Id: Net.pm 60 2012-12-26 14:17:42Z minus $
 
 =head1 SYNOPSIS
 
@@ -82,15 +82,19 @@ $Id: Net.pm 50 2012-12-18 10:33:15Z minus $
 
 Using handlers, for sample: 
 
-    -rescode => sub { debug(CTK::Net::_debug_http(@_))  },
+    -rescode => sub { debug(CTK::Net::_debug_http(@_)) },
 
+    or
+    
+    -rescode => sub { debug($c->debug_http(@_)) },
+    
 =head1 TO DO
 
     * Use SSH (SFTP)
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>.
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
@@ -107,7 +111,7 @@ See C<LICENSE> file
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 50 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 60 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use CTK::Util qw(:API :FORMAT :ATOM :FILE);
 use URI;
@@ -378,19 +382,18 @@ sub store { # store (put, upload)
 }
 sub put { store(@_) }
 sub upload { store(@_) }
-
 sub _debug_http {
-	# Возврат в пул данных HTTP
+    # Возврат в пул данных HTTP
     # debug_http( $response_object )
-    # 
+    my $self; $self = shift if (@_ && $_[0] && ref($_[0]) eq 'CTK');
 
-	my $res = shift || return '';
-	
-	return "\n\nREQUEST-HEADERS:\n\n",
-	$res->request->method, " ", $res->request->url->as_string,"\n",
-	$res->request->headers_as_string,
-	"\n\nREQUEST-CONTENT:\n\n",$res->request->content,
-	"\n\nRESPONSE:\n\n",$res->code," ",$res->message,"\n",$res->headers_as_string;	
+    my $res = shift || return '';
+    
+    return "\n\nREQUEST-HEADERS:\n\n",
+    $res->request->method, " ", $res->request->url->as_string,"\n",
+    $res->request->headers_as_string,
+    "\n\nREQUEST-CONTENT:\n\n",$res->request->content,
+    "\n\nRESPONSE:\n\n",$res->code," ",$res->message,"\n",$res->headers_as_string;	
 }
 sub _error {
     #CTK::debug(@_);

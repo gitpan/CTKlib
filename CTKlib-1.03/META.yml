@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:         CTKlib
-version:      1.02
+version:      1.03
 abstract:     CTKlib - Command-line ToolKit library (CTK). Command line interface (CLI)
 author:
     - Lepenkov Sergey (Serz Minus) C<minus@mail333.com>
@@ -13,6 +13,7 @@ requires:
     Test::More:             0.94
     Config::General:        2.00
     Time::Local:            1.20
+    Time::HiRes:            1.97
     MIME::Base64:           3.00
     MIME::Lite:             3.00
     Net::FTP:               2.60
@@ -34,6 +35,8 @@ requires:
     HTTP::Headers:          5.80
     HTTP::Request:          5.80
     HTTP::Response:         5.80
+    Term::ReadLine:         1.04
+    Text::ParseWords:       3.27
 recommends:
     DBI:                    0
     Data::Dumper:           0
