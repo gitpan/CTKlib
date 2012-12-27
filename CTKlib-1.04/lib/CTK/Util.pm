@@ -1,4 +1,4 @@
-package CTK::Util; # $Revision: 58 $
+package CTK::Util; # $Revision: 63 $
 use strict;
 # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
@@ -10,7 +10,7 @@ CTK::Util - Utilities
 
 1.00
 
-$Id: Util.pm 58 2012-12-26 10:45:15Z minus $
+$Id: Util.pm 63 2012-12-27 11:01:02Z minus $
 
 =head1 SYNOPSIS
 
@@ -105,7 +105,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 58 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 63 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw(catfile rootdir tmpdir updir);
@@ -135,7 +135,7 @@ our @EXPORT = qw(
         
         preparedir
         sendmail send_mail
-        scandirs scanfiles
+        ls scandirs scanfiles
         ftp ftptest ftpgetlist getlist getdirlist 
         procexec procexe proccommand proccmd procrun exe com execute
         
@@ -155,7 +155,7 @@ our %EXPORT_TAGS = (
                 translate variant_stf randomize
                 load_file save_file file_load file_save fsave fload bsave bload touch
                 sendmail send_mail
-                scandirs scanfiles
+                ls scandirs scanfiles
                 read_attributes
             )],
         FORMAT  => [qw(
@@ -172,7 +172,7 @@ our %EXPORT_TAGS = (
         UTIL    => [qw(
                 preparedir
                 sendmail send_mail
-                scandirs scanfiles
+                ls scandirs scanfiles
                 ftp ftptest ftpgetlist getlist getdirlist 
                 procexec procexe proccommand proccmd procrun exe com execute
                 catfile rootdir tmpdir updir
@@ -180,7 +180,7 @@ our %EXPORT_TAGS = (
                 read_attributes
             )],
         ATOM   => [qw(
-                scandirs scanfiles
+                ls scandirs scanfiles
                 ftp ftptest ftpgetlist getlist getdirlist 
                 procexec procexe proccommand proccmd procrun exe com execute
             )],
@@ -795,6 +795,21 @@ sub scanfiles {
     }
   
     return @files;
+}
+sub ls {
+    # Получаем список каталога
+    my $dir = shift || '/'; # по умолчанию - корень
+    my $mask = shift || qr//; # по умолчанию - все файлы
+   
+    my @fds;
+    
+    opendir(DIR,$dir) or return @fds;
+    @fds = readdir(DIR);# ищем все файлы в указаной папке
+    closedir(DIR);
+
+    @fds = grep {/$mask/i} @fds if $mask; # выкидываем все файлы не по маске!
+    
+    return @fds;
 }
 
 # Процедуры группы Atom

@@ -15,6 +15,7 @@ lib/CTK/Net.pm
 lib/CTK/Status.pm
 lib/CTK/Util.pm
 t/01-use.t
+t/02-version.t
 CHANGES
 LICENSE
 Makefile.PL

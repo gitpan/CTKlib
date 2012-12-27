@@ -1,4 +1,4 @@
-package CTK; # $Revision: 59 $
+package CTK; # $Revision: 64 $
 use Moose; #use strict;
 
 =head1 NAME
@@ -7,9 +7,9 @@ CTK - Command-line ToolKit
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
-$Id: CTK.pm 59 2012-12-26 11:06:51Z minus $
+$Id: CTK.pm 64 2012-12-27 11:19:15Z minus $
 
 =head1 SYNOPSIS
 
@@ -58,31 +58,38 @@ See C<CHANGES> file for details
 
 =head1 DEPENDENCIES
 
-L<ExtUtils::MakeMaker>,
-L<File::Spec>,
-L<Test::More>,
-L<Config::General>,
-L<Time::Local>,
-L<MIME::Base64>,
-L<MIME::Lite>,
-L<Net::FTP>,
-L<File::Path>,
-L<IPC::Open3>,
-L<Term::ReadKey>,
-L<IO::Handle>,
-L<File::Copy>,
+L<Archive::Extract>,
 L<Archive::Tar>,
 L<Archive::Zip>,
-L<Archive::Extract>,
-L<Moose>,
-L<namespace::autoclean>,
-L<URI>,
+L<Config::General>,
+L<DBI>,
+L<ExtUtils::MakeMaker>,
+L<File::Copy>,
+L<File::Path>,
+L<File::Pid>,
+L<File::Spec>,
+L<HTTP::Headers>,
+L<HTTP::Request>,
+L<HTTP::Response>,
+L<IO::Handle>,
+L<IPC::Open3>,
 L<LWP>,
 L<LWP::MediaTypes>,
 L<LWP::UserAgent>,
-L<HTTP::Headers>,
-L<HTTP::Request>,
-L<HTTP::Response>
+L<MIME::Base64>,
+L<MIME::Lite>,
+L<Moose>,
+L<namespace::autoclean>,
+L<Net::FTP>,
+L<Sys::SigAction>,
+L<Term::ReadKey>,
+L<Term::ReadLine>,
+L<Test::More>,
+L<Text::ParseWords>,
+L<Time::Local>,
+L<Time::HiRes>,
+L<URI>,
+L<YAML>
 
 =head1 TO DO
 
@@ -121,7 +128,7 @@ use vars qw/
         $VERSION
         $TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %ARGS %OPT @OPTSYSDEF
     /;
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 use constant {
     DEBUG     => 1, # 0 - off, 1 - on, 2 - all (+ http headers and other)

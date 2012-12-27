@@ -38,6 +38,7 @@ my $prereq_pm = {
         'HTTP::Response'        => 5.80,
         'Term::ReadLine'        => 1.04,
         'Text::ParseWords'      => 3.27,
+        'YAML'                  => 0.73,
     };
 $prereq_pm->{'Sys::SigAction'}  =  0.15 unless $MSWIN;
 
