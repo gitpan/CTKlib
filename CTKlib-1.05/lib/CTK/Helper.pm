@@ -1,4 +1,4 @@
-package CTK::Helper;
+package CTK::Helper; # $Id: Helper.pm 69 2012-12-28 19:26:44Z minus $
 #
 # Процедуры возвращающие контенты файлов-скриптов. новых проектов
 # Для обработки ключей %PROJECTNAME% и %PODSIG% нужно использовать регулярные выражения
@@ -7,7 +7,7 @@ package CTK::Helper;
 # %PROJECTNAME% -- имя проекта в Unix стиле
 #
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 53 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use base qw/Exporter/;
 our @EXPORT = qw(
@@ -131,7 +131,7 @@ L<Moose>
 
 %PODSIG%head1 AUTHOR
 
-Yor Name E<lt>your@email.comE<gt>
+Your Name E<lt>your@email.comE<gt>
 
 %PODSIG%head1 TO DO
 

@@ -1,4 +1,4 @@
-package CTK::FilePid;
+package CTK::FilePid; # $Id: FilePid.pm 69 2012-12-28 19:26:44Z minus $
 use strict;
 
 =head1 NAME
@@ -7,9 +7,11 @@ CTK::FilePid - File::Pid patched interface
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
-$id$
+=head1 REVISION
+
+$Revision: 69 $
 
 =head1 SYNOPSIS
 
@@ -60,7 +62,7 @@ See C<LICENSE> file
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = 1.00;
+$VERSION = 1.01;
 
 use base qw/File::Pid/;
 

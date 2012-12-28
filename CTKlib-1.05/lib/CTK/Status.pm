@@ -1,14 +1,17 @@
-package CTK::Status;
+package CTK::Status; # $Id: Status.pm 69 2012-12-28 19:26:44Z minus $
 use strict;
+
 =head1 NAME
 
 CTK::Status - Progressbar's system
 
 =head1 VIRSION
 
-1.20
+Version 1.22
 
-$Id: Status.pm 58 2012-12-26 10:45:15Z minus $
+=head1 REVISION
+
+$Revision: 69 $
 
 =head1 HISTORY
 
@@ -23,6 +26,10 @@ Init version
 On base BeeCDR
 
 =item B<1.21>
+
+Documentation modified
+
+=item B<1.22>
 
 Documentation modified
 
@@ -74,7 +81,7 @@ See C<LICENSE> file
 
 =cut
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 use Time::HiRes qw(time);
 use Term::ReadKey qw(GetTerminalSize);
 use IO::Handle;

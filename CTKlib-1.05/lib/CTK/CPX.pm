@@ -1,12 +1,16 @@
+package CTK::CPX; # $Id: CPX.pm 69 2012-12-28 19:26:44Z minus $
+use Moose;
 =head1 NAME
 
 CTK::CPX - Converter between windows-1251 and your terminal encoding
 
 =head1 VERSION
 
-$Id: CPX.pm 58 2012-12-26 10:45:15Z minus $
+Version 1.01
 
-Based on BeeCDR project
+=head1 REVISION
+
+$Revision: 69 $
 
 =head1 SYNOPSIS
 
@@ -16,7 +20,9 @@ Based on BeeCDR project
 
 =head1 DESCRIPTION
 
-Converter between windows-1251 and your terminal encoding
+Converter between windows-1251 and your terminal encoding.
+
+Based on BeeCDR project
 
 =head1 AUTHOR
 
@@ -43,8 +49,6 @@ This program is distributed under the GNU LGPL v3 (GNU Lesser General Public Lic
 See C<LICENSE> file
 
 =cut
-package CTK::CPX;
-use Moose;
 use namespace::autoclean;
 extends qw/Tie::Handle/;
 use Encode;

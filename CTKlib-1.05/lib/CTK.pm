@@ -1,4 +1,4 @@
-package CTK; # $Revision: 64 $
+package CTK; # $Id: CTK.pm 69 2012-12-28 19:26:44Z minus $
 use Moose; #use strict;
 
 =head1 NAME
@@ -7,23 +7,25 @@ CTK - Command-line ToolKit
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
-$Id: CTK.pm 64 2012-12-27 11:19:15Z minus $
+=head1 REVISION
+
+$Revision: 69 $
 
 =head1 SYNOPSIS
 
-  use CTK;
+    use CTK;
   
-  use CTK qw( :BASE ); # :SUBS and :VARS tags to export
+    use CTK qw( :BASE ); # :SUBS and :VARS tags to export
   
-  use CTK qw( :SUBS ); # :SUBS tag only to export
+    use CTK qw( :SUBS ); # :SUBS tag only to export
   
-  use CTK qw( :VARS ); # :VARS tag only to export
+    use CTK qw( :VARS ); # :VARS tag only to export
   
-  my $c = new CTK;
+    my $c = new CTK;
   
-  my $c = new CTK (
+    my $c = new CTK (
         prefix       => 'myprogram',
         suffix       => 'sample',
         cfgfile      => '/path/to/conf/file.conf',
@@ -128,7 +130,7 @@ use vars qw/
         $VERSION
         $TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %ARGS %OPT @OPTSYSDEF
     /;
-$VERSION = '1.04';
+$VERSION = 1.05;
 
 use constant {
     DEBUG     => 1, # 0 - off, 1 - on, 2 - all (+ http headers and other)
@@ -275,6 +277,13 @@ with 'CTK::CLI' => {
             -excludes => [qw/_flush/], 
         };
 
+has 'revision'  => ( # Ревизия
+        is      => 'ro',
+        isa     => 'Str',
+        default => q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? $1 : '0',
+        lazy    => 1,
+        init_arg=> undef,
+    );
 has 'script'    => ( # Имя скрипта
         is      => 'ro', 
         isa     => 'Str', 

@@ -1,20 +1,33 @@
-package CTK::Util; # $Revision: 63 $
-use strict;
-# use Data::Dumper; $Data::Dumper::Deparse = 1;
+package CTK::Util; # $Id: Util.pm 69 2012-12-28 19:26:44Z minus $
+use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
 
-CTK::Util - Utilities
+CTK::Util - CTK Utilities
 
 =head1 VERSION
 
-1.00
+Version 1.00
 
-$Id: Util.pm 63 2012-12-27 11:01:02Z minus $
+=head1 REVISION 
+
+$Revision: 69 $
 
 =head1 SYNOPSIS
 
-    my $sent = send_mail(
+    use CTK;
+    
+    my $c = new CTK;
+    
+    my @ls = CTK::ls(".");
+    
+=head1 DESCRIPTION
+
+no public subroutines
+
+=head2 SENDMAIL
+
+    my $sent = sendmail(
         -to       => 'to@example.com',
         -cc       => 'cc@example.com',     ### OPTIONAL
         -from     => 'from@example.com',
@@ -56,8 +69,9 @@ $Id: Util.pm 63 2012-12-27 11:01:02Z minus $
           ],
     );
     debug($sent ? 'mail has been sent :)' : 'mail was not sent :(');
-    
-    # General API
+
+=head2 GENERAL API
+
     my @args = @_;
     my ($content, $maxcnt, $timeout, $timedie, $base, $login, $password, $host, $table_tmp);
     ($content, $maxcnt, $timeout, $timedie, $base, $login, $password, $host, $table_tmp) =
@@ -73,14 +87,9 @@ $Id: Util.pm 63 2012-12-27 11:01:02Z minus $
         ['TABLE','TABLENAME','NAME','SESSION','SESSIONNAME']
     ],@args) if defined $args[0];
 
-
-=head1 DESCRIPTION
-
-no public subroutines
-
 =head1 SEE ALSO
 
-L<MIME::Lite>, L<CGI::Util>
+L<MIME::Lite>, L<CGI::Util>, L<Time::Local>, L<Net::FTP>, L<IPC::Open3>
 
 =head1 AUTHOR
 
@@ -105,7 +114,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 63 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw(catfile rootdir tmpdir updir);

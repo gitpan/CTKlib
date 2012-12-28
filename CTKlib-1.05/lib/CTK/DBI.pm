@@ -1,9 +1,10 @@
 ################################################
 #
-# Module : CTK::DBI
-# Style  : OOP
-#
-# DATE   : 27.11.2012
+# Module   : CTK::DBI
+# Style    : OOP
+# DATE     : 28.12.2012
+# Revision : $Revision: 69 $
+# Id       : $Id: DBI.pm 69 2012-12-28 19:26:44Z minus $
 #
 # ƒосутп к базам данных на основе модул€ DBI. модуль облегчает доступ к данным и несколько схож
 # с модулем multistore в проекте MPMinus
@@ -13,11 +14,9 @@
 # Copyright (c) 1998-2012 D&D Corporation. All rights reserved
 # Copyright (C) 1998-2012 Lepenkov Sergej (Serz Minus) <minus@mail333.com>
 #
-# Version: $Id: DBI.pm 58 2012-12-26 10:45:15Z minus $
 #
 ################################################
-
-package CTK::DBI;
+package CTK::DBI; # $Id: DBI.pm 69 2012-12-28 19:26:44Z minus $
 use strict;
 
 =head1 NAME
@@ -26,9 +25,11 @@ CTK::DBI - Database independent interface for CTKlib
 
 =head1 VERSION
 
-1.00
+Version 1.01
 
-$Id: DBI.pm 58 2012-12-26 10:45:15Z minus $
+=head1 REVISION
+
+$Revision: 69 $
 
 =head1 SYNOPSIS
 
@@ -93,15 +94,16 @@ use constant {
     TIMEOUT_REQUEST => 60, # timeout request
 };
 
-use vars qw($VERSION);
-our $VERSION = q/$Revision: 58 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+use vars qw/$VERSION/;
+$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 my $LOAD_SigAction = 0;
 eval 'use Sys::SigAction';
 my $es = $@;
 if ($es) {
     eval '
-        package Sys::SigAction;
+        package  # hide me from PAUSE
+            Sys::SigAction;
         sub set_sig_handler($$;$$) { 1 };
         1;
     ';

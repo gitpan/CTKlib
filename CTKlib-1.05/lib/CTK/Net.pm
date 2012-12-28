@@ -1,4 +1,4 @@
-package CTK::Net; # $Revision: 60 $
+package CTK::Net; # $Id: Net.pm 69 2012-12-28 19:26:44Z minus $
 use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -7,9 +7,11 @@ CTK::Net - Network working
 
 =head1 VERSION
 
-1.00
+Version 1.00
 
-$Id: Net.pm 60 2012-12-26 14:17:42Z minus $
+=head1 REVISION
+
+$Revision: 69 $
 
 =head1 SYNOPSIS
 
@@ -111,7 +113,7 @@ See C<LICENSE> file
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 60 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use CTK::Util qw(:API :FORMAT :ATOM :FILE);
 use URI;

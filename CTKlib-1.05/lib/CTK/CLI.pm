@@ -1,4 +1,4 @@
-package CTK::CLI; # $Revision: 58 $
+package CTK::CLI; # $Id: CLI.pm 69 2012-12-28 19:26:44Z minus $
 use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -7,9 +7,11 @@ CTK::CLI - Command line interface
 
 =head1 VERSION
 
-1.00
+Version 1.00
 
-$Id: CLI.pm 58 2012-12-26 10:45:15Z minus $
+=head1 REVISION
+
+$Revision: 69 $
 
 =head1 SYNOPSIS
 
@@ -70,7 +72,7 @@ See C<LICENSE> file
 
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 58 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use CTK::Util qw(:API);
 use ExtUtils::MakeMaker qw/prompt/;

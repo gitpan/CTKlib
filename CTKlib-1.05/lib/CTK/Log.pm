@@ -1,4 +1,4 @@
-package CTK::Log; # $Revision: 63 $
+package CTK::Log; # $Id: Log.pm 69 2012-12-28 19:26:44Z minus $
 use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 use Moose::Util::TypeConstraints;
 
@@ -8,9 +8,11 @@ CTK::Log - CTK Logging methods
 
 =head1 VERSION
 
-1.00
+Version 1.00
 
-$Id: Log.pm 63 2012-12-27 11:01:02Z minus $
+=head1 REVISION
+
+$Revision: 69 $
 
 =head1 SYNOPSIS
 
@@ -73,7 +75,7 @@ use constant {
 use Data::Dumper;
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 63 $/ =~ /(\d+\.?\d*)/ ? $1 : '1.00';
+$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 subtype 'LogLevels'
     => as 'Int'
