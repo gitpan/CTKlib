@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 69 2012-12-28 19:26:44Z minus $
+package CTK::Util; # $Id: Util.pm 78 2013-01-06 00:11:23Z minus $
 use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -11,7 +11,7 @@ Version 1.00
 
 =head1 REVISION 
 
-$Revision: 69 $
+$Revision: 78 $
 
 =head1 SYNOPSIS
 
@@ -114,15 +114,20 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 78 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use Time::Local;
-use File::Spec::Functions qw(catfile rootdir tmpdir updir);
+use File::Spec::Functions qw/
+        catdir catfile rootdir tmpdir updir curdir 
+        path splitpath splitdir abs2rel rel2abs
+    /;
 use MIME::Base64;
 use MIME::Lite;
 use Net::FTP;
 use File::Path; # mkpath / rmtree
 use IPC::Open3;
+use Symbol;
+use Cwd;
 
 use Carp qw/carp croak cluck confess/;
 # carp    -- просто пишем
@@ -148,7 +153,7 @@ our @EXPORT = qw(
         ftp ftptest ftpgetlist getlist getdirlist 
         procexec procexe proccommand proccmd procrun exe com execute
         
-        catfile rootdir tmpdir updir
+        catdir catfile rootdir tmpdir updir curdir path splitpath splitdir
         carp croak cluck confess
         
         read_attributes
@@ -184,7 +189,7 @@ our %EXPORT_TAGS = (
                 ls scandirs scanfiles
                 ftp ftptest ftpgetlist getlist getdirlist 
                 procexec procexe proccommand proccmd procrun exe com execute
-                catfile rootdir tmpdir updir
+                catdir catfile rootdir tmpdir updir curdir path splitpath splitdir
                 carp croak cluck confess
                 read_attributes
             )],
@@ -194,7 +199,7 @@ our %EXPORT_TAGS = (
                 procexec procexe proccommand proccmd procrun exe com execute
             )],
         API    => [qw(
-                catfile rootdir tmpdir updir
+                catdir catfile rootdir tmpdir updir curdir path splitpath splitdir
                 carp croak cluck confess
                 read_attributes
             )],
@@ -762,59 +767,42 @@ sub preparedir {
 }
 sub scandirs {
     # Получаем список каталогов [путь,имя]
-    my $dir = shift || '/';  # начинать поиск. по умолчанию - корень
+    my $dir = shift || cwd() || curdir() || '.'; # по умолчанию - текущий каталог
+    my $mask = shift || ''; # по умолчанию - все файлы
    
     my @dirs;
    
-    opendir(DIR,$dir) or return @dirs;
-    @dirs = grep {!(/^\.+$/) && -d "$dir/$_"} readdir(DIR); # ищем все директории в указаной
-    closedir (DIR);
+    @dirs = grep {!(/^\.+$/) && -d catfile($dir,$_)} ls($dir, $mask);
     @dirs = sort {$a cmp $b} @dirs;
-    my $cd;
   
-    foreach (@dirs) {
-        $cd = "$dir/$_";
-        $cd =~ s/\/{2,}/\//;
-        $_ = [$cd, $_];
-    }
-  
-    return @dirs;
+    return map {[catfile($dir,$_), $_]} @dirs;
 }
 sub scanfiles {
     # Получаем список файлов [путь,имя]
-    my $dir = shift || '/'; # по умолчанию - корень
-    my $mask = shift || qr//; # по умолчанию - все файлы
+    my $dir = shift || cwd() || curdir() || '.'; # по умолчанию - текущий каталог
+    my $mask = shift || ''; # по умолчанию - все файлы
    
     my @files;
-    
-    opendir(DIR,$dir) or return @files;
-        @files = grep {!(/^\.+$/) && -f "$dir/$_"} readdir(DIR);# ищем все файлы в указаной папке
-    closedir (DIR);
-
-    
-    @files = grep {/$mask/i} @files if $mask; # выкидываем все файлы не по маске!
-
+    @files = grep { -f catfile($dir,$_)} ls($dir, $mask);
     @files = sort {$a cmp $b} @files;
-    my $cd;
   
-    foreach (@files) {
-        $cd = "$dir/$_";
-        $cd =~s/\/{2,}/\//;
-        $_ = [$cd, $_];
-    }
-  
-    return @files;
+    return map {[catfile($dir,$_), $_]} @files;
 }
 sub ls {
     # Получаем список каталога
-    my $dir = shift || '/'; # по умолчанию - корень
-    my $mask = shift || qr//; # по умолчанию - все файлы
-   
+    my $dir = shift || curdir() || '.'; # по умолчанию - текущий каталог
+    my $mask = shift || ''; # по умолчанию - все файлы
+    
     my @fds;
     
-    opendir(DIR,$dir) or return @fds;
-    @fds = readdir(DIR);# ищем все файлы в указаной папке
-    closedir(DIR);
+    my $dh = gensym();
+    unless (opendir($dh,$dir)) {
+        _error("[LS: Can't open directory \"$dir\"] $!");
+        return @fds;
+    }
+     
+    @fds = readdir($dh);# ищем все файлы в указаной папке
+    closedir($dh);
 
     @fds = grep {/$mask/i} @fds if $mask; # выкидываем все файлы не по маске!
     
