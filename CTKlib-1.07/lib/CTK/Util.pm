@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 78 2013-01-06 00:11:23Z minus $
+package CTK::Util; # $Id: Util.pm 88 2013-01-23 14:18:25Z minus $
 use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -11,19 +11,110 @@ Version 1.00
 
 =head1 REVISION 
 
-$Revision: 78 $
+$Revision: 88 $
 
 =head1 SYNOPSIS
 
-    use CTK;
+    use CTK::Util;
+    use CTK::Util qw( :ALL ); # Export only ALL tag. See TAGS section
     
-    my $c = new CTK;
-    
-    my @ls = CTK::ls(".");
+    my @ls = ls(".");
     
 =head1 DESCRIPTION
 
-no public subroutines
+Public subrountines
+
+=head2 SUBROUNTINES
+
+=head3 prefixdir
+
+See L<Sys::Path> prefix
+
+=head3 localstatedir
+
+See L<Sys::Path> localstatedir
+
+=head3 sysconfdir
+
+See L<Sys::Path> sysconfdir
+
+=head3 sharedir
+
+See L<Sys::Path> datadir
+
+=head3 docdir
+
+See <Sys::Path> docdir
+
+=head3 localedir
+
+See L<Sys::Path> localedir
+
+=head3 cachedir
+
+See L<Sys::Path> cachedir
+
+=head3 syslogdir
+
+See L<Sys::Path> logdir
+
+=head3 spooldir
+
+See L<Sys::Path> spooldir
+
+=head3 rundir
+
+See L<Sys::Path> rundir
+
+=head3 lockdir
+
+See L<Sys::Path> lockdir
+
+=head3 sharedstatedir
+
+See L<Sys::Path> sharedstatedir
+
+=head3 webdir
+
+See L<Sys::Path> webdir
+
+=head3 srvdir
+
+See L<Sys::Path> srvdir
+
+=head2 TAGS
+
+=head3 ALL, DEFAULT
+
+Export all subrountines, default
+
+=head3 BASE
+
+Export only base subrountines
+
+=head3 FORMAT
+
+Export only text format subrountines
+
+=head3 DATE
+
+Export only date and time subrountines
+
+=head3 FILE
+
+Export only file and directories subrountines
+
+=head3 UTIL
+
+Export only utilities subrountines
+
+=head3 ATOM
+
+Export only processing subrountines
+
+=head3 API
+
+Export only inerface subrountines
 
 =head2 SENDMAIL
 
@@ -97,7 +188,7 @@ Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -111,10 +202,15 @@ See C<LICENSE> file
 
 use constant {
     DEBUG     => 1, # 0 - off, 1 - on, 2 - all (+ http headers and other)
+    WIN       => $^O =~ /mswin/i ? 1 : 0,
+    NULL      => $^O =~ /mswin/i ? 'NUL' : '/dev/null',
+    TONULL    => $^O =~ /mswin/i ? '>NUL 2>&1' : '>/dev/null 2>&1',
+    ERR2OUT   => '2>&1',
+    VOIDFILE  => 'void.txt',
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 78 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 88 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw/
@@ -136,74 +232,82 @@ use Carp qw/carp croak cluck confess/;
 # confess -- пишем с подробностями и убиваем
 
 use base qw /Exporter/;
-our @EXPORT = qw(
-        to_utf8 to_windows1251 CP1251toUTF8 UTF8toCP1251 to_base64 
+my @est_core = qw(
+        getsyscfg
+        carp croak cluck confess
+        read_attributes
+    );
+my @est_encoding = qw(
+        to_utf8 to_windows1251 CP1251toUTF8 UTF8toCP1251 to_base64
+    );
+my @est_escape = qw(
         unescape slash tag tag_create cdata dformat fformat splitformat
+    );
+my @est_format = qw(
         correct_number correct_dig
-        translate variant_stf randomize
-        
+        translate variant_stf randomize randchars
+    );
+my @est_datetime = qw(
         current_date current_date_time localtime2date localtime2date_time correct_date date2localtime
         datetime2localtime visokos date2dig dig2date date_time2dig dig2date_time basetime
-        
+    );
+my @est_file = qw(
         load_file save_file file_load file_save fsave fload bsave bload touch
-        
-        preparedir
-        sendmail send_mail
+    );
+my @est_dir = qw(
         ls scandirs scanfiles
+        preparedir
+        catdir catfile rootdir tmpdir updir curdir path splitpath splitdir
+        prefixdir localstatedir sysconfdir srvdir
+        sharedir docdir localedir cachedir syslogdir spooldir rundir lockdir sharedstatedir webdir
+    );
+my @est_util = qw(
+        sendmail send_mail
         ftp ftptest ftpgetlist getlist getdirlist 
         procexec procexe proccommand proccmd procrun exe com execute
-        
-        catdir catfile rootdir tmpdir updir curdir path splitpath splitdir
-        carp croak cluck confess
-        
-        read_attributes
+    );
+
+our @EXPORT = (
+        @est_core, @est_encoding, @est_escape, @est_format, @est_datetime, 
+        @est_file, @est_dir, @est_util,
     );
 our @EXPORT_OK = @EXPORT;
 our %EXPORT_TAGS = (
         ALL     => [@EXPORT],
         DEFAULT => [@EXPORT],
-        BASE    => [qw(
-                to_utf8 to_windows1251 CP1251toUTF8 UTF8toCP1251 to_base64 
-                unescape slash tag tag_create cdata dformat fformat splitformat
-                correct_number correct_dig
-                translate variant_stf randomize
-                load_file save_file file_load file_save fsave fload bsave bload touch
-                sendmail send_mail
-                ls scandirs scanfiles
-                read_attributes
-            )],
-        FORMAT  => [qw(
-                to_utf8 to_windows1251 CP1251toUTF8 UTF8toCP1251 to_base64 
-                unescape slash tag tag_create cdata dformat fformat splitformat
-                correct_number correct_dig
-                translate variant_stf randomize
-            )],
-        DATE    => [qw(
-                current_date current_date_time localtime2date localtime2date_time correct_date date2localtime
-                datetime2localtime visokos date2dig dig2date date_time2dig dig2date_time basetime
-            )],
-        FILE    => [qw(load_file save_file file_load file_save fsave fload bsave bload touch)],
-        UTIL    => [qw(
-                preparedir
-                sendmail send_mail
-                ls scandirs scanfiles
-                ftp ftptest ftpgetlist getlist getdirlist 
-                procexec procexe proccommand proccmd procrun exe com execute
-                catdir catfile rootdir tmpdir updir curdir path splitpath splitdir
-                carp croak cluck confess
-                read_attributes
-            )],
-        ATOM   => [qw(
-                ls scandirs scanfiles
-                ftp ftptest ftpgetlist getlist getdirlist 
-                procexec procexe proccommand proccmd procrun exe com execute
-            )],
-        API    => [qw(
-                catdir catfile rootdir tmpdir updir curdir path splitpath splitdir
-                carp croak cluck confess
-                read_attributes
-            )],
+        BASE    => [
+                @est_core,
+                @est_encoding,
+                @est_escape,
+                @est_format,
+                @est_file,
+                @est_util,
+            ],
+        FORMAT  => [
+                @est_encoding,
+                @est_escape,
+                @est_format,
+            ],
+        DATE    => [@est_datetime],
+        FILE    => [@est_file],
+        UTIL    => [
+                @est_core,
+                @est_dir,
+                @est_util,
+            ],
+        ATOM   => [
+                @est_dir,
+                @est_util,
+            ],
+        API    => [
+                @est_core,
+                @est_dir,
+            ],
     );
+
+# Модули OOP которые должны вызываться ТОЛЬКО внутри этого модуля, все остальные запросы
+# должны идти через оболочку!!!
+push @CTK::Util::ISA, qw/CTK::Util::SysConfig/;
 
 sub send_mail {
     # Version 3.01 (with UTF-8 as default character set and attachment support)    
@@ -634,6 +738,19 @@ sub randomize {
     $rstat=substr ($rstat,0,abs($digs));
     return "$rstat"
 }
+sub randchars {
+    # Вычисление случайного символьного значения с заданным количеством знаков и заданным массивом
+	my $l = shift || return '';
+	return '' unless $l =~/^\d+$/;
+    my $arr = shift;
+
+	my $result = '';
+	my @chars = ($arr && ref($arr) eq 'ARRAY') ? (@$arr) : (0..9,'a'..'z','A'..'Z');
+	$result .= $chars[(int(rand($#chars+1)))] for (1..$l);
+
+	return $result;
+}
+
 
 #
 # Процедуры чтения и записи текстовых массивов из файла/в файл
@@ -820,7 +937,8 @@ sub ftp {
     #    ftpuser     => 'login',
     #    ftppassword => 'password',
     #    ftpdir      => '~/',
-    #    #ftpattr     => {},
+    #    voidfile    => './void.txt',
+    #    #ftpattr    => {},
     #);
     #my $rfiles = CTK::ftp(\%ftpct, 'ls');
     #my @remotefiles = $rfiles ? grep {!(/^\./)} @$rfiles : ();
@@ -864,7 +982,7 @@ sub ftp {
         return $ftp;
 	} elsif ( $cmd eq "ls" ){
 		# получаем список в виде массива
-		(my @out = $ftp->ls(CTK::WIN ? "" : "-1a" )) 
+		(my @out = $ftp->ls(WIN ? "" : "-1a" )) 
 			or _debug( "FTP: Can't get directory listing (\"$ftpdir\") from remote FTP server $ftphost: ", $ftp->message );
 	    $ftp->quit;
 	    return [@out];
@@ -898,19 +1016,26 @@ sub ftptest {
         return undef;
     }
     # _debug("Проверка соединения RW с ftp://$ftpdata->{ftphost}...");
-    my $vfile = catfile($CTK::DATADIR, CTK::VOIDFILE);
-    unless (CTK::VOIDFILE && -e $vfile) {
+    my $vfile = '';
+    if ($ftpdata->{voidfile}) {
+        $vfile = $ftpdata->{voidfile};
+    } else {
+        $vfile = catfile(tmpdir(),VOIDFILE);
+        touch($vfile);
+        
+    }
+    unless (-e $vfile) {
         _debug("Нет файла VOID: \"$vfile\""); # Данные соединения с FTP
         return undef;
     }
-    ftp($ftpdata, 'put', $vfile, CTK::VOIDFILE);
+    ftp($ftpdata, 'put', $vfile, VOIDFILE);
     my $rfiles = ftp($ftpdata,'ls');
     my @remotefiles = $rfiles ? grep {!(/^\./)} @$rfiles : ();
-    unless (grep {$_ eq CTK::VOIDFILE} @remotefiles) {
+    unless (grep {$_ eq VOIDFILE} @remotefiles) {
         _debug("Ошибка соединения с FTP {".join(", ",(%$ftpdata))."}");
         return undef;
     }
-    ftp($ftpdata, 'delete', CTK::VOIDFILE);
+    ftp($ftpdata, 'delete', VOIDFILE);
     return 1;
 }
 sub ftpgetlist {
@@ -980,6 +1105,45 @@ sub com { procexec(@_) }
 sub execute { procexec(@_) }
 
 #
+# Расширенный утилитарий (Extended)
+#
+sub getsyscfg { __PACKAGE__->syscfg(@_) }
+
+#
+# Утилиты базирующиеся на работах автора модуля Sys::Path
+#
+# prefixdir localstatedir sysconfdir srvdir
+# sharedir docdir localedir cachedir syslogdir spooldir rundir lockdir sharedstatedir webdir
+#
+sub prefixdir { 
+    my $pfx = __PACKAGE__->syscfg('prefix') ;
+    return defined $pfx ? $pfx : '';
+}
+sub localstatedir {
+    my $pfx = prefixdir();
+	return $pfx eq '/usr' ? '/var' : catdir($pfx, 'var');
+};
+sub sysconfdir {
+    my $pfx = prefixdir();
+	return $pfx eq '/usr' ? '/etc' : catdir($pfx, 'etc');
+};
+sub srvdir {
+    my $pfx = prefixdir();
+	return $pfx eq '/usr' ? '/srv' : catdir($pfx, 'srv');
+};
+sub sharedir        { catdir(prefixdir(), 'share') }
+sub docdir          { catdir(prefixdir(), 'share', 'doc') }
+sub localedir       { catdir(prefixdir(), 'share', 'locale') }
+sub cachedir        { catdir(localstatedir(), 'cache') }
+sub syslogdir       { catdir(localstatedir(), 'log') }
+sub spooldir        { catdir(localstatedir(), 'spool') }
+sub rundir          { catdir(localstatedir(), 'run') }
+sub lockdir         { catdir(localstatedir(), 'lock') }
+sub sharedstatedir  { catdir(localstatedir(), 'lib') }
+sub webdir          { catdir(localstatedir(), 'www') }
+
+
+#
 # Утилитарные процедуры модуля
 #
 # Smart rearrangement of parameters to allow named parameter calling.
@@ -1038,4 +1202,26 @@ sub _debug { carp(@_) } # Просто пишем дебаггером
 sub _error { carp(@_) } # Пишем в стандартный вывод STDERROR, ТОЛЬКО ДЛЯ СИСТЕМНЫХ ПРОБЛЕМ!!!
 sub _exception { confess(@_) } # Пишем в стандартный вывод STDERROR и убиваем, ТОЛЬКО ДЛЯ СИСТЕМНЫХ ПРОБЛЕМ!!!
 1;
+
+package  # hide me from PAUSE
+    CTK::Util::SysConfig;
+use strict;
+use vars qw/$VERSION/;
+$VERSION = $CTK::Util::VERSION;
+use Config qw//;
+sub syscfg {
+    # Принимаем значение системной конфигурации
+    my $caller; $caller = shift if (@_ && $_[0] && $_[0] eq 'CTK::Util');
+    my $self; $self = shift if (@_ && $_[0] && ref($_[0]) eq 'CTK');
+    
+    my $param = shift;
+    if (defined $param) {
+        return $Config::Config{$param}
+    }
+    my %locconf = %Config::Config;
+    return %locconf;
+}
+1;
+
+
 __END__

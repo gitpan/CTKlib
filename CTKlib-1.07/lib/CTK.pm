@@ -1,4 +1,4 @@
-package CTK; # $Id: CTK.pm 71 2012-12-28 22:11:58Z minus $
+package CTK; # $Id: CTK.pm 80 2013-01-08 17:09:32Z minus $
 use Moose; #use strict;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK - Command-line ToolKit
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =head1 REVISION
 
-$Revision: 71 $
+$Revision: 80 $
 
 =head1 SYNOPSIS
 
@@ -130,7 +130,7 @@ use vars qw/
         $VERSION
         $TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %ARGS %OPT @OPTSYSDEF
     /;
-$VERSION = 1.06;
+$VERSION = 1.07;
 
 use constant {
     DEBUG     => 1, # 0 - off, 1 - on, 2 - all (+ http headers and other)
@@ -280,7 +280,7 @@ with 'CTK::CLI' => {
 has 'revision'  => ( # Ğåâèçèÿ
         is      => 'ro',
         isa     => 'Str',
-        default => q/$Revision: 71 $/ =~ /(\d+\.?\d*)/ ? $1 : '0',
+        default => q/$Revision: 80 $/ =~ /(\d+\.?\d*)/ ? $1 : '0',
         lazy    => 1,
         init_arg=> undef,
     );

@@ -1,4 +1,4 @@
-package CTK::CPX; # $Id: CPX.pm 69 2012-12-28 19:26:44Z minus $
+package CTK::CPX; # $Id: CPX.pm 87 2013-01-23 14:07:18Z minus $
 use Moose;
 =head1 NAME
 
@@ -10,7 +10,7 @@ Version 1.01
 
 =head1 REVISION
 
-$Revision: 69 $
+$Revision: 87 $
 
 =head1 SYNOPSIS
 
@@ -22,7 +22,7 @@ $Revision: 69 $
 
 Converter between windows-1251 and your terminal encoding.
 
-Based on BeeCDR project
+No public subroutines
 
 =head1 AUTHOR
 

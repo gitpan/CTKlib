@@ -1,4 +1,4 @@
-package CTK::Helper; # $Id: Helper.pm 69 2012-12-28 19:26:44Z minus $
+package CTK::Helper; # $Id: Helper.pm 85 2013-01-15 11:34:17Z minus $
 #
 # Процедуры возвращающие контенты файлов-скриптов. новых проектов
 # Для обработки ключей %PROJECTNAME% и %PODSIG% нужно использовать регулярные выражения
@@ -7,7 +7,7 @@ package CTK::Helper; # $Id: Helper.pm 69 2012-12-28 19:26:44Z minus $
 # %PROJECTNAME% -- имя проекта в Unix стиле
 #
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 85 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use base qw/Exporter/;
 our @EXPORT = qw(
@@ -233,37 +233,31 @@ START:  debug "-"x16, " START ", (testmode() ? 'IN TEST MODE ' : ''), tms," ","-
 ### START
 #########################
 
-foreach my $curcmd (@commands) {
-    if ($command eq $curcmd) {
-        my $code = __PACKAGE__->can(uc($command));
-        if ($code && ref($code) eq 'CODE') {
-            %cmddata = %{CMD->{$command}};
-            $cmddata{arguments} = [@arguments];
+my $code = __PACKAGE__->can(uc($command));
+if ($code && ref($code) eq 'CODE') {
+    %cmddata = %{CMD->{$command}};
+    $cmddata{arguments} = [@arguments];
 
-            # Определение PID файла и получение состояния
-            my $pidfile = new CTK::FilePid({ file => CTK::catfile($DATADIR, $cmddata{pidfile} || PIDFILE) });
-            my $pidstat = $pidfile->running || 0;
-            
-            debug "";
-            debug "==== START COMMAND: ".uc($curcmd)." ($$) ====";
-            
-            if ($cmddata{pidcheck}) {
-                exception("PID STATE (".$pidfile->file()."): ALREADY EXISTS (PID: $pidstat)" ) if $pidstat;
-                $pidfile->write;
-            }
-
-            &{$code}(%cmddata); # Передается в процедуру Хэш данных и параметров
-            
-            if ($cmddata{pidcheck}) {
-                $pidfile->remove;
-            }
-            
-            debug "==== FINISH COMMAND: ".uc($curcmd)." ($$) ====";
-        } else {
-            exception("Sub \"".uc($command)."\" undefined");
-        }
-        last;
+    # Определение PID файла и получение состояния
+    my $pidfile = new CTK::FilePid({ file => CTK::catfile($DATADIR, $cmddata{pidfile} || PIDFILE) });
+    my $pidstat = $pidfile->running || 0;
+    
+    debug "==== START COMMAND: ".uc($command)." ($$) ====";
+    
+    if ($cmddata{pidcheck}) {
+        exception("PID STATE (".$pidfile->file()."): ALREADY EXISTS (PID: $pidstat)" ) if $pidstat;
+        $pidfile->write;
     }
+
+    &{$code}(%cmddata); # Передается в процедуру Хэш данных и параметров
+    
+    if ($cmddata{pidcheck}) {
+        $pidfile->remove;
+    }
+    
+    debug "==== FINISH COMMAND: ".uc($command)." ($$) ====";
+} else {
+    exception("Sub \"".uc($command)."\" undefined");
 }
 
 #########################
@@ -342,18 +336,12 @@ sub get_projectcontent_conf {return <<'CONTENT';
 # See Config::General for details
 #
 
-<Oracle prod>
-    dsn		DBI:Oracle:PROD
-    user	login
-    password	123
-</Oracle>
-<Oracle prodt>
-    dsn		DBI:Oracle:PRODT
-    user	login
-    password	123
-</Oracle>
+#######################
+#
+# Секция работы с программой sendmail и ее параметрами отправки почты
+#
+########################
 
-# Программа SendMail и параметры отправки почты. Умолчания
 <SendMail>
     # Основные данные отправки писем
     to          to@example.com
@@ -372,7 +360,8 @@ sub get_projectcontent_conf {return <<'CONTENT';
     sendmail    /usr/sbin/sendmail
     flags       -t
     
-    # SMTP сервер, если есть
+    # SMTP сервер, если есть. 
+    # SMTP сервер является приоритетным отночительно программы sendmail
     smtp        192.168.1.1
     
     # Авторизация SMTP
@@ -382,29 +371,44 @@ sub get_projectcontent_conf {return <<'CONTENT';
 
 #######################
 #
-# Секция работы с архивами
+# Секция работы с архивами. Оригинал см. в модуле CTK
 # 
-# тут определяются основные настройки работы с архивами
+# В этой секции определяются основные настройки работы с архивами,
 # каждое значение любого параметра обрабатывается единым механизмом обработки маски.
-# Ключи могут быть использованы следующие:
+# Ключи в маске могут быть использованы следующие:
 #
+# Для случая извлечения файлов из арива:
 #    FILE     -- Полное имя файла с путем
 #    FILENAME -- Только имя файлов архивов
 #    DIRSRC   -- Каталог поиска имен файлов
 #    DIRIN    -- = DIRSRC
 #    DIRDST   -- Каталог для исзвлечения содержимого архивов
 #    DIROUT   -- = DIRDST
-#    EXC      -- 'exclude file' Зарезервировано!!!
-#    LIST     -- Список файлов через пробел
+#    LIST     -- Список файлов в архиве, через пробел
+#    EXC      -- 'exclude file' !!!Зарезервировано!!!
 #
-# Для случая сжатия используется следеющий набор ключей:
+# Для случая сжатия файлов используется следеющий набор ключей:
 #    FILE     -- Полное имя выходного файла архива с путем
 #    DIRSRC   -- Каталог поиска имен файлов и подкаталогов для сжатия
-#    DIRIN    -- DIRSRC
-#    EXC      -- 'exclude file' Зарезервировано!!!
-#    LIST     -- Список файлов через пробел
+#    DIRIN    -- = DIRSRC
+#    LIST     -- Список файлов для сжатия, через пробел
+#    EXC      -- 'exclude file' !!!Зарезервировано!!!
+#
+# Для примера можно рассмотреть случай с архиватором tar
+# 
+# <Arc tgz> # Начало именованной секции. Имя, как правило, это расширение файлов архива
+#    type       tar                       # Тип архива, его версия имени
+#    ext        tgz                       # Расширение файлов архива
+#    create     tar -zcpf [FILE] [LIST]   # Команда для создания архива
+#    extract    tar -zxpf [FILE] [DIRDST] # Команда для извлечения файлов из архива
+#    exclude    --exclude-from            # !!!Зарезервировано!!!
+#    list       tar -ztf [FILE]           # Команда для получения списка файлов в архиве
+#    nocompress tar -cpf [FILE]           # Команда для упаковки файлов без сжатия
+# </Arc>
 #
 ######################
+
+# Tape ARchive
 <Arc tar>
     type       tar
     ext        tar
@@ -414,6 +418,8 @@ sub get_projectcontent_conf {return <<'CONTENT';
     list       tar -tf [FILE]
     nocompress tar -cpf [FILE]
 </Arc>
+
+# Tape ARchive + GNU Zip
 <Arc tgz>
     type       tar
     ext        tgz
@@ -423,6 +429,8 @@ sub get_projectcontent_conf {return <<'CONTENT';
     list       tar -ztf [FILE]
     nocompress tar -cpf [FILE]
 </Arc>
+
+# GNU Zip
 <Arc gz>
     type       gz
     ext        gz
@@ -430,32 +438,66 @@ sub get_projectcontent_conf {return <<'CONTENT';
     extract    gzip -d [FILE]
     exclude    --exclude-from
     list       gzip -l [FILE]
-    nocompress gzip -0 [FILE]
+    nocompress gzip -0 [FILE] [LIST]
 </Arc>
+
+# ZIP
 <Arc zip>
     type       zip
     ext        zip
     # Win
-    #create    zip -rqq [FILE] [LIST]
-    create     zip -rqqy [FILE] [LIST]
+    create     zip -rqq [FILE] [LIST]
+    #create    zip -rqqy [FILE] [LIST]
     # Win
-    #extract   unzip -uqqoX [FILE] -d [DIRDST]
-    extract    unzip -uqqoX [FILE] [DIRDST]
+    extract    unzip -uqqoX [FILE] -d [DIRDST]
+    #extract   unzip -uqqoX [FILE] [DIRDST]
     exclude    -x\@
     list       unzip -lqq
     nocompress zip -qq0
 </Arc>
+
+# bzip2 
+<Arc bz2>
+    type       bzip2 
+    ext        bz2
+    create     bzip2 --best [FILE] [LIST]
+    extract    bzip2 -d [FILE]
+    exclude    --exclude-from
+    list       bzip2 -l [FILE]
+    nocompress bzip2 --fast [FILE] [LIST]
+</Arc>
+
+# RAR
 <Arc rar>
     type       rar
     ext        rar
     # Win
-    #create    rar a -r -y -ep2 [FILE] [LIST]
-    create     rar a -r -ol -y [FILE] [LIST]
+    create     rar a -r -y -ep2 [FILE] [LIST]
+    #create    rar a -r -ol -y [FILE] [LIST]
     extract    rar x -y [FILE] [DIRDST]
     exclude    -x\@
     list       rar vb
     nocompress rar a -m0
 </Arc>
+
+#######################
+#
+# Секция работы с БД оракл
+#
+########################
+
+#<Oracle prod>
+#    DSN        DBI:Oracle:PROD
+#    User       login
+#    Password   password
+#</Oracle>
+
+#<Oracle prodt>
+#    DSN        DBI:Oracle:PRODT
+#    User       login
+#    Password   password
+#</Oracle>
+
 
 Include conf/*.conf
 CONTENT

@@ -33,3 +33,10 @@
 
     * Documentation modified
     * CTK::Util: Modified functions scandirs, scanfiles and ls
+
+1.07 Tue Jan  8 17:06:49 2013 GMT
+
+    * Documentation modified
+    * CTK::Util - Added functions: getsyscfg, prefixdir, localstatedir,
+      sysconfdir, srvdir, sharedir, docdir, localedir, cachedir, syslogdir,
+      spooldir, rundir, lockdir, sharedstatedir, webdir and randchars

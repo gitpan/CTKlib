@@ -2,9 +2,9 @@ NAME
     CTKlib - Command-line ToolKit library (CTK). Command line interface (CLI)
 
 VERSION
-    Version 1.06
+    Version 1.07
     
-    $Id: README 71 2012-12-28 22:11:58Z minus $
+    $Id: README 80 2013-01-08 17:09:32Z minus $
 
 SYNOPSIS
     
@@ -23,7 +23,7 @@ ABSTRACT
     Как создавать НОВЫЕ версии:
     
     * Правим README
-    * Добавляем в конец CHANGES секцию изменений с пом. команды: perl -e "print scalar gmtime time"
+    * Добавляем в конец CHANGES секцию изменений с пом. команды: perl -e "print scalar gmtime time, ' GMT'"
     * META.yml -- в самом верху
     * lib/CTK.pm -- в двух местах - в POD документации и коде
     * t/01-use.t
