@@ -2,23 +2,30 @@
 #
 # Serz Minus (Lepenkov Sergey), <minus@mail333.com>
 #
-# Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
 # 
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 02-version.t 64 2012-12-27 11:19:15Z minus $
+# $Id: 02-version.t 101 2013-02-01 09:25:37Z minus $
 #
 #########################################################################
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More;
 use File::Spec;
 use YAML;
 
 use CTK;
 #$OPT{debug} = 1;
+my $MSWIN = $^O =~ /mswin/i ? 1 : 0;
+
+if ($MSWIN) {
+    plan tests => 10;      
+} else {
+    plan skip_all => 'test only for MSWin32';
+}
 
 # Go!
 

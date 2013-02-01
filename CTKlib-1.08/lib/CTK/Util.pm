@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 88 2013-01-23 14:18:25Z minus $
+package CTK::Util; # $Id: Util.pm 97 2013-01-31 21:37:15Z minus $
 use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -11,7 +11,7 @@ Version 1.00
 
 =head1 REVISION 
 
-$Revision: 88 $
+$Revision: 97 $
 
 =head1 SYNOPSIS
 
@@ -20,103 +20,61 @@ $Revision: 88 $
     
     my @ls = ls(".");
     
+    # or (for CTK module)
+    
+    use CTK;
+    my @ls = CTK::ls(".");
+    
+    # or (for core and extended subroutines only)
+    
+    use CTK;
+    my $c = new CTK;
+    my $prefix = $c->getsyscfg("prefix");
+    
 =head1 DESCRIPTION
 
-Public subrountines
+Public subroutines
 
-=head2 SUBROUNTINES
+=head2 SUBROUTINES
 
-=head3 prefixdir
+...
 
-See L<Sys::Path> prefix
+=head3 eqtime
 
-=head3 localstatedir
+    eqtime("source/file", "destination/file");
 
-See L<Sys::Path> localstatedir
+Sets modified time of destination to that of source.
 
-=head3 sysconfdir
+=head3 escape
 
-See L<Sys::Path> sysconfdir
+    $safe = escape("10% is enough\n");
+    
+Replaces each unsafe character in the string "10% is enough\n" with the corresponding
+escape sequence and returns the result.  The string argument should
+be a string of bytes.
 
-=head3 sharedir
+See also L<URI::Escape>
 
-See L<Sys::Path> datadir
+=head3 shuffle
 
-=head3 docdir
+    @cards = shuffle(0..51); # 0..51 in a random order
 
-See <Sys::Path> docdir
+Returns the elements of LIST in a random order
 
-=head3 localedir
+Pure-Perl implementation of Function List::Util::PP::shuffle
+(Copyright (c) 1997-2009 Graham Barr <gbarr@pobox.com>. All rights reserved.)
 
-See L<Sys::Path> localedir
+See also L<List::Util>
 
-=head3 cachedir
+=head3 touch
 
-See L<Sys::Path> cachedir
+    touch("file");
 
-=head3 syslogdir
+Makes file exist, with current timestamp
 
-See L<Sys::Path> logdir
+=head2 UTILITY SUBROUTINES
 
-=head3 spooldir
-
-See L<Sys::Path> spooldir
-
-=head3 rundir
-
-See L<Sys::Path> rundir
-
-=head3 lockdir
-
-See L<Sys::Path> lockdir
-
-=head3 sharedstatedir
-
-See L<Sys::Path> sharedstatedir
-
-=head3 webdir
-
-See L<Sys::Path> webdir
-
-=head3 srvdir
-
-See L<Sys::Path> srvdir
-
-=head2 TAGS
-
-=head3 ALL, DEFAULT
-
-Export all subrountines, default
-
-=head3 BASE
-
-Export only base subrountines
-
-=head3 FORMAT
-
-Export only text format subrountines
-
-=head3 DATE
-
-Export only date and time subrountines
-
-=head3 FILE
-
-Export only file and directories subrountines
-
-=head3 UTIL
-
-Export only utilities subrountines
-
-=head3 ATOM
-
-Export only processing subrountines
-
-=head3 API
-
-Export only inerface subrountines
-
-=head2 SENDMAIL
+=head3 sendmail, send_mail
 
     my $sent = sendmail(
         -to       => 'to@example.com',
@@ -161,7 +119,316 @@ Export only inerface subrountines
     );
     debug($sent ? 'mail has been sent :)' : 'mail was not sent :(');
 
-=head2 GENERAL API
+=head3 unescape
+
+    $str = unescape(escape("10% is enough\n"));
+    
+Returns a string with each %XX sequence replaced with the actual byte (octet).
+
+This does the same as:
+
+    $string =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+
+See also L<URI::Escape>
+    
+=head2 EXTENDED SUBROUTINES
+
+=head3 cachedir
+
+    my $value = cachedir();
+    my $value = $c->cachedir();
+
+For example value can be set as: /var/cache
+
+/var/cache is intended for cached data from applications. Such data is locally generated as a result of
+time-consuming I/O or calculation. The application must be able to regenerate or restore the data. Unlike
+/var/spool, the cached files can be deleted without data loss. The data must remain valid between invocations
+of the application and rebooting the system.
+
+Files located under /var/cache may be expired in an application specific manner, by the system administrator,
+or both. The application must always be able to recover from manual deletion of these files (generally because of
+a disk space shortage). No other requirements are made on the data format of the cache directories.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> cachedir
+
+=head3 docdir
+
+    my $value = docdir();
+    my $value = $c->docdir();
+    
+For example value can be set as: /usr/share/doc
+
+See <Sys::Path> docdir
+
+=head3 localstatedir
+
+    my $value = localstatedir();
+    my $value = $c->localstatedir();
+
+For example value can be set as: /var
+
+/var - $Config::Config{'prefix'}
+
+/var contains variable data files. This includes spool directories and files, administrative and logging data, and
+transient and temporary files.
+Some portions of /var are not shareable between different systems. For instance, /var/log, /var/lock, and
+/var/run. Other portions may be shared, notably /var/mail, /var/cache/man, /var/cache/fonts, and
+/var/spool/news.
+
+/var is specified here in order to make it possible to mount /usr read-only. Everything that once went into /usr
+that is written to during system operation (as opposed to installation and software maintenance) must be in /var.
+If /var cannot be made a separate partition, it is often preferable to move /var out of the root partition and into
+the /usr partition. (This is sometimes done to reduce the size of the root partition or when space runs low in the
+root partition.) However, /var must not be linked to /usr because this makes separation of /usr and /var
+more difficult and is likely to create a naming conflict. Instead, link /var to /usr/var.
+
+Applications must generally not add directories to the top level of /var. Such directories should only be added if
+they have some system-wide implication, and in consultation with the FHS mailing list.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> localstatedir
+
+=head3 localedir
+
+    my $value = localedir();
+    my $value = $c->localedir();
+
+For example value can be set as: /usr/share/locale
+
+See L<Sys::Path> localedir
+
+=head3 lockdir
+
+    my $value = lockdir();
+    my $value = $c->lockdir();
+
+For example value can be set as: /var/lock
+
+Lock files should be stored within the /var/lock directory structure.
+Lock files for devices and other resources shared by multiple applications, such as the serial device lock files that
+were originally found in either /usr/spool/locks or /usr/spool/uucp, must now be stored in /var/lock.
+The naming convention which must be used is "LCK.." followed by the base name of the device. For example, to
+lock /dev/ttyS0 the file "LCK..ttyS0" would be created. 5
+
+The format used for the contents of such lock files must be the HDB UUCP lock file format. The HDB format is
+to store the process identifier (PID) as a ten byte ASCII decimal number, with a trailing newline. For example, if
+process 1230 holds a lock file, it would contain the eleven characters: space, space, space, space, space, space,
+one, two, three, zero, and newline.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> lockdir
+
+=head3 prefixdir
+
+    my $value = prefixdir();
+    my $value = $c->prefixdir();
+
+For example value can be set as: /usr
+
+/usr - $Config::Config{'prefix'}
+
+Is a helper function and should not be used directly.
+
+/usr is the second major section of the filesystem. /usr is shareable, read-only data. That means that /usr
+should be shareable between various FHS-compliant hosts and must not be written to. Any information that is
+host-specific or varies with time is stored elsewhere.
+
+Large software packages must not use a direct subdirectory under the /usr hierarchy.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> prefix
+
+=head3 rundir
+
+    my $value = rundir();
+    my $value = $c->rundir();
+
+For example value can be set as: /var/run
+
+This directory contains system information data describing the system since it was booted. Files under this
+directory must be cleared (removed or truncated as appropriate) at the beginning of the boot process. Programs
+may have a subdirectory of /var/run; this is encouraged for programs that use more than one run-time file. 7
+Process identifier (PID) files, which were originally placed in /etc, must be placed in /var/run. The naming
+convention for PID files is <program-name>.pid. For example, the crond PID file is named
+/var/run/crond.pid.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> rundir
+
+=head3 sharedir
+
+    my $value = sharedir();
+    my $value = $c->sharedir();
+
+For example value can be set as: /usr/share
+
+The /usr/share hierarchy is for all read-only architecture independent data files. 10
+This hierarchy is intended to be shareable among all architecture platforms of a given OS; thus, for example, a
+site with i386, Alpha, and PPC platforms might maintain a single /usr/share directory that is
+centrally-mounted. Note, however, that /usr/share is generally not intended to be shared by different OSes or
+by different releases of the same OS.
+
+Any program or package which contains or requires data that doesn’t need to be modified should store that data
+in /usr/share (or /usr/local/share, if installed locally). It is recommended that a subdirectory be used in
+/usr/share for this purpose.
+
+Game data stored in /usr/share/games must be purely static data. Any modifiable files, such as score files,
+game play logs, and so forth, should be placed in /var/games.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> datadir
+
+=head3 sharedstatedir
+
+    my $value = sharedstatedir();
+    my $value = $c->sharedstatedir();
+
+For example value can be set as: /var/lib
+
+This hierarchy holds state information pertaining to an application or the system. State information is data that
+programs modify while they run, and that pertains to one specific host. Users must never need to modify files in
+/var/lib to configure a package’s operation.
+
+State information is generally used to preserve the condition of an application (or a group of inter-related
+applications) between invocations and between different instances of the same application. State information
+should generally remain valid after a reboot, should not be logging output, and should not be spooled data.
+
+An application (or a group of inter-related applications) must use a subdirectory of /var/lib for its data. There
+is one required subdirectory, /var/lib/misc, which is intended for state files that don’t need a subdirectory;
+the other subdirectories should only be present if the application in question is included in the distribution.
+
+/var/lib/<name> is the location that must be used for all distribution packaging support. Different
+distributions may use different names, of course.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> sharedstatedir
+
+=head3 spooldir
+
+    my $value = spooldir();
+    my $value = $c->spooldir();
+
+For example value can be set as: /var/spool
+
+/var/spool contains data which is awaiting some kind of later processing. Data in /var/spool represents
+work to be done in the future (by a program, user, or administrator); often data is deleted after it has been
+processed.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> spooldir
+
+=head3 srvdir
+
+    my $value = srvdir();
+    my $value = $c->srvdir();
+
+For example value can be set as: /srv
+
+/srv contains site-specific data which is served by this system.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> srvdir
+
+=head3 sysconfdir
+
+    my $value = sysconfdir();
+    my $value = $c->sysconfdir();
+
+For example value can be set as: /etc
+
+The /etc hierarchy contains configuration files. A "configuration file" is a local file used to control the operation
+of a program; it must be static and cannot be an executable binary.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> sysconfdir
+
+=head3 syslogdir
+
+    my $value = syslogdir();
+    my $value = $c->syslogdir();
+
+For example value can be set as: /var/log
+
+This directory contains miscellaneous log files. Most logs must be written to this directory or an appropriate
+subdirectory.
+
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> logdir
+
+=head3 webdir
+
+    my $value = webdir();
+    my $value = $c->webdir();
+
+For example value can be set as: /var/www
+
+Directory where distribution put static web files.
+
+See L<Sys::Path> webdir
+
+=head2 CORE SUBROUTINES
+
+=head3 carp, croak, cluck, confess
+
+This is the L<Carp> functions, and exported here for historical reasons.
+
+=over 4
+
+=item B<carp>
+
+Warn user (from perspective of caller)
+
+    carp "string trimmed to 80 chars";
+
+=item B<croak>
+
+Die of errors (from perspective of caller)
+
+    croak "We're outta here!";
+
+=item B<cluck>
+
+Warn user (more detailed what carp with stack backtrace)
+
+    cluck "This is how we got here!";
+
+=item B<confess>
+        
+Die of errors with stack backtrace
+
+    confess "not implemented";
+
+=back
+
+=head3 getsyscfg, syscfg 
+
+Returns all hash %Config from system module L<Config> or one value of this hash
+
+    my %syscfg = getsyscfg();
+    my $prefix = getsyscfg("prefix");
+    # or
+    my %syscfg = $c->getsyscfg();
+    my $prefix = $c->getsyscfg("prefix");
+
+See L<Config> module for details
+    
+=head3 isos
+
+Returns true or false if the OS name is of the current value of C<$^O>
+
+    isos('mswin32') ? "OK" : "NO";
+    # or
+    $c->isos('mswin32') ? "OK" : "NO";
+    
+See L<Perl::OSType> for details
+
+=head3 isostype
+
+Given an OS type and OS name, returns true or false if the OS name is of the
+given type.
+
+    isostype('Windows') ? "OK" : "NO";
+    isostype('Unix', 'dragonfly') ? "OK" : "NO";
+    # or
+    $c->isos('Windows') ? "OK" : "NO";
+    $c->isostype('Unix', 'dragonfly') ? "OK" : "NO";
+
+See L<Perl::OSType> C<is_os_type>
+
+=head3 read_attributes
+
+Smart rearrangement of parameters to allow named parameter calling.
+We do the rearrangement if the first parameter begins with a -
 
     my @args = @_;
     my ($content, $maxcnt, $timeout, $timedie, $base, $login, $password, $host, $table_tmp);
@@ -178,9 +445,45 @@ Export only inerface subrountines
         ['TABLE','TABLENAME','NAME','SESSION','SESSIONNAME']
     ],@args) if defined $args[0];
 
+See L<CGI::Util>
+
+=head2 TAGS
+
+=head3 ALL, DEFAULT
+
+Export all subroutines, default
+
+=head3 BASE
+
+Export only base subroutines
+
+=head3 FORMAT
+
+Export only text format subroutines
+
+=head3 DATE
+
+Export only date and time subroutines
+
+=head3 FILE
+
+Export only file and directories subroutines
+
+=head3 UTIL
+
+Export only utility subroutines
+
+=head3 ATOM
+
+Export only processing subroutines
+
+=head3 API
+
+Export only inerface subroutines
+
 =head1 SEE ALSO
 
-L<MIME::Lite>, L<CGI::Util>, L<Time::Local>, L<Net::FTP>, L<IPC::Open3>
+L<MIME::Lite>, L<CGI::Util>, L<Time::Local>, L<Net::FTP>, L<IPC::Open3>, L<List::Util>
 
 =head1 AUTHOR
 
@@ -210,7 +513,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 88 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 97 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw/
@@ -233,26 +536,24 @@ use Carp qw/carp croak cluck confess/;
 
 use base qw /Exporter/;
 my @est_core = qw(
-        getsyscfg
+        syscfg getsyscfg isos isostype
         carp croak cluck confess
         read_attributes
     );
 my @est_encoding = qw(
         to_utf8 to_windows1251 CP1251toUTF8 UTF8toCP1251 to_base64
     );
-my @est_escape = qw(
-        unescape slash tag tag_create cdata dformat fformat splitformat
-    );
 my @est_format = qw(
+        escape unescape slash tag tag_create cdata dformat fformat splitformat
         correct_number correct_dig
-        translate variant_stf randomize randchars
+        translate variant_stf randomize randchars shuffle
     );
 my @est_datetime = qw(
         current_date current_date_time localtime2date localtime2date_time correct_date date2localtime
         datetime2localtime visokos date2dig dig2date date_time2dig dig2date_time basetime
     );
 my @est_file = qw(
-        load_file save_file file_load file_save fsave fload bsave bload touch
+        load_file save_file file_load file_save fsave fload bsave bload touch eqtime
     );
 my @est_dir = qw(
         ls scandirs scanfiles
@@ -268,7 +569,7 @@ my @est_util = qw(
     );
 
 our @EXPORT = (
-        @est_core, @est_encoding, @est_escape, @est_format, @est_datetime, 
+        @est_core, @est_encoding, @est_format, @est_datetime, 
         @est_file, @est_dir, @est_util,
     );
 our @EXPORT_OK = @EXPORT;
@@ -278,14 +579,12 @@ our %EXPORT_TAGS = (
         BASE    => [
                 @est_core,
                 @est_encoding,
-                @est_escape,
                 @est_format,
                 @est_file,
                 @est_util,
             ],
         FORMAT  => [
                 @est_encoding,
-                @est_escape,
                 @est_format,
             ],
         DATE    => [@est_datetime],
@@ -412,7 +711,7 @@ sub send_mail {
 
     return $sendstat ? 1 : 0;    
 }
-sub sendmail { send_mail(@_) }
+sub sendmail { goto &send_mail }
 sub to_utf8 {
     # Конвертирование строки в UTF-8 из указанной кодировки
     # to_utf8( $string, $charset ) # charset is 'Windows-1251' as default
@@ -426,8 +725,8 @@ sub to_windows1251 {
     my $ch = shift || 'Windows-1251'; # Перекодировка
     return Encode::encode($ch,$ss)
 }
-sub CP1251toUTF8 {to_utf8(@_)};
-sub UTF8toCP1251 {to_windows1251(@_)};
+sub CP1251toUTF8 { goto &to_utf8 };
+sub UTF8toCP1251 { goto &to_windows1251 };
 sub to_base64 {
     # Конвертирование строки UTF-8  в base64
     # to_base64( $utf8_string )
@@ -486,14 +785,20 @@ sub cdata {
     }
     return '';
 }
-sub unescape($) { 
-    # Обратное преобразование URL разделителей типа &amp; => &
-    # unescape( $string )
-    
-    my $c = shift || return ''; 
-    $c=~s/&amp;/&/g; 
-    return $c; 
+sub escape { # Percent-encoding, also known as URL encoding
+    my $toencode = shift;
+    return '' unless defined($toencode);
+    $toencode =~ s/([^a-zA-Z0-9_.~-])/uc(sprintf("%%%02x",ord($1)))/eg;
+    return $toencode;
 }
+sub unescape { # Percent-decoding, also known as URL decoding
+    my $todecode = shift;
+    return '' unless defined($todecode);
+    $todecode =~ tr/+/ /; # pluses become spaces
+    $todecode =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+    return $todecode;
+}
+
 sub dformat { # маска, данные для замены в виде ссылки на хэш
     # Заменяет во входном шаблоне внутренние параметры на подставляемые
     my $fmt = shift || ''; # Формат для замены
@@ -517,7 +822,7 @@ sub fformat { # маска, имя файла
     $fmt =~ s/\[FILE\]/$fin/ig;
     return $fmt; # void-blah-blah-blah.txt
 }
-sub splitformat { fformat(@_) }
+sub splitformat { goto &fformat }
 #
 # Корректировочные функции
 # 
@@ -750,7 +1055,17 @@ sub randchars {
 
 	return $result;
 }
-
+sub shuffle {
+    # Процедура шаффлинга взятая из удаленного модуля List::Util::PP
+    return unless @_;
+    my @a=\(@_);
+    my $n;
+    my $i=@_;
+    map {
+        $n = rand($i--);
+        (${$a[$n]}, $a[$n] = $a[$i])[0];
+    } @_;
+}
 
 #
 # Процедуры чтения и записи текстовых массивов из файла/в файл
@@ -786,6 +1101,7 @@ sub save_file {
     }
     return 1; # статус выполнения операции 
 }
+
 #
 # Процедуры чтения и записи двоичных массивов из файла/в файл
 #
@@ -836,11 +1152,14 @@ sub file_save {
     close $OUT if $flc;
     return 1; # статус выполнения операции 
 }
-sub fsave {save_file(@_)} # текстовая запись
-sub fload {load_file(@_)} # текстовое чтение
-sub bsave {file_save(@_)} # двоичная запись
-sub bload {file_load(@_)} # двоичное чтение
+sub fsave { goto &save_file } # текстовая запись
+sub fload { goto &load_file } # текстовое чтение
+sub bsave { goto &file_save } # двоичная запись
+sub bload { goto &file_load } # двоичное чтение
 
+#
+# Файловые процедуры и процедуры работы с каталогами и списками каталогов
+#
 sub touch {
     # Трогаем файл (взято с ExtUtils::Command)
     my $fn  = shift || '';
@@ -857,7 +1176,21 @@ sub touch {
     utime($t,$t,$fn);
     return 1;
 }
+sub eqtime {
+    # Делаем файл такой же датой создания и модификации
+    my $src = shift || '';
+    my $dst = shift || '';
 
+    unless ($src && -e $src) {
+        _error("[EQTIME: Can't open file to read] $!");
+        return 0;
+    }
+    unless (utime((stat($src))[8,9],$dst)) {
+        _error("[EQTIME: Can't change access and modification times on file] $!");
+        return 0;
+    }
+    return 1;
+}
 sub preparedir {
 	# Подготовка директории к работе
     # Ссоздание каталога, если его нет, выставление прав на запись 0777
@@ -889,7 +1222,7 @@ sub scandirs {
    
     my @dirs;
    
-    @dirs = grep {!(/^\.+$/) && -d catfile($dir,$_)} ls($dir, $mask);
+    @dirs = grep {!(/^\.+$/) && -d catdir($dir,$_)} ls($dir, $mask);
     @dirs = sort {$a cmp $b} @dirs;
   
     return map {[catfile($dir,$_), $_]} @dirs;
@@ -1096,18 +1429,18 @@ sub procexec {
     
     return $out;
 }
-sub procexe { procexec(@_) }
-sub proccommand { procexec(@_) }
-sub proccmd { procexec(@_) }
-sub procrun { procexec(@_) }
-sub exe { procexec(@_) }
-sub com { procexec(@_) }
-sub execute { procexec(@_) }
+sub procexe { goto &procexec }
+sub proccommand { goto &procexec }
+sub proccmd { goto &procexec }
+sub procrun { goto &procexec }
+sub exe { goto &procexec }
+sub com { goto &procexec }
+sub execute { goto &procexec }
+
 
 #
 # Расширенный утилитарий (Extended)
 #
-sub getsyscfg { __PACKAGE__->syscfg(@_) }
 
 #
 # Утилиты базирующиеся на работах автора модуля Sys::Path
@@ -1116,21 +1449,35 @@ sub getsyscfg { __PACKAGE__->syscfg(@_) }
 # sharedir docdir localedir cachedir syslogdir spooldir rundir lockdir sharedstatedir webdir
 #
 sub prefixdir { 
-    my $pfx = __PACKAGE__->syscfg('prefix') ;
+    my $pfx = __PACKAGE__->ext_syscfg('prefix') ;
     return defined $pfx ? $pfx : '';
 }
 sub localstatedir {
     my $pfx = prefixdir();
-	return $pfx eq '/usr' ? '/var' : catdir($pfx, 'var');
-};
+    if ($pfx eq '/usr') {
+        return '/var';
+    } elsif ($pfx eq '/usr/local') {
+        return '/var';
+    }
+	return catdir($pfx, 'var');
+}
 sub sysconfdir {
     my $pfx = prefixdir();
 	return $pfx eq '/usr' ? '/etc' : catdir($pfx, 'etc');
-};
+}
 sub srvdir {
     my $pfx = prefixdir();
-	return $pfx eq '/usr' ? '/srv' : catdir($pfx, 'srv');
-};
+    if ($pfx eq '/usr') {
+        return '/srv';
+    } elsif ($pfx eq '/usr/local') {
+        return '/srv';
+    }
+	return catdir($pfx, 'srv');
+}
+sub webdir {
+    my $pfx = prefixdir();
+    return $pfx eq '/usr' ? '/var/www' : catdir($pfx, 'www');
+}
 sub sharedir        { catdir(prefixdir(), 'share') }
 sub docdir          { catdir(prefixdir(), 'share', 'doc') }
 sub localedir       { catdir(prefixdir(), 'share', 'locale') }
@@ -1140,11 +1487,17 @@ sub spooldir        { catdir(localstatedir(), 'spool') }
 sub rundir          { catdir(localstatedir(), 'run') }
 sub lockdir         { catdir(localstatedir(), 'lock') }
 sub sharedstatedir  { catdir(localstatedir(), 'lib') }
-sub webdir          { catdir(localstatedir(), 'www') }
-
 
 #
-# Утилитарные процедуры модуля
+# Системный утилитарий (Core)
+#
+sub getsyscfg { __PACKAGE__->ext_syscfg(@_) }
+sub syscfg { __PACKAGE__->ext_syscfg(@_) }
+sub isostype {__PACKAGE__->ext_isostype(@_)}
+sub isos {__PACKAGE__->ext_isos(@_)}
+
+#
+# Утилитарные процедуры модуля (API)
 #
 # Smart rearrangement of parameters to allow named parameter calling.
 # See CGI::Util
@@ -1198,9 +1551,9 @@ sub _make_attributes {
     }
     return @att;
 }
-sub _debug { carp(@_) } # Просто пишем дебаггером
-sub _error { carp(@_) } # Пишем в стандартный вывод STDERROR, ТОЛЬКО ДЛЯ СИСТЕМНЫХ ПРОБЛЕМ!!!
-sub _exception { confess(@_) } # Пишем в стандартный вывод STDERROR и убиваем, ТОЛЬКО ДЛЯ СИСТЕМНЫХ ПРОБЛЕМ!!!
+sub _debug { goto &carp } # Просто пишем дебаггером
+sub _error { goto &carp } # Пишем в стандартный вывод STDERROR, ТОЛЬКО ДЛЯ СИСТЕМНЫХ ПРОБЛЕМ!!!
+sub _exception { goto &confess } # Пишем в стандартный вывод STDERROR и убиваем, ТОЛЬКО ДЛЯ СИСТЕМНЫХ ПРОБЛЕМ!!!
 1;
 
 package  # hide me from PAUSE
@@ -1209,7 +1562,8 @@ use strict;
 use vars qw/$VERSION/;
 $VERSION = $CTK::Util::VERSION;
 use Config qw//;
-sub syscfg {
+use Perl::OSType qw//;
+sub ext_syscfg {
     # Принимаем значение системной конфигурации
     my $caller; $caller = shift if (@_ && $_[0] && $_[0] eq 'CTK::Util');
     my $self; $self = shift if (@_ && $_[0] && ref($_[0]) eq 'CTK');
@@ -1220,6 +1574,20 @@ sub syscfg {
     }
     my %locconf = %Config::Config;
     return %locconf;
+}
+sub ext_isostype {
+    # Принимаем типы операционных систем и смотрим, если тип соответствует искомому, то TRUE
+    my $caller; $caller = shift if (@_ && $_[0] && $_[0] eq 'CTK::Util');
+    my $self; $self = shift if (@_ && $_[0] && ref($_[0]) eq 'CTK');
+    return Perl::OSType::is_os_type(@_);
+}
+sub ext_isos {
+    # Принимаем имена операционных систем и смотрим, если такой тип соответствует искомому, то TRUE
+    my $caller; $caller = shift if (@_ && $_[0] && $_[0] eq 'CTK::Util');
+    my $self; $self = shift if (@_ && $_[0] && ref($_[0]) eq 'CTK');
+    my $cos = shift;
+    my $os = $^O;
+    return $cos && (lc($os) eq lc($cos)) && Perl::OSType::os_type($os) ? 1 : 0;
 }
 1;
 

@@ -7,11 +7,12 @@ ctklib - CTKlib project helper
 
 =head1 VERSION
 
-$Id: ctklib 46 2012-12-11 10:00:18Z minus $
+$Id: ctklib 100 2013-02-01 08:38:03Z minus $
 
 =head1 SYNOPSIS
 
-    ctklib [-hvdt] [PROJECTNAME]
+    ctklib [-dt] [PROJECTNAME]
+    ctklib [-di]
 
 =head1 OPTIONS
 
@@ -25,13 +26,17 @@ Debug mode without logging in log-file
 
 Help page
 
-=item B<-v, --ver, --version>
+=item B<-i, --interactive, --shell>
 
-Version of CTK module
+Interactive (shell) mode without creation of project
 
 =item B<-t, --tiny>
 
 Tiny project create
+
+=item B<-v, --ver, --version>
+
+Version of CTK module
 
 =back
 
@@ -45,7 +50,7 @@ Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -58,20 +63,16 @@ See C<LICENSE> file
 =cut
 
 use constant {
-    PROJECTNAME     => 'foo',
-
-    DIRS => [qw/
-            log
-            inc
-            conf
-            data
-            src
-        /],
-
+    PROJECTNAME => 'foo',
+    EXEMODE     => 0755,
+    DIRMODE     => 0777,
+    DIRS        => [qw/log inc conf data src/],
 };
 use Getopt::Long;
 use Pod::Usage;
 use Cwd;
+use Term::ReadLine ();
+use Text::ParseWords qw(shellwords);
 
 # Packages
 use CTK;
@@ -84,6 +85,7 @@ GetOptions(\%OPT,
     "version|ver|v",        # Текущая версия CTK
     "debug|d",              # Отладка
     "tiny|simple|t",        # Tiny
+    "interactive|shell|i",  # Interactive
 ) || pod2usage(-exitval => 1, -verbose => 0);
 pod2usage(-exitval => 0, -verbose => 2) if $OPT{help};
 
@@ -92,27 +94,54 @@ if ($OPT{version}) {
     exit 0;
 }
 
-# Аргемент
+# Arguments
 my $projectname   = @ARGV ? shift @ARGV : ''; # имя проекта
 
-START:  debug "-"x16, " START ", tms," ","-"x16;
+START: debug "-"x16, " START ", tms," ","-"x16;
 #########################
 ### START
 #########################
-
 my $c = new CTK;
-$projectname =~ s/[^a-zA-Z0-9_\-]//g;
-$projectname = $c->cli_prompt("Please enter name of Your project in unix style:", PROJECTNAME) unless $projectname;
+if ($OPT{interactive}) {
+    $ENV{TERM} = "dumb" if CTK::WIN;
+    my $term = new Term::ReadLine('CTKlib');
+    while ( defined ($_ = $term->readline("CTKlib> ")) ) { last if /^\s*(quit|exit)$/i;
+        my @w = shellwords($_);
+        if (@w) {
+            $term->addhistory($_);
+            my $command = shift @w;
+            if ($command =~ /^(help|man|\?)/i) {
+                say "USAGE:\n\t<command>";
+                say "\t... any Perl command ...";
+                say;
+                say "\thelp:\t\tHelp page";
+                say "\texit:\t\tExit";
+            } else {
+                my $res = eval(defined($_) ? $_ : "");
+                warn $@ if $@;
+            }
+            say;
+        }
+    }
+    goto FINISH;
+}
+
+$projectname =~ s/[^a-z0-9_\-]//ig;
+unless ($projectname) {
+    goto FINISH if $c->cli_prompt("Are you sure you want to create a new ".($OPT{tiny} ? 'tiny ' : '')."project?:", "yes") =~ /^n/i;
+    $projectname = $c->cli_prompt("Please enter name of Your project in unix style:", PROJECTNAME);
+}
 exception("Invalid project's name!") if $projectname =~ /[^a-z0-9_\-]/i;
 exception("Invalid project's name. Name must not be begun with a number!") if $projectname =~ /^\d/;
-debug "Creating project \"$projectname\"...";
+say "Creating ".($OPT{tiny} ? 'tiny ' : '')."project \"$projectname\"...";
 
 # Preparing directories and Log Clear 
 my $ds = DIRS;
 my $cd = cwd();
-foreach (@$ds) { $_ = CTK::catfile($cd,$projectname,$_) }
-push @$ds, CTK::catfile($cd,$projectname);
-CTK::preparedir($ds,0777);
+my $pdir = CTK::catdir($cd,$projectname);
+foreach (@$ds) { $_ = CTK::catdir($cd,$projectname,$_) }
+push @$ds, $pdir;
+CTK::preparedir($ds,DIRMODE) unless $OPT{tiny};
 
 my %replace = (
     PROJECTNAME  => $projectname,
@@ -122,13 +151,16 @@ my %replace = (
 
 # Пишем сам файл
 my $data = $OPT{tiny} ? get_projectcontent_tiny() : get_projectcontent();
-my $f = CTK::catfile($cd,$projectname,$projectname.'.pl');
+my $f = $OPT{tiny} 
+    ? CTK::catfile($cd,$projectname.'.pl')
+    : CTK::catfile($cd,$projectname,$projectname.'.pl');
 my $overwrite = 'yes';
 $overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;
 if ($overwrite =~ /^y/i) {
     CTK::fsave($f,_ff($data,\%replace)) ;
-    chmod(0755,$f);
+    chmod(EXEMODE,$f);
 }
+say "The tiny project \"$projectname\" was successfully created." and goto FINISH if $OPT{tiny};
 
 # Пишем библиотеку
 $f = CTK::catfile($cd,$projectname,'inc',$projectname.'.pm');
@@ -140,8 +172,7 @@ $f = CTK::catfile($cd,$projectname,$projectname.'.conf');
 $overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;
 CTK::fsave($f,_ff(get_projectcontent_conf(),\%replace)) if $overwrite =~ /^y/i;
 
-debug "Project \"$projectname\" created.";
-
+say "The project \"$projectname\" was successfully created.";
 #########################
 ### FINISH
 #########################

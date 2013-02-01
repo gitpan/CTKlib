@@ -1,4 +1,4 @@
-package CTK::Helper; # $Id: Helper.pm 85 2013-01-15 11:34:17Z minus $
+package CTK::Helper; # $Id: Helper.pm 99 2013-02-01 08:29:00Z minus $
 #
 # Процедуры возвращающие контенты файлов-скриптов. новых проектов
 # Для обработки ключей %PROJECTNAME% и %PODSIG% нужно использовать регулярные выражения
@@ -7,7 +7,7 @@ package CTK::Helper; # $Id: Helper.pm 85 2013-01-15 11:34:17Z minus $
 # %PROJECTNAME% -- имя проекта в Unix стиле
 #
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 85 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 99 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use base qw/Exporter/;
 our @EXPORT = qw(
@@ -39,61 +39,45 @@ Version 1.00
 
     %PROJECTNAME%.pl [--help | --version | --man]
     
-    %PROJECTNAME%.pl [[--debug | --nodebug] [--log | --nolog] [--logclear] [--testmode | --notestmode]]
+    %PROJECTNAME%.pl [--log] [--logclear] [--debug] [--testmode] [--signature=MESSAGE]
            [ test | void ]
 
 %PODSIG%head1 OPTIONS
 
 %PODSIG%over 4
 
+%PODSIG%item B<-c, --logclear>
+
+Очищать файл системного лога CTK при каждом вызове программы.
+
 %PODSIG%item B<-d, --debug>
 
-Включение отладочного режима. 
-Для управления уровнем отладки см. параметр DEBUG секции кофигурирования.
-Отладочный режим позволяет видеть процесс работы на экране терминала
-
-%PODSIG%item B<--nodebug>
-
-Выключение отладочного режима (default).
-Для управлением уровнем отладки см. параметр DEBUG секции кофигурирования 
+Включение системного отладочного режима уровня модуля CTK.
+Отладочный режим позволяет видеть процесс работы программы на экране терминала.
 
 %PODSIG%item B<-h, --help>
 
-Отображение краткой справочной информации
-
-%PODSIG%item B<-v, --ver, --version>
-
-Отображение текущей версии и наименование программы
-
-%PODSIG%item B<-m, --man>
-
-Отображение полной справочной документации
+Отображение краткой справочной информации.
 
 %PODSIG%item B<-l, --log>
 
-Включение режима записи в лог.
-Для управлением уровнем записи в лог см. параметр LOG секции кофигурирования.
+Включение режима записи отладочной (debug) информации в систменый лог CTK.
 
-%PODSIG%item B<--nolog>
+%PODSIG%item B<-m, --man>
 
-Выключение режима записи в лог (default)
-
-%PODSIG%item B<-c, --logclear>
-
-Очищать лог файл при каждом запуске программы
+Отображение полной справочной информации.
 
 %PODSIG%item B<--signature=MESSAGE>
 
-Помечать подписью каждую строчку лога
+Помечать подписью каждую строчку системного лога CTK сообщением MESSAGE.
 
 %PODSIG%item B<-t, --testmode>
 
-Включение тестового режима.
-Для управления уровнем тестового режима см. параметр TESTMODE секции кофигурирования.
+Включение тестового режима работы программы.
 
-%PODSIG%item B<--notestmode>
+%PODSIG%item B<-v, --ver, --version>
 
-Выключение тестового режима (default)
+Отображение текущей версии и наименование программы.
 
 %PODSIG%back
 
@@ -103,11 +87,11 @@ Version 1.00
 
 %PODSIG%item B<test>
 
-Тестирование всех основных компонентов робота
+Тестирование всех основных компонентов программы.
 
 %PODSIG%item B<void>
 
-Временные операции, по умолчанию пустой контекст, запускается и ничего не делает
+Пустой контекст, программа запускается и ничего не делает.
 
 %PODSIG%back
 
@@ -127,7 +111,7 @@ Init version
 
 %PODSIG%head1 DEPENDENCIES
 
-L<Moose>
+L<CTK>
 
 %PODSIG%head1 AUTHOR
 
@@ -139,7 +123,7 @@ Your Name E<lt>your@email.comE<gt>
 
 %PODSIG%head1 SEE ALSO
 
-C<perl>, C<Moose>
+C<perl>, L<CTK>
 
 %PODSIG%head1 DIAGNOSTICS
 
@@ -188,7 +172,7 @@ use Pod::Usage;
 use FindBin qw($RealBin);
 
 # Others:
-use Data::Dumper;
+# use Data::Dumper;
 
 # CTK Packages
 use lib "$RealBin/inc";

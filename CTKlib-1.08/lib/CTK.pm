@@ -1,4 +1,4 @@
-package CTK; # $Id: CTK.pm 80 2013-01-08 17:09:32Z minus $
+package CTK; # $Id: CTK.pm 99 2013-02-01 08:29:00Z minus $
 use Moose; #use strict;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK - Command-line ToolKit
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =head1 REVISION
 
-$Revision: 80 $
+$Revision: 99 $
 
 =head1 SYNOPSIS
 
@@ -83,6 +83,7 @@ L<MIME::Lite>,
 L<Moose>,
 L<namespace::autoclean>,
 L<Net::FTP>,
+L<Perl::OSType>,
 L<Sys::SigAction>,
 L<Term::ReadKey>,
 L<Term::ReadLine>,
@@ -115,7 +116,7 @@ Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -130,7 +131,7 @@ use vars qw/
         $VERSION
         $TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %ARGS %OPT @OPTSYSDEF
     /;
-$VERSION = 1.07;
+$VERSION = 1.08;
 
 use constant {
     DEBUG     => 1, # 0 - off, 1 - on, 2 - all (+ http headers and other)
@@ -188,30 +189,30 @@ sub init {
     # GLOBAL VARS
     $TM       = gettimeofday();
     $EXEDIR   = $RealBin; # Каталог где скрипт (не модифицируемый)
-    $DATADIR  = catfile($EXEDIR, DATADIRD); # Место где хранятся данные и отчеты
-    $CONFDIR  = catfile($EXEDIR, CONFDIRD); # Место где хранятся конфигурационные файлы (не главные)
-    $LOGDIR   = catfile($EXEDIR, LOGDIRD);  # Место где хранятся данные и отчеты
+    $DATADIR  = catdir($EXEDIR, DATADIRD);  # Место где хранятся данные и отчеты
+    $CONFDIR  = catdir($EXEDIR, CONFDIRD);  # Место где хранятся конфигурационные файлы (не главные)
+    $LOGDIR   = catdir($EXEDIR, LOGDIRD);   # Место где хранятся данные и отчеты
     $CONFFILE = catfile($EXEDIR, CFGFILED); # Файл конфигурации (УМОЛЧАНИЕ). См. BUILD()
-    $LOGFILE  = catfile($LOGDIR, LOGFILED); # Файл лога
+    $LOGFILE  = catfile($LOGDIR, LOGFILED); # Файл лога (умолчание)
     %OPT = (                                # Опции командной строки
-        'debug'     => DEBUG    ? 0 : 1, 
-        'log'       => LOG      ? 0 : 1,
-        'testmode'  => TESTMODE ? 0 : 1,
+        'debug'     => DEBUG    ? 0 : 1,    # Это сравнение излишне так как упразнен флаг "!"
+        'log'       => LOG      ? 0 : 1,    # Это сравнение излишне так как упразнен флаг "!"
+        'testmode'  => TESTMODE ? 0 : 1,    # Это сравнение излишне так как упразнен флаг "!"
     );
     @OPTSYSDEF = ( # Параметры по умолчанию. Используются ключевые буквы: humvdlcyt?
         # Параметры справки
-        "help|usage|h|u|?",                  # Помощь по синопсису
-        "man|m",                             # Справка
-        "version|ver|v",                     # Текущая версия
+        "help|usage|h|u|?",                 # Помощь по синопсису
+        "man|m",                            # Справка
+        "version|ver|v",                    # Текущая версия
     
         # Параметры отладки
-        "debug|d!",                          # Отладка (+ no~) -- на экран, уровень отладки см. DEBUG
-        "log|l!",                            # Логирование (+ no~) -- в лог, уровень лога см. LOG
-        "logclear|logclean|clean|clear|c",   # Очистка лога перед каждым запуском
-        "signature|sign|msg|y=s",            # Подпись к логу
+        "debug|d",                          # Отладка -- на экран, уровень отладки см. DEBUG
+        "log|l",                            # Логирование -- в лог, уровень лога см. LOG
+        "logclear|logclean|clean|clear|c",  # Очистка лога перед каждым запуском
+        "signature|sign|msg|y=s",           # Подпись к логу
     
         # Режим работы
-        "testmode|test|t!",                  # Тестовый режим работы (+ no~) -- уровень режима см. TESTMODE
+        "testmode|test|t",                  # Тестовый режим работы -- уровень режима см. TESTMODE
     );
 }    
 BEGIN { init() }
@@ -280,7 +281,7 @@ with 'CTK::CLI' => {
 has 'revision'  => ( # Ревизия
         is      => 'ro',
         isa     => 'Str',
-        default => q/$Revision: 80 $/ =~ /(\d+\.?\d*)/ ? $1 : '0',
+        default => q/$Revision: 99 $/ =~ /(\d+\.?\d*)/ ? $1 : '0',
         lazy    => 1,
         init_arg=> undef,
     );

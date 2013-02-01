@@ -37,6 +37,16 @@
 1.07 Tue Jan  8 17:06:49 2013 GMT
 
     * Documentation modified
-    * CTK::Util - Added functions: getsyscfg, prefixdir, localstatedir,
+    * CTK::Util - Added subroutines: getsyscfg, prefixdir, localstatedir,
       sysconfdir, srvdir, sharedir, docdir, localedir, cachedir, syslogdir,
       spooldir, rundir, lockdir, sharedstatedir, webdir and randchars
+
+1.08 Tue Jan 29 12:31:22 2013 GMT
+
+    * Documentation modified
+    * CTK::Util: Modified all extended subroutines.  
+      See http://www.pathname.com/fhs/pub/ for details
+    * CTK::Util: Added shuffle function from List::Util::PP module
+    * CTK::Util: Added eqtime function from ExtUtils::Command module
+    * Added interactive mode in bin/ctklib helper script
+

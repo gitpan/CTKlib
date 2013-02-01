@@ -30,6 +30,7 @@ my $prereq_pm = {
         'MIME::Lite'            => 3.00,
         'Moose'                 => 2.00,
         'Net::FTP'              => 2.60,
+        'Perl::OSType'          => 1.00,
         'Symbol'                => 1.07,
         'Term::ReadKey'         => 2.10,
         'Term::ReadLine'        => 1.04,
@@ -37,7 +38,7 @@ my $prereq_pm = {
         'Text::ParseWords'      => 3.27,
         'Time::HiRes'           => 1.97,
         'Time::Local'           => 1.20,
-        'URI'                   => 1.58,
+        'URI'                   => 1.60,
         'YAML'                  => 0.73,
         'namespace::autoclean'  => 0.13,
     };
