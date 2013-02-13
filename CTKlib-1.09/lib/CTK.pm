@@ -1,4 +1,4 @@
-package CTK; # $Id: CTK.pm 99 2013-02-01 08:29:00Z minus $
+package CTK; # $Id: CTK.pm 105 2013-02-06 13:58:46Z minus $
 use Moose; #use strict;
 
 =head1 NAME
@@ -7,24 +7,24 @@ CTK - Command-line ToolKit
 
 =head1 VERSION
 
-Version 1.08
+Version 1.09
 
 =head1 REVISION
 
-$Revision: 99 $
+$Revision: 105 $
 
 =head1 SYNOPSIS
 
     use CTK;
-  
+    
     use CTK qw( :BASE ); # :SUBS and :VARS tags to export
-  
+    
     use CTK qw( :SUBS ); # :SUBS tag only to export
-  
+    
     use CTK qw( :VARS ); # :VARS tag only to export
-  
+    
     my $c = new CTK;
-  
+    
     my $c = new CTK (
         prefix       => 'myprogram',
         suffix       => 'sample',
@@ -35,7 +35,7 @@ $Revision: 99 $
         logfile      => CTK::catfile($LOGDIR,'foo.log'),
         logseparator => ' ', # as default
     );
-  
+
 =head1 ABSTRACT
 
 CTKlib - Command-line ToolKit library (CTKlib). Command line interface (CLI)
@@ -127,11 +127,12 @@ This program is distributed under the GNU LGPL v3 (GNU Lesser General Public Lic
 See C<LICENSE> file
 
 =cut
+
 use vars qw/
         $VERSION
         $TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %ARGS %OPT @OPTSYSDEF
     /;
-$VERSION = 1.08;
+$VERSION = 1.09;
 
 use constant {
     DEBUG     => 1, # 0 - off, 1 - on, 2 - all (+ http headers and other)
@@ -281,7 +282,7 @@ with 'CTK::CLI' => {
 has 'revision'  => ( # Ревизия
         is      => 'ro',
         isa     => 'Str',
-        default => q/$Revision: 99 $/ =~ /(\d+\.?\d*)/ ? $1 : '0',
+        default => q/$Revision: 105 $/ =~ /(\d+\.?\d*)/ ? $1 : '0',
         lazy    => 1,
         init_arg=> undef,
     );

@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 97 2013-01-31 21:37:15Z minus $
+package CTK::Util; # $Id: Util.pm 110 2013-02-13 12:58:06Z minus $
 use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -11,12 +11,12 @@ Version 1.00
 
 =head1 REVISION 
 
-$Revision: 97 $
+$Revision: 110 $
 
 =head1 SYNOPSIS
 
     use CTK::Util;
-    use CTK::Util qw( :ALL ); # Export only ALL tag. See TAGS section
+    use CTK::Util qw( :BASE ); # Export only BASE subroutines. See TAGS section
     
     my @ls = ls(".");
     
@@ -30,14 +30,256 @@ $Revision: 97 $
     use CTK;
     my $c = new CTK;
     my $prefix = $c->getsyscfg("prefix");
-    
+
 =head1 DESCRIPTION
 
 Public subroutines
 
 =head2 SUBROUTINES
 
-...
+All subroutines are listed in alphabetical order
+
+=head3 basetime
+
+    $secs = basetime();
+
+The time at which the program began running, in seconds.
+This function returns result of expression:
+
+    time() - $^T
+
+=head3 bload, file_load
+
+    $bindata = bload( $file_or_fh, $onutf8 );
+
+Reading file in binary mode as ':raw:utf8' layer (if $onutf8 is true) or regular binary layer.
+
+=head3 bsave, file_save
+
+    $status = bsave( $file_or_fh, $bindata, $onutf8 );
+
+Saving file in binary mode as ':raw:utf8' layer (if $onutf8 is true) or regular binary layer.
+
+=head3 catdir, catfile, rootdir, tmpdir, updir, curdir, path, splitpath, splitdir
+
+This is the L<File::Spec> functions, and exported here for historical reasons.
+
+See L<File::Spec::Functions> and L<File::Spec> for details
+
+=over 4
+
+=item B<catdir>
+
+    $path = catdir( @directories );
+
+Concatenate two or more directory names to form a complete path ending with a directory. 
+But remove the trailing slash from the resulting string, because it doesn't look good, isn't 
+necessary and confuses OS/2. Of course, if this is the root directory, don't cut off the 
+trailing slash :-)
+
+=item B<catfile>
+
+    $path = catfile( @directories, $filename );
+
+Concatenate one or more directory names and a filename to form a complete path ending with a filename
+
+=item B<curdir>
+
+    $curdir = curdir();
+
+Returns a string representation of the current directory.
+
+=item B<path>
+
+    @PATH = path();
+
+Takes no argument. Returns the environment variable PATH (or the local platform's equivalent) as a list.
+
+=item B<rootdir>
+
+    $rootdir = rootdir();
+
+Returns a string representation of the root directory.
+
+=item B<splitdir>
+
+    @dirs = splitdir( $directories );
+
+The opposite of "catdir"
+
+=item B<splitpath>
+
+    ($volume,$directories,$file) = splitpath( $path );
+    ($volume,$directories,$file) = splitpath( $path, $no_file );
+
+Splits a path in to volume, directory, and filename portions. On systems with no concept of volume, 
+returns '' for volume.
+
+For systems with no syntax differentiating filenames from directories, assumes that the last file is 
+a path unless $no_file is true or a trailing separator or /. or /.. is present. On Unix, this means 
+that $no_file true makes this return ( '', $path, '' ).
+
+=item B<tmpdir>
+
+    $tmpdir = tmpdir();
+
+Returns a string representation of the first writable directory from a list of possible temporary 
+directories. Returns the current directory if no writable temporary directories are found. The list 
+of directories checked depends on the platform; e.g. File::Spec::Unix checks $ENV{TMPDIR} (unless 
+taint is on) and /tmp.
+
+=item B<updir>
+
+    $updir = updir();
+
+Returns a string representation of the parent directory.
+
+=back
+
+=head3 cdata
+
+    $cdatatext = cdata( $text );
+
+Returns a string "<![CDATA[$text]]>" for plain XML documents.
+
+=head3 correct_date
+
+    $mydate = correct_date( $date );
+
+Returns date in format dd.mm.yyyy or null ('') if $date is wrongly.
+
+=head3 correct_dig
+
+    $mydig = correct_dig( $string );
+
+Returns digits only from string or 0 if string is not correctly.
+
+=head3 correct_number
+
+    $mynumber = correct_number( $string, $sep );
+
+Placement of separators discharges among digits. For example 1`234`567 if $sep is char "`" (default)
+
+=head3 current_date
+
+    $date = current_date();
+
+Returns current date in format dd.mm.yyyy
+
+=head3 current_date_time
+
+    $datetime = current_date_time();
+
+Returns current date in format dd.mm.yyyy hh.mm.ss
+
+=head3 date_time2dig
+
+    $dtd = date_time2dig( $datetime );
+
+Returns $datetime (or current) in format yyyymmddhhmmss
+
+=head3 date2dig
+
+    $dd = date2dig( $date );
+
+Returns $date (or current) in format yyyymmdd
+
+=head3 date2localtime
+
+    $time = date2localtime( $date );
+
+Returns time from date format dd.mm.yyyy in time() value in seconds since the system epoch 
+(Midnight, January 1, 1970 GMT on Unix, for example).
+
+See L<Time::Local/"timelocal">
+
+=head3 datetime2localtime
+
+    $time = datetime2localtime( $datetime );
+
+Returns time from datetime format dd.mm.yyyy hh.mm.ss in time() value in seconds since the system epoch 
+(Midnight, January 1, 1970 GMT on Unix, for example).
+
+See L<Time::Local/"timelocal">
+
+=head3 dformat
+
+    $string = dformat( $mask, \%replacehash );
+
+Replace substrings "[...]" in mask and
+returns replaced result. Data for replacing get from \%replacehash
+
+For example:
+
+    # -> 01-foo-bar.baz.tgz
+    $string = dformat( "01-[NAME]-bar.[EXT].tgz", {
+                NAME => 'foo', 
+                EXT  => 'baz',
+            } );
+
+=head3 dig2date
+
+    $date = dig2date_time( $dd );
+
+Returns date (or current) from format yyyymmdd in format dd.mm.yyyy
+
+=head3 dtf (datetimef, timef, datef)
+
+    $datetime = dtf( $format, $time );
+    $datetime = dtf( $format, $time, 1 ); # in GMT context
+    $datetime = dtf( $format, $time, 'MSK' ); # TimeZone (Z) = MSK
+    $datetime = dtf( $format, $time, 'GMT' ); # TimeZone (Z) = GMT
+
+Returns time in your format.
+Each conversion specification is replaced by appropriate characters as described in the following list. 
+
+    s, ss, _s - Seconds
+    m, mm, _m - Minutes
+    h, hh, _h - Hours
+    D, DD, _D - Day of month
+    M, MM, _M - Month
+    Y, YY, YYY, YYYY - Year
+    w       - Short form of week day (Sat, Tue and etc)
+    W       - Week day (Saturdat, Tuesday and etc)
+    MON, mon - Short form of month (Apr, May and etc)
+    MONTH, month - Month (April, May and etc)
+    Z       - short name of local TimeZone
+    G       - short name of TimeZone GMT (for GMT context only)
+    U       - short name of TimeZone UTC (for GMT context only)
+
+Examples:
+
+    # RFC2822
+    $dt = dtf("%w, %DD %MON %YYYY %hh:%mm:%ss +0400"); # Tue, 12 Feb 2013 16:07:05 +0400
+    
+    # W3CDTF (ISO 8601) -- Mail format
+    $dt = dtf("%YYYY-%MM-%DDT%hh:%mm:%ss+04:00"); # 2013-02-12T16:10:28+04:00
+    
+    # CTIME
+    $dt = dtf("%w %MON %_D %hh:%mm:%ss %YYYY"); # Tue Feb  2 16:15:18 2013
+    
+    # CTIME with TimeZone
+    $dt = dtf("%w %MON %_D %hh:%mm:%ss %YYYY %Z", time(), 'MSK'); # Tue Feb 12 17:21:50 2013 MSK
+    
+    # Russian date and time format
+    $dt = dtf("%DD.%MM.%YYYY %hh:%mm:%ss"); # 12.02.2013 16:16:53
+
+    # DIG form
+    $dt = dtf("%YYYY%MM%DD%hh%mm%ss"); # 20130212161844
+    
+    # HTTP headers format (See CGI::Util::expires)
+    $dt = dtf("%w, %DD %MON %YYYY %hh:%mm:%ss %G", time, 1); # Tue, 12 Feb 2013 13:35:04 GMT
+    
+    # HTTP/cookie format (See CGI::Util::expires)
+    $dt = dtf("%w, %DD-%MON-%YYYY %hh:%mm:%ss %G", time, 1); # Tue, 12-Feb-2013 13:35:04 GMT
+
+For more features please use L<Date::Format> and L<DateTime>
+
+=head3 dig2date_time
+
+    $datetime = dig2date_time( $dtd );
+
+Returns date (or current) from format yyyymmddhhmmss in format dd.mm.yyyy hh.mm.ss
 
 =head3 eqtime
 
@@ -48,12 +290,121 @@ Sets modified time of destination to that of source.
 =head3 escape
 
     $safe = escape("10% is enough\n");
-    
+
 Replaces each unsafe character in the string "10% is enough\n" with the corresponding
-escape sequence and returns the result.  The string argument should
+escape sequence and returns the result. The string argument should
 be a string of bytes.
 
 See also L<URI::Escape>
+
+=head3 fformat, splitformat
+
+    $file = fformat( $mask, $filename );
+
+Replace substrings "[FILENAME]", "[NAME]", "[FILEEXT]", "[EXT]" and "[FILE]" in mask and
+returns replaced result. Data for replacing get from filename:
+
+    [FILENAME] -- Fileneme only
+    [NAME]     -- Fileneme only
+    [FILEEXT]  -- Extension only
+    [EXT]      -- Extension only
+    [FILE]     -- = "[FILENAME].[FILEEXT]" ($filename)
+
+For example:
+
+    $file = fformat( "01-[NAME]-bar.[EXT].tgz", "foo.baz" ); # -> 01-foo-bar.baz.tgz
+
+=head3 fload, load_file
+
+    $textdata = fload( $file );
+
+Reading file in regular text mode
+
+=head3 fsave, save_file
+
+    $status = fsave( $file, $textdata );
+
+Saving file in regular text mode
+
+=head3 getlist, getfilelist
+
+    $listref = getlist( $dir, $mask );
+
+Returns reference to array files of directory $dir by $mask (regexp or scalar string).
+
+See L</"ls">
+
+=head3 getdirlist
+
+    $listref = getdirlist( $dir, $mask );
+
+Returns reference to array directories of directory $dir by $mask (regexp or scalar string).
+
+See L</"ls">
+
+=head3 localtime2date
+
+    $date = localtime2date( time() )
+
+Returns time in format dd.mm.yyyy
+
+=head3 localtime2date_time
+
+    $datetime = localtime2date_time( time() )
+
+Returns time in format dd.mm.yyyy hh.mm.ss
+
+=head3 ls
+
+    @list = ls( $dir);
+    @list = ls( $dir, $mask );
+
+A function returns list content of directory $dir by $mask (regexp or scalar string)
+
+=head3 preparedir
+
+    $status = preparedir( $dir );
+    $status = preparedir( \@dirs );
+    $status = preparedir( \%dirs );
+    $status = preparedir( $dir, $chmode );
+
+Preparing directory: creation and permission modification.
+The function returns true or false. 
+
+The $chmode argument should be a octal value, for example: 
+
+    $status = preparedir( [qw/ foo bar baz /], 0777 );
+
+=head3 randchars
+
+    $rand = randchars( $n ); # default chars collection: 0..9,'a'..'z','A'..'Z'
+    $rand = randchars( $n, \@collection ); # Defined chars collection
+
+Returns random sequence of casual characters by the amount of n
+
+For example:
+
+    $rand = randchars( 8, [qw/a b c d e f/]); # -> cdeccfdf
+
+=head3 randomize
+
+    $rand = randomize( $n );
+
+Returns random number of the set amount of characters
+
+=head3 scandirs
+
+    @dirs = scandirs( $dir, $mask );
+
+A function returns all directories of directory $dir by $mask (regexp or scalar string) in 
+format: [$path, $name]
+
+=head3 scanfiles
+
+    @files = scanfiles( $dir, $mask );
+
+A function returns all files of directory $dir by $mask (regexp or scalar string) in 
+format: [$path, $name]
 
 =head3 shuffle
 
@@ -66,13 +417,141 @@ Pure-Perl implementation of Function List::Util::PP::shuffle
 
 See also L<List::Util>
 
+=head3 slash
+
+    $slashed = slash( $string );
+
+Escaping symbols \ and ' and returns strings \\ and \'
+
+=head3 tag
+
+    $detagged = tag( $string );
+
+<, >, " and ' chars convert to &lt;, &gt;, &quot; and &#39; strings.
+
+=head3 tag_create
+
+    $string = tag_create( $detagged );
+
+Reverse function L</"tag">
+
+=head3 to_base64
+
+    $base64_text = to_base64( $utf8_text );
+
+Function to encode strings into the base64 encoding specified in 
+RFC 2045 - I<MIME (Multipurpose Internet
+Mail Extensions)>. The base64 encoding is designed to represent
+arbitrary sequences of octets in a form that need not be humanly
+readable. A 65-character subset ([A-Za-z0-9+/=]) of US-ASCII is used,
+enabling 6 bits to be represented per printable character.
+
+See also L<MIME::Base64>
+
+=head3 to_utf8 (CP1251toUTF8)
+
+    $utf8_text = to_utf8( $win1251_text )
+    $utf8_text = to_utf8( $win1251_text, "Windows-1251" )
+
+Decodes a sequence of octets ($win1251_text) assumed to be in I<ENCODING> (Windows-1251) into Perl's
+internal form and returns the resulting string.  As in encode(),
+ENCODING can be either a canonical name or an alias. For encoding names
+and aliases, see L<Encode>.
+
+=head3 to_windows1251 (UTF8toCP1251)
+
+    $win1251_text = to_windows1251( $utf8_text )
+    $win1251_text = to_windows1251( $utf8, "Windows-1251" )
+
+Encodes a string from Perl's internal form into I<ENCODING> (Windows-1251) and returns
+a sequence of octets ($win1251_text).  ENCODING can be either a canonical name or
+an alias. For encoding names and aliases, see L<Encode>.
+
 =head3 touch
 
-    touch("file");
+    touch( "file" );
 
 Makes file exist, with current timestamp
 
+=head3 translate
+
+    $string = translate( $rus_string );
+
+Translation russian (windows-1251/CP-1251) chars in latin symbols (poland transcription)
+
+=head3 unescape
+
+    $str = unescape(escape("10% is enough\n"));
+
+Returns a string with each %XX sequence replaced with the actual byte (octet).
+
+This does the same as:
+
+    $string =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+
+See also L<URI::Escape>
+
+=head3 variant_stf
+
+    $fixlenstr = variant_stf( "qwertyuiop", 3 ); # -> q.p
+    $fixlenstr = variant_stf( "qwertyuiop", 7 ); # -> qw...op
+
+Returns a line the fixed length from 3 to the n chars
+
+=head3 visokos
+
+    $lybool = visokos( 2012 );
+
+Returns a leap-year or not
+
 =head2 UTILITY SUBROUTINES
+
+=head3 ftp
+
+    %ftpct = (
+        ftphost     => '192.168.1.1',
+        ftpuser     => 'login',
+        ftppassword => 'password',
+        ftpdir      => '~/',
+        voidfile    => './void.txt',
+        #ftpattr    => {}, # See Net::FTP
+    );
+    
+    $ftpct  = ftp( \%ftpct, 'connect' ); # Returns the connect's object
+    $rfiles = ftp( \%ftpct, 'ls' ); # Returns reference to array of directory listing
+    @remotefiles = $rfiles ? grep {!(/^\./)} @$rfiles : ();
+    
+    ftp( \%ftpct, 'delete', $rfile ); # Delete remote file
+    ftp( \%ftpct, 'get', $rfile, $lfile ); # Get remote file to local file
+    ftp( \%ftpct, 'put', $lfile, $rfile ); # Put local file to remote file
+
+Simple working with FTP.
+
+See also L<Net::FTP>
+
+=head3 ftptest
+
+    $status = ftptest( \%ftpct );
+
+FTP connect testing. 
+
+See L</"ftp">
+
+=head3 ftpgetlist
+
+    $rfiles = ftpgetlist( \%ftpct, $mask);
+
+Returns reference to array of remote source listing by mask (as regexp, optional)
+
+See L</"ftp">
+
+=head3 procexec (procexe, proccommand, proccmd, procrun, exe, com, execute)
+
+    $outputdata = procexec( "ls -la" );
+
+Executing external (system) command.
+
+See also L<IPC::Open3>
 
 =head3 sendmail, send_mail
 
@@ -119,18 +598,8 @@ Makes file exist, with current timestamp
     );
     debug($sent ? 'mail has been sent :)' : 'mail was not sent :(');
 
-=head3 unescape
+Send mail. See L<MIME::Lite> for details
 
-    $str = unescape(escape("10% is enough\n"));
-    
-Returns a string with each %XX sequence replaced with the actual byte (octet).
-
-This does the same as:
-
-    $string =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
-
-See also L<URI::Escape>
-    
 =head2 EXTENDED SUBROUTINES
 
 =head3 cachedir
@@ -149,16 +618,16 @@ Files located under /var/cache may be expired in an application specific manner,
 or both. The application must always be able to recover from manual deletion of these files (generally because of
 a disk space shortage). No other requirements are made on the data format of the cache directories.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> cachedir
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"cachedir">
 
 =head3 docdir
 
     my $value = docdir();
     my $value = $c->docdir();
-    
+
 For example value can be set as: /usr/share/doc
 
-See <Sys::Path> docdir
+See <Sys::Path/"docdir">
 
 =head3 localstatedir
 
@@ -185,7 +654,7 @@ more difficult and is likely to create a naming conflict. Instead, link /var to 
 Applications must generally not add directories to the top level of /var. Such directories should only be added if
 they have some system-wide implication, and in consultation with the FHS mailing list.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> localstatedir
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"localstatedir">
 
 =head3 localedir
 
@@ -194,7 +663,7 @@ See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> localstatedir
 
 For example value can be set as: /usr/share/locale
 
-See L<Sys::Path> localedir
+See L<Sys::Path/"localedir">
 
 =head3 lockdir
 
@@ -214,7 +683,7 @@ to store the process identifier (PID) as a ten byte ASCII decimal number, with a
 process 1230 holds a lock file, it would contain the eleven characters: space, space, space, space, space, space,
 one, two, three, zero, and newline.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> lockdir
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"lockdir">
 
 =head3 prefixdir
 
@@ -233,7 +702,7 @@ host-specific or varies with time is stored elsewhere.
 
 Large software packages must not use a direct subdirectory under the /usr hierarchy.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> prefix
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"prefix">
 
 =head3 rundir
 
@@ -249,7 +718,7 @@ Process identifier (PID) files, which were originally placed in /etc, must be pl
 convention for PID files is <program-name>.pid. For example, the crond PID file is named
 /var/run/crond.pid.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> rundir
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"rundir">
 
 =head3 sharedir
 
@@ -271,7 +740,7 @@ in /usr/share (or /usr/local/share, if installed locally). It is recommended tha
 Game data stored in /usr/share/games must be purely static data. Any modifiable files, such as score files,
 game play logs, and so forth, should be placed in /var/games.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> datadir
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"datadir">
 
 =head3 sharedstatedir
 
@@ -295,7 +764,7 @@ the other subdirectories should only be present if the application in question i
 /var/lib/<name> is the location that must be used for all distribution packaging support. Different
 distributions may use different names, of course.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> sharedstatedir
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"sharedstatedir">
 
 =head3 spooldir
 
@@ -308,7 +777,7 @@ For example value can be set as: /var/spool
 work to be done in the future (by a program, user, or administrator); often data is deleted after it has been
 processed.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> spooldir
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"spooldir">
 
 =head3 srvdir
 
@@ -319,7 +788,7 @@ For example value can be set as: /srv
 
 /srv contains site-specific data which is served by this system.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> srvdir
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"srvdir">
 
 =head3 sysconfdir
 
@@ -331,7 +800,7 @@ For example value can be set as: /etc
 The /etc hierarchy contains configuration files. A "configuration file" is a local file used to control the operation
 of a program; it must be static and cannot be an executable binary.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> sysconfdir
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"sysconfdir">
 
 =head3 syslogdir
 
@@ -343,7 +812,7 @@ For example value can be set as: /var/log
 This directory contains miscellaneous log files. Most logs must be written to this directory or an appropriate
 subdirectory.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path> logdir
+See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"logdir">
 
 =head3 webdir
 
@@ -354,7 +823,7 @@ For example value can be set as: /var/www
 
 Directory where distribution put static web files.
 
-See L<Sys::Path> webdir
+See L<Sys::Path/"webdir">
 
 =head2 CORE SUBROUTINES
 
@@ -366,27 +835,27 @@ This is the L<Carp> functions, and exported here for historical reasons.
 
 =item B<carp>
 
-Warn user (from perspective of caller)
+    carp( "string trimmed to 80 chars" );
 
-    carp "string trimmed to 80 chars";
+Warn user (from perspective of caller)
 
 =item B<croak>
 
-Die of errors (from perspective of caller)
+    croak( "We're outta here!" );
 
-    croak "We're outta here!";
+Die of errors (from perspective of caller)
 
 =item B<cluck>
 
+    cluck( "This is how we got here!" );
+
 Warn user (more detailed what carp with stack backtrace)
 
-    cluck "This is how we got here!";
-
 =item B<confess>
-        
-Die of errors with stack backtrace
 
-    confess "not implemented";
+    confess( "not implemented" );
+
+Die of errors with stack backtrace
 
 =back
 
@@ -401,7 +870,7 @@ Returns all hash %Config from system module L<Config> or one value of this hash
     my $prefix = $c->getsyscfg("prefix");
 
 See L<Config> module for details
-    
+
 =head3 isos
 
 Returns true or false if the OS name is of the current value of C<$^O>
@@ -409,7 +878,7 @@ Returns true or false if the OS name is of the current value of C<$^O>
     isos('mswin32') ? "OK" : "NO";
     # or
     $c->isos('mswin32') ? "OK" : "NO";
-    
+
 See L<Perl::OSType> for details
 
 =head3 isostype
@@ -420,10 +889,10 @@ given type.
     isostype('Windows') ? "OK" : "NO";
     isostype('Unix', 'dragonfly') ? "OK" : "NO";
     # or
-    $c->isos('Windows') ? "OK" : "NO";
+    $c->isostype('Windows') ? "OK" : "NO";
     $c->isostype('Unix', 'dragonfly') ? "OK" : "NO";
 
-See L<Perl::OSType> C<is_os_type>
+See L<Perl::OSType/"is_os_type">
 
 =head3 read_attributes
 
@@ -451,35 +920,360 @@ See L<CGI::Util>
 
 =head3 ALL, DEFAULT
 
-Export all subroutines, default
+Export all subroutines, default:
+
+C<CP1251toUTF8>,
+C<UTF8toCP1251>,
+L</"basetime">,
+C<bload>,
+C<bsave>,
+L</"cachedir">,
+L</"carp">,
+L</"catdir">,
+L</"catfile">,
+L</"cdata">,
+L</"cluck">,
+C<com>,
+L</"confess">,
+L</"correct_date">,
+L</"correct_dig">,
+L</"correct_number">,
+L</"croak">,
+L</"curdir">,
+L</"current_date">,
+L</"current_date_time">,
+L</"date2dig">,
+L</"date2localtime">,
+L</"date_time2dig">,
+C<datef>,
+L</"datetime2localtime">,
+C<datetimef>,
+L</"dformat">,
+L</"dig2date">,
+L</"dig2date_time">,
+L</"docdir">,
+L</"dtf">,
+L</"eqtime">,
+L</"escape">,
+C<exe>,
+C<execute>,
+C<fformat>,
+C<file_load>,
+C<file_save>,
+C<fload>,
+C<fsave>,
+L</"ftp">,
+L</"ftpgetlist">,
+L</"ftptest">,
+L</"getdirlist">,
+C<getfilelist>,
+C<getlist>,
+C<getsyscfg>,
+L</"isos">,
+L</"isostype">,
+C<load_file>,
+L</"localedir">,
+L</"localstatedir">,
+L</"localtime2date">,
+L</"localtime2date_time">,
+L</"lockdir">,
+L</"ls">,
+L</"path">,
+L</"prefixdir">,
+L</"preparedir">,
+C<proccmd>,
+C<proccommand>,
+C<procexe>,
+L</"procexec">,
+C<procrun>,
+L</"randchars">,
+L</"randomize">,
+L</"read_attributes">,
+L</"rootdir">,
+L</"rundir">,
+C<save_file>,
+L</"scandirs">,
+L</"scanfiles">,
+C<send_mail>,
+C<sendmail>,
+L</"sharedir">,
+L</"sharedstatedir">,
+L</"shuffle">,
+L</"slash">,
+L</"splitdir">,
+C<splitformat>,
+L</"splitpath">,
+L</"spooldir">,
+L</"srvdir">,
+C<syscfg>,
+L</"sysconfdir">,
+L</"syslogdir">,
+L</"tag">,
+L</"tag_create">,
+C<timef>,
+L</"tmpdir">,
+L</"to_base64">,
+L</"to_utf8">,
+L</"to_windows1251">,
+L</"touch">,
+L</"translate">,
+L</"unescape">,
+L</"updir">,
+L</"variant_stf">,
+L</"visokos">,
+L</"webdir">
 
 =head3 BASE
 
-Export only base subroutines
+Export only base subroutines:
+
+C<CP1251toUTF8>,
+C<UTF8toCP1251>,
+L</"basetime">,
+C<bload>,
+C<bsave>,
+L</"cachedir">,
+L</"carp">,
+L</"catdir">,
+L</"catfile">,
+L</"cdata">,
+L</"cluck">,
+L</"confess">,
+L</"correct_date">,
+L</"correct_dig">,
+L</"correct_number">,
+L</"croak">,
+L</"curdir">,
+L</"current_date">,
+L</"current_date_time">,
+L</"date2dig">,
+L</"date2localtime">,
+L</"date_time2dig">,
+C<datef>,
+L</"datetime2localtime">,
+C<datetimef>,
+L</"dformat">,
+L</"dig2date">,
+L</"dig2date_time">,
+L</"docdir">,
+L</"dtf">,
+L</"eqtime">,
+L</"escape">,
+C<fformat>,
+C<file_load>,
+C<file_save>,
+C<fload>,
+C<fsave>,
+L</"getdirlist">,
+C<getfilelist>,
+C<getlist>,
+C<getsyscfg>,
+L</"isos">,
+L</"isostype">,
+C<load_file>,
+L</"localedir">,
+L</"localstatedir">,
+L</"localtime2date">,
+L</"localtime2date_time">,
+L</"lockdir">,
+L</"ls">,
+L</"path">,
+L</"prefixdir">,
+L</"preparedir">,
+L</"randchars">,
+L</"randomize">,
+L</"read_attributes">,
+L</"rootdir">,
+L</"rundir">,
+C<save_file>,
+L</"scandirs">,
+L</"scanfiles">,
+L</"sharedir">,
+L</"sharedstatedir">,
+L</"shuffle">,
+L</"slash">,
+L</"splitdir">,
+C<splitformat>,
+L</"splitpath">,
+L</"spooldir">,
+L</"srvdir">,
+C<syscfg>,
+L</"sysconfdir">,
+L</"syslogdir">,
+L</"tag">,
+L</"tag_create">,
+C<timef>,
+L</"tmpdir">,
+L</"to_base64">,
+L</"to_utf8">,
+L</"to_windows1251">,
+L</"touch">,
+L</"translate">,
+L</"unescape">,
+L</"updir">,
+L</"variant_stf">,
+L</"visokos">,
+L</"webdir">
 
 =head3 FORMAT
 
-Export only text format subroutines
+Export only text format subroutines:
+
+C<CP1251toUTF8>,
+C<UTF8toCP1251>,
+L</"cdata">,
+L</"correct_dig">,
+L</"correct_number">,
+L</"dformat">,
+L</"escape">,
+C<fformat>,
+L</"randchars">,
+L</"randomize">,
+L</"shuffle">,
+L</"slash">,
+C<splitformat>,
+L</"tag">,
+L</"tag_create">,
+L</"to_base64">,
+L</"to_utf8">,
+L</"to_windows1251">,
+L</"translate">,
+L</"unescape">,
+L</"variant_stf">
 
 =head3 DATE
 
-Export only date and time subroutines
+Export only date and time subroutines:
+
+L</"basetime">,
+L</"correct_date">,
+L</"current_date">,
+L</"current_date_time">,
+L</"date2dig">,
+L</"date2localtime">,
+L</"date_time2dig">,
+C<datef>,
+L</"datetime2localtime">,
+C<datetimef>,
+L</"dig2date">,
+L</"dig2date_time">,
+L</"dtf">,
+L</"localtime2date">,
+L</"localtime2date_time">,
+C<timef>,
+L</"visokos">
 
 =head3 FILE
 
-Export only file and directories subroutines
+Export only file and directories subroutines:
+
+C<bload>,
+C<bsave>,
+L</"eqtime">,
+C<file_load>,
+C<file_save>,
+C<fload>,
+C<fsave>,
+L</"getdirlist">,
+C<getfilelist>,
+C<getlist>,
+C<load_file>,
+L</"ls">,
+L</"preparedir">,
+C<save_file>,
+L</"scandirs">,
+L</"scanfiles">,
+L</"touch">
 
 =head3 UTIL
 
-Export only utility subroutines
+Export only utility subroutines:
+
+C<com>,
+C<exe>,
+C<execute>,
+L</"ftp">,
+L</"ftpgetlist">,
+L</"ftptest">,
+C<proccmd>,
+C<proccommand>,
+C<procexe>,
+L</"procexec">,
+C<procrun>,
+C<send_mail>,
+C<sendmail>
 
 =head3 ATOM
 
-Export only processing subroutines
+Export only processing subroutines:
+
+C<bload>,
+C<bsave>,
+C<com>,
+L</"eqtime">,
+C<exe>,
+C<execute>,
+C<file_load>,
+C<file_save>,
+C<fload>,
+C<fsave>,
+L</"ftp">,
+L</"ftpgetlist">,
+L</"ftptest">,
+L</"getdirlist">,
+C<getfilelist>,
+C<getlist>,
+C<load_file>,
+L</"ls">,
+L</"preparedir">,
+C<proccmd>,
+C<proccommand>,
+C<procexe>,
+L</"procexec">,
+C<procrun>,
+C<save_file>,
+L</"scandirs">,
+L</"scanfiles">,
+C<send_mail>,
+C<sendmail>,
+L</"touch">
 
 =head3 API
 
-Export only inerface subroutines
+Export only inerface subroutines:
+
+L</"cachedir">,
+L</"carp">,
+L</"catdir">,
+L</"catfile">,
+L</"cluck">,
+L</"confess">,
+L</"croak">,
+L</"curdir">,
+L</"docdir">,
+C<getsyscfg>,
+L</"isos">,
+L</"isostype">,
+L</"localedir">,
+L</"localstatedir">,
+L</"lockdir">,
+L</"path">,
+L</"prefixdir">,
+L</"read_attributes">,
+L</"rootdir">,
+L</"rundir">,
+L</"sharedir">,
+L</"sharedstatedir">,
+L</"splitdir">,
+L</"splitpath">,
+L</"spooldir">,
+L</"srvdir">,
+C<syscfg>,
+L</"sysconfdir">,
+L</"syslogdir">,
+L</"tmpdir">,
+L</"updir">,
+L</"webdir">
 
 =head1 SEE ALSO
 
@@ -510,10 +1304,18 @@ use constant {
     TONULL    => $^O =~ /mswin/i ? '>NUL 2>&1' : '>/dev/null 2>&1',
     ERR2OUT   => '2>&1',
     VOIDFILE  => 'void.txt',
+    DTF       => {
+                    DOW  => [qw/Sunday Monday Tuesday Wednesday Thursday Friday Saturday/],
+                    DOWS => [qw/Sun Mon Tue Wed Thu Fri Sat/],
+                    MOY  => [qw/January February March April May June
+                             July August September October November December/],
+                    MOYS => [qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/],
+
+                },
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 97 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 110 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw/
@@ -538,6 +1340,9 @@ use base qw /Exporter/;
 my @est_core = qw(
         syscfg getsyscfg isos isostype
         carp croak cluck confess
+        catdir catfile rootdir tmpdir updir curdir path splitpath splitdir
+        prefixdir localstatedir sysconfdir srvdir
+        sharedir docdir localedir cachedir syslogdir spooldir rundir lockdir sharedstatedir webdir
         read_attributes
     );
 my @est_encoding = qw(
@@ -551,20 +1356,19 @@ my @est_format = qw(
 my @est_datetime = qw(
         current_date current_date_time localtime2date localtime2date_time correct_date date2localtime
         datetime2localtime visokos date2dig dig2date date_time2dig dig2date_time basetime
+        dtf datetimef timef datef
     );
 my @est_file = qw(
         load_file save_file file_load file_save fsave fload bsave bload touch eqtime
     );
 my @est_dir = qw(
-        ls scandirs scanfiles
+        ls scandirs scanfiles getlist getfilelist getdirlist 
         preparedir
-        catdir catfile rootdir tmpdir updir curdir path splitpath splitdir
-        prefixdir localstatedir sysconfdir srvdir
-        sharedir docdir localedir cachedir syslogdir spooldir rundir lockdir sharedstatedir webdir
+        
     );
 my @est_util = qw(
         sendmail send_mail
-        ftp ftptest ftpgetlist getlist getdirlist 
+        ftp ftptest ftpgetlist
         procexec procexe proccommand proccmd procrun exe com execute
     );
 
@@ -576,31 +1380,30 @@ our @EXPORT_OK = @EXPORT;
 our %EXPORT_TAGS = (
         ALL     => [@EXPORT],
         DEFAULT => [@EXPORT],
+        API     => [
+                @est_core,
+            ],
         BASE    => [
                 @est_core,
-                @est_encoding,
-                @est_format,
-                @est_file,
-                @est_util,
+                @est_encoding, @est_format,
+                @est_datetime, 
+                @est_file, @est_dir,
             ],
         FORMAT  => [
-                @est_encoding,
-                @est_format,
+                @est_encoding, @est_format,
             ],
-        DATE    => [@est_datetime],
-        FILE    => [@est_file],
+        DATE    => [
+                @est_datetime,
+            ],
+        FILE    => [
+                @est_file, @est_dir,
+            ],
         UTIL    => [
-                @est_core,
-                @est_dir,
                 @est_util,
             ],
         ATOM   => [
-                @est_dir,
+                @est_file, @est_dir,
                 @est_util,
-            ],
-        API    => [
-                @est_core,
-                @est_dir,
             ],
     );
 
@@ -608,110 +1411,6 @@ our %EXPORT_TAGS = (
 # должны идти через оболочку!!!
 push @CTK::Util::ISA, qw/CTK::Util::SysConfig/;
 
-sub send_mail {
-    # Version 3.01 (with UTF-8 as default character set and attachment support)    
-    #
-    # Отправка письма посредством модуля MIME::Lite в кодировке UTF-8
-    # Возвращает статус отправки. 1 - удача, 0 - неудача. Данные записались в лог
-    #
-    
-    my @args = @_;
-    my ($to, $cc, $from, $subject, $message, $type, 
-        $sendmail, $charset, $mailer_flags, $smtp, $smtpuser, $smtppass,$att);
-    
-    # Приём данных
-    ($to, $cc, $from, $subject, $message, $type, 
-     $sendmail, $charset, $mailer_flags, $smtp, $smtpuser, $smtppass, $att) =
-    read_attributes([
-        ['TO','KOMU','ADDRESS'],
-        ['COPY','CC'],
-        ['FROM','OT','OTKOGO','OT_KOGO'],
-        ['SUBJECT','SUBJ','SBJ','TEMA','DESCRIPTION'],
-        ['MESSAGE','CONTENT','TEXT','MAIL','DATA'],
-        ['TYPE','CONTENT-TYPE','CONTENT_TYPE'],
-        ['PROGRAM','SENDMAIL','PRG'],
-        ['CHARSET','CHARACTER_SET'],
-        ['FLAG','FLAGS','MAILERFLAGS','MAILER_FLAGS','SENDMAILFLAGS','SENDMAIL_FLAGS'],
-        ['SMTP','MAILSERVER','SERVER','HOST'],
-        ['SMTPLOGIN','AUTHLOGIN','LOGIN','SMTPUSER','AUTHUSER','USER'],
-        ['SMTPPASSWORD','AUTHPASSWORD','PASSWORD','SMTPPASS','AUTHPASS','PASS'],
-        ['ATTACH','ATTACHE','ATT'],
-    ],@args) if defined $args[0];
-
-    # По умолчанию берутся пустые данные, в дальнейшем -- данные конфигурации
-    $to           ||= ''; 
-    $cc           ||= '';
-    $from         ||= '';
-    $subject      ||= '';
-    $message      ||= '';
-    $type         ||= "text/plain";
-    $sendmail     ||= "/usr/lib/sendmail";
-    $sendmail       = "/usr/sbin/sendmail" if !-e $sendmail;
-    $sendmail       = "" if (-e $sendmail) && (-l $sendmail);
-    $charset      ||= "Windows-1251";
-    $mailer_flags ||= "-t";
-    $smtp         ||= ''; 
-    $smtpuser     ||= ''; 
-    $smtppass     ||= ''; 
-    $att          ||= '';
-
-    # Преобразование полей темы и данных в выбранную кодировку
-    if ($charset !~ /utf\-?8/i) {
-        $subject = to_utf8($subject,$charset);
-        $message = to_utf8($message,$charset);
-    }
-    
-    # Формирую объект
-    my $msg = MIME::Lite->new( 
-        From     => $from,
-        To       => $to,
-        Cc       => $cc,
-        Subject  => to_base64($subject),
-	    Type     => $type,
-        Encoding => 'base64',
-        Data     => Encode::encode('UTF-8',$message)
-    );
-    # Устанавливаем кодовую таблицу
-    $msg->attr('content-type.charset' => 'UTF-8');
-    $msg->attr('Content-Transfer-Encoding' => 'base64');
-    
-    # Аттач (если он есть)
-    if ($att) {
-        if (ref($att) =~ /HASH/i) {
-            $msg->attach(%$att);
-        } elsif  (ref($att) =~ /ARRAY/i) {
-            foreach (@$att) {
-                if (ref($_) =~ /HASH/i) {
-                    $msg->attach(%$_);
-                } else {
-                    _debug("невозможно присоединить множественные данные или файл к отправляемому письму");
-                }
-            }
-        } else {
-            _debug("невозможно присоединить данные или файл к отправляемому письму");
-        }
-    }
-
-    # Отправка письма
-    my $sendstat;
-    if ($sendmail && -e $sendmail) {
-        # sendmail указан и он существует
-        $sendstat = $msg->send(sendmail => "$sendmail $mailer_flags");
-        _debug("[SENDMAIL: program sendmail not found! \"$sendmail $mailer_flags\"] $!") unless $sendstat;
-                   
-    } else {
-        # Попытка использовать SMTP сервер
-        my %auth;
-        %auth = (AuthUser=>$smtpuser, AuthPass=>$smtppass) if $smtpuser;
-        eval { $sendstat = $smtp ? $msg->send('smtp',$smtp,%auth) : $msg->send(); };
-        _debug("[SENDMAIL: bad send message ($smtp)!] $@") if $@;
-        _debug("[SENDMAIL: bad method send($smtp)!] $!") unless $sendstat; 
-    }
-    #_debug("[SENDMAIL: The mail has been successfully sent to $to ",::tms(),"]") if $sendstat;
-
-    return $sendstat ? 1 : 0;    
-}
-sub sendmail { goto &send_mail }
 sub to_utf8 {
     # Конвертирование строки в UTF-8 из указанной кодировки
     # to_utf8( $string, $charset ) # charset is 'Windows-1251' as default
@@ -728,7 +1427,7 @@ sub to_windows1251 {
 sub CP1251toUTF8 { goto &to_utf8 };
 sub UTF8toCP1251 { goto &to_windows1251 };
 sub to_base64 {
-    # Конвертирование строки UTF-8  в base64
+    # Конвертирование строки UTF-8 в base64
     # to_base64( $utf8_string )
 
     my $ss = shift || ''; # Сообщение
@@ -752,6 +1451,8 @@ sub slash {
 sub tag {
     #
     # Процедура удаляет системные данные из строки заменяя их 
+    # 
+    # <, >, " and ' chars convert to &lt;, &gt;, &quot; and &#39; strings
     #
     my $data_staring = shift || '';
 
@@ -798,7 +1499,6 @@ sub unescape { # Percent-decoding, also known as URL decoding
     $todecode =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
     return $todecode;
 }
-
 sub dformat { # маска, данные для замены в виде ссылки на хэш
     # Заменяет во входном шаблоне внутренние параметры на подставляемые
     my $fmt = shift || ''; # Формат для замены
@@ -809,7 +1509,9 @@ sub dformat { # маска, данные для замены в виде ссылки на хэш
 sub fformat { # маска, имя файла
     # Заменяет во входном шаблоне внутренние параметры на разделенные
     # [FILENAME] -- Только имя файла
+    # [NAME]     -- Только имя файла
     # [FILEEXT]  -- Только расширение файла
+    # [EXT]      -- Только расширение файла
     # [FILE]     -- Все имя файла и расширрение вместе
     my $fmt = shift || ''; # Формат. Например такй: [FILENAME]-blah-blah-blah.[FILEEXT]
     my $fin = shift || ''; # Имя файла которое будем всталять "по формату", например void.txt
@@ -835,8 +1537,8 @@ sub correct_number {
 }
 sub correct_dig {
     # Процедура корректировки значения на факт числа. Если значение состоит НЕ из цифр то возвращается 0
-    my $dig=shift || '';
-    if ($dig =~/^(\d{1,11})$/) {
+    my $dig = shift || '';
+    if ($dig =~/^\s*(\d+)\s*$/) {
         return $1;    
     }
     return 0;
@@ -845,23 +1547,14 @@ sub correct_dig {
 #
 # Конверторы дат и времени
 #
-sub current_date {
-    my @dt=localtime(time);
-    my $cdt= (($dt[3]>9)?$dt[3]:'0'.$dt[3]).'.'.(($dt[4]+1>9)?$dt[4]+1:'0'.($dt[4]+1)).'.'.($dt[5]+1900);
-    return $cdt;
-}
-sub current_date_time {
-    my @dt=localtime(time);
-    my $cdt= (($dt[3]>9)?$dt[3]:'0'.$dt[3]).'.'.(($dt[4]+1>9)?$dt[4]+1:'0'.($dt[4]+1)).'.'.($dt[5]+1900)." ".(($dt[2]>9)?$dt[2]:'0'.$dt[2]).":".(($dt[1]>9)?$dt[1]:'0'.$dt[1]).':'.(($dt[0]>9)?$dt[0]:'0'.$dt[0]);
-    return $cdt;
-}
+
 sub localtime2date {
     # Преобразование времени в дату формата 02.12.2010
     # localtime2date ( time() ) # => 02.12.2010
 
-    my $dandt=shift || time;
-    my @dt=localtime($dandt);
-    #my $cdt= (($dt[3]>9)?$dt[3]:'0'.$dt[3]).'.'.(($dt[4]+1>9)?$dt[4]+1:'0'.($dt[4]+1)).'.'.($dt[5]+1900);
+    my $dandt = shift || time();
+    my @dt = localtime($dandt);
+    #my $cdt=(($dt[3]>9)?$dt[3]:'0'.$dt[3]).'.'.(($dt[4]+1>9)?$dt[4]+1:'0'.($dt[4]+1)).'.'.($dt[5]+1900);
     #return $cdt;
     return sprintf (
         "%02d.%02d.%04d",
@@ -871,9 +1564,11 @@ sub localtime2date {
     );
 }
 sub localtime2date_time {
-    my $dandt=shift || time;
-    my @dt=localtime($dandt);
-    #my $cdt= (($dt[3]>9)?$dt[3]:'0'.$dt[3]).'.'.(($dt[4]+1>9)?$dt[4]+1:'0'.($dt[4]+1)).'.'.($dt[5]+1900)." ".(($dt[2]>9)?$dt[2]:'0'.$dt[2]).":".(($dt[1]>9)?$dt[1]:'0'.$dt[1]).':'.(($dt[0]>9)?$dt[0]:'0'.$dt[0]);
+    my $dandt = shift || time();
+    my @dt = localtime($dandt);
+    #my $cdt=(($dt[3]>9)?$dt[3]:'0'.$dt[3]).'.'.(($dt[4]+1>9)?$dt[4]+1:'0'.($dt[4]+1)).'.'
+    #.($dt[5]+1900)." ".(($dt[2]>9)?$dt[2]:'0'.$dt[2]).":".(($dt[1]>9)?$dt[1]:'0'.$dt[1]).':'
+    #.(($dt[0]>9)?$dt[0]:'0'.$dt[0]);
     #return $cdt;
     return sprintf (
         "%02d.%02d.%04d %02d:%02d:%02d",
@@ -886,6 +1581,8 @@ sub localtime2date_time {
     );
 
 }
+sub current_date { localtime2date() }
+sub current_date_time { localtime2date_time() }
 sub correct_date {
     #
     # Приведение даты в корректный правильный формат dd.mm.yyyy
@@ -970,6 +1667,56 @@ sub basetime {
     # Количество секунд с момента старта скрипта
     return time() - $^T
 }
+sub dtf {
+    my $f = shift || '';
+    my $t = shift || time();
+    my $g = shift || 0; # GMT time switch
+    my $z = ($g && $g =~ /^[\-+]?[1-9]$/) ? 'GMT' : ($g || '');
+
+    my (@dt,%dth, %dth2);
+    @dt = ($g && $z =~ /GMT|UTC/) ? gmtime($t) : localtime($t);
+    $dth{'%s'}     = $dt[0] || 0;
+    $dth{'%ss'}    = sprintf('%02d',$dth{'%s'});
+    $dth{'%_s'}    = sprintf('%2d',$dth{'%s'});
+    $dth{'%m'}     = $dt[1] || 0;
+    $dth{'%mm'}    = sprintf('%02d',$dth{'%m'});
+    $dth{'%_m'}    = sprintf('%2d',$dth{'%m'});
+    $dth{'%h'}     = $dt[2] || 0;
+    $dth{'%hh'}    = sprintf('%02d',$dth{'%h'});
+    $dth{'%_h'}    = sprintf('%2d',$dth{'%h'});
+    $dth{'%D'}     = $dt[3] || 0;
+    $dth{'%DD'}    = sprintf('%02d',$dth{'%D'});
+    $dth{'%_D'}    = sprintf('%2d',$dth{'%D'});
+    $dth{'%M'}     = $dt[4] || 0; $dth{'%M'}++;
+    $dth{'%MM'}    = sprintf('%02d',$dth{'%M'});
+    $dth{'%_M'}    = sprintf('%2d',$dth{'%M'});
+    $dth{'%Y'}     = $dt[5] || 0; $dth{'%Y'}+=1900;
+    $dth{'%YY'}    = sprintf('%02d',$dth{'%Y'}%100);
+    $dth{'%YYY'}   = sprintf('%03d',$dth{'%Y'}%1000);
+    $dth{'%YYYY'}  = sprintf('%04d',$dth{'%Y'});
+    $dth{'%_Y'}    = sprintf('%2d',$dth{'%Y'}%100);
+    $dth{'%_YY'}   = sprintf('%3d',$dth{'%Y'}%1000);
+    $dth{'%w'}     = DTF->{DOWS}->[$dt[6] || 0];
+    $dth{'%W'}     = DTF->{DOW}->[$dt[6] || 0];
+    $dth{'%MON'}   = DTF->{MOYS}->[$dt[4] || 0];
+    $dth{'%mon'}   = DTF->{MOYS}->[$dt[4] || 0];
+    $dth{'%MONTH'} = DTF->{MOY}->[$dt[4] || 0];
+    $dth{'%month'} = DTF->{MOY}->[$dt[4] || 0];
+    
+    # Second block
+    $dth2{'%G'}    = 'GMT' if $g;
+    $dth2{'%U'}    = 'UTC' if $g;
+    $dth2{'%Z'}    = $z;
+    $dth2{'%%'}    = '%';
+    
+    $f =~ s/$_/$dth{$_}/sge for sort { length($b) <=> length($a) } keys %dth;
+    $f =~ s/$_/$dth2{$_}/sge for qw/%G %U %Z %%/;
+   
+    return $f
+}
+sub timef { goto &dtf }
+sub datef { goto &dtf }
+sub datetimef { goto &dtf }
 
 #
 # Специфические преобразования и вычисления
@@ -1101,6 +1848,8 @@ sub save_file {
     }
     return 1; # статус выполнения операции 
 }
+sub fload { goto &load_file } # текстовое чтение
+sub fsave { goto &save_file } # текстовая запись
 
 #
 # Процедуры чтения и записи двоичных массивов из файла/в файл
@@ -1152,10 +1901,8 @@ sub file_save {
     close $OUT if $flc;
     return 1; # статус выполнения операции 
 }
-sub fsave { goto &save_file } # текстовая запись
-sub fload { goto &load_file } # текстовое чтение
-sub bsave { goto &file_save } # двоичная запись
 sub bload { goto &file_load } # двоичное чтение
+sub bsave { goto &file_save } # двоичная запись
 
 #
 # Файловые процедуры и процедуры работы с каталогами и списками каталогов
@@ -1225,7 +1972,7 @@ sub scandirs {
     @dirs = grep {!(/^\.+$/) && -d catdir($dir,$_)} ls($dir, $mask);
     @dirs = sort {$a cmp $b} @dirs;
   
-    return map {[catfile($dir,$_), $_]} @dirs;
+    return map {[catdir($dir,$_), $_]} @dirs;
 }
 sub scanfiles {
     # Получаем список файлов [путь,имя]
@@ -1254,15 +2001,131 @@ sub ls {
     @fds = readdir($dh);# ищем все файлы в указаной папке
     closedir($dh);
 
-    @fds = grep {/$mask/i} @fds if $mask; # выкидываем все файлы не по маске!
-    
+    # выкидываем все файлы не по маске!
+    if ($mask && ref($mask) eq 'Regexp') {
+        return grep {$_ =~ $mask} @fds; 
+    } else {
+        return grep {/$mask/} @fds if $mask;
+    }
     return @fds;
 }
+sub getlist {
+    # Получение списка ФАЙЛОВ в указанной директории по маске (отличие только в возврате вывода)
+    return [map {$_->[1]} scanfiles(@_)];
+}
+sub getfilelist { goto &getlist }
+sub getdirlist {
+    # Получение списка ПАПОК в указанной директории по маске (отличие только в возврате вывода)
+    return [map {$_->[1]} scandirs(@_)];
+}
 
-# Процедуры группы Atom
 #
-# ftp ftprwtest ftpgetlist getlist getdirlist procexec procexe proccommand proccmd procrun
+# Процедуры группы Util (Atom)
 #
+sub send_mail {
+    # Version 3.01 (with UTF-8 as default character set and attachment support)    
+    #
+    # Отправка письма посредством модуля MIME::Lite в кодировке UTF-8
+    # Возвращает статус отправки. 1 - удача, 0 - неудача. Данные записались в лог
+    #
+    
+    my @args = @_;
+    my ($to, $cc, $from, $subject, $message, $type, 
+        $sendmail, $charset, $mailer_flags, $smtp, $smtpuser, $smtppass,$att);
+    
+    # Приём данных
+    ($to, $cc, $from, $subject, $message, $type, 
+     $sendmail, $charset, $mailer_flags, $smtp, $smtpuser, $smtppass, $att) =
+    read_attributes([
+        ['TO','KOMU','ADDRESS'],
+        ['COPY','CC'],
+        ['FROM','OT','OTKOGO','OT_KOGO'],
+        ['SUBJECT','SUBJ','SBJ','TEMA','DESCRIPTION'],
+        ['MESSAGE','CONTENT','TEXT','MAIL','DATA'],
+        ['TYPE','CONTENT-TYPE','CONTENT_TYPE'],
+        ['PROGRAM','SENDMAIL','PRG'],
+        ['CHARSET','CHARACTER_SET'],
+        ['FLAG','FLAGS','MAILERFLAGS','MAILER_FLAGS','SENDMAILFLAGS','SENDMAIL_FLAGS'],
+        ['SMTP','MAILSERVER','SERVER','HOST'],
+        ['SMTPLOGIN','AUTHLOGIN','LOGIN','SMTPUSER','AUTHUSER','USER'],
+        ['SMTPPASSWORD','AUTHPASSWORD','PASSWORD','SMTPPASS','AUTHPASS','PASS'],
+        ['ATTACH','ATTACHE','ATT'],
+    ],@args) if defined $args[0];
+
+    # По умолчанию берутся пустые данные, в дальнейшем -- данные конфигурации
+    $to           ||= ''; 
+    $cc           ||= '';
+    $from         ||= '';
+    $subject      ||= '';
+    $message      ||= '';
+    $type         ||= "text/plain";
+    $sendmail     ||= "/usr/lib/sendmail";
+    $sendmail       = "/usr/sbin/sendmail" if !-e $sendmail;
+    $sendmail       = "" if (-e $sendmail) && (-l $sendmail);
+    $charset      ||= "Windows-1251";
+    $mailer_flags ||= "-t";
+    $smtp         ||= ''; 
+    $smtpuser     ||= ''; 
+    $smtppass     ||= ''; 
+    $att          ||= '';
+
+    # Преобразование полей темы и данных в выбранную кодировку
+    if ($charset !~ /utf\-?8/i) {
+        $subject = to_utf8($subject,$charset);
+        $message = to_utf8($message,$charset);
+    }
+    
+    # Формирую объект
+    my $msg = MIME::Lite->new( 
+        From     => $from,
+        To       => $to,
+        Cc       => $cc,
+        Subject  => to_base64($subject),
+	    Type     => $type,
+        Encoding => 'base64',
+        Data     => Encode::encode('UTF-8',$message)
+    );
+    # Устанавливаем кодовую таблицу
+    $msg->attr('content-type.charset' => 'UTF-8');
+    $msg->attr('Content-Transfer-Encoding' => 'base64');
+    
+    # Аттач (если он есть)
+    if ($att) {
+        if (ref($att) =~ /HASH/i) {
+            $msg->attach(%$att);
+        } elsif  (ref($att) =~ /ARRAY/i) {
+            foreach (@$att) {
+                if (ref($_) =~ /HASH/i) {
+                    $msg->attach(%$_);
+                } else {
+                    _debug("невозможно присоединить множественные данные или файл к отправляемому письму");
+                }
+            }
+        } else {
+            _debug("невозможно присоединить данные или файл к отправляемому письму");
+        }
+    }
+
+    # Отправка письма
+    my $sendstat;
+    if ($sendmail && -e $sendmail) {
+        # sendmail указан и он существует
+        $sendstat = $msg->send(sendmail => "$sendmail $mailer_flags");
+        _debug("[SENDMAIL: program sendmail not found! \"$sendmail $mailer_flags\"] $!") unless $sendstat;
+                   
+    } else {
+        # Попытка использовать SMTP сервер
+        my %auth;
+        %auth = (AuthUser=>$smtpuser, AuthPass=>$smtppass) if $smtpuser;
+        eval { $sendstat = $smtp ? $msg->send('smtp',$smtp,%auth) : $msg->send(); };
+        _debug("[SENDMAIL: bad send message ($smtp)!] $@") if $@;
+        _debug("[SENDMAIL: bad method send($smtp)!] $!") unless $sendstat; 
+    }
+    #_debug("[SENDMAIL: The mail has been successfully sent to $to ",::tms(),"]") if $sendstat;
+
+    return $sendstat ? 1 : 0;    
+}
+sub sendmail { goto &send_mail }
 sub ftp {
     # Упрощенная работа с FTP
     #my %ftpct = (
@@ -1284,7 +2147,7 @@ sub ftp {
     
     # Проверка на вшивость:
     unless ($ftpconnect && (ref($ftpconnect) eq 'HASH') && $ftpconnect->{ftphost}) {
-        _exception("Undefined conect's data");
+        _exception("Connect's data missing");
         return undef;
     }
 
@@ -1345,27 +2208,25 @@ sub ftptest {
     # Проверка RW соединения FTP и возвращение 1 в случае успеха
     my $ftpdata = shift || undef;
     unless ($ftpdata) {
-        _error('Нет данных соединения'); # Данные соединения с FTP
+        _error("Connect's data missing"); # Данные соединения с FTP
         return undef;
     }
-    # _debug("Проверка соединения RW с ftp://$ftpdata->{ftphost}...");
     my $vfile = '';
     if ($ftpdata->{voidfile}) {
         $vfile = $ftpdata->{voidfile};
     } else {
         $vfile = catfile(tmpdir(),VOIDFILE);
         touch($vfile);
-        
     }
     unless (-e $vfile) {
-        _debug("Нет файла VOID: \"$vfile\""); # Данные соединения с FTP
+        _debug("VOID file \"$vfile\" missing"); # Данные соединения с FTP
         return undef;
     }
     ftp($ftpdata, 'put', $vfile, VOIDFILE);
     my $rfiles = ftp($ftpdata,'ls');
     my @remotefiles = $rfiles ? grep {!(/^\./)} @$rfiles : ();
     unless (grep {$_ eq VOIDFILE} @remotefiles) {
-        _debug("Ошибка соединения с FTP {".join(", ",(%$ftpdata))."}");
+        _debug("Can't connect to remote FTP server {".join(", ",(%$ftpdata))."}");
         return undef;
     }
     ftp($ftpdata, 'delete', VOIDFILE);
@@ -1380,32 +2241,6 @@ sub ftpgetlist {
     my @files = grep {$_ =~ $mask} ($rfile ? @$rfile : ());
     return [@files];
 }
-sub getlist {
-    # Получение списка файлов в указанной директории по маске
-    my $dirin  = shift || '';     # Директория-источник
-    my $mask   = shift || qr//;   # Маска поиска файлов
-
-    my @list;
-    if (ref($mask) eq 'Regexp') {
-        foreach my $fr (scanfiles($dirin,$mask)) {
-            push @list, $fr->[1];
-        }
-    }
-    return [@list];
-}
-sub getdirlist {
-    # Получение списка папок в указанной директории по маске
-    my $dirin  = shift || '';     # Директория-источник
-    my $mask   = shift || qr//;   # Маска поиска файлов
-
-    my @list;
-    if (ref($mask) eq 'Regexp') {
-        foreach my $fr (scandirs($dirin)) {
-            push @list, $fr->[1] if $fr->[1] =~ $mask;
-        }
-    }
-    return [@list];
-}
 sub procexec {
     # Выполнение внешней команды IPC
     my $icmd = shift || '';     # команда и аргументы (ссылка на массив или строка)
@@ -1418,6 +2253,7 @@ sub procexec {
     }
    
     my ($in,$out,$err) = ('','',''); 
+    local (*IN, *OUT, *ERR);
     my $pid	= open3(\*IN, \*OUT, \*ERR, $scmd);
 	close IN;
 	while (<OUT>) { $out .= $_ }
@@ -1436,7 +2272,6 @@ sub procrun { goto &procexec }
 sub exe { goto &procexec }
 sub com { goto &procexec }
 sub execute { goto &procexec }
-
 
 #
 # Расширенный утилитарий (Extended)

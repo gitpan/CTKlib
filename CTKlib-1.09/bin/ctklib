@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+# $Id: ctklib 110 2013-02-13 12:58:06Z minus $
 use strict;
 
 =head1 NAME
@@ -7,11 +8,12 @@ ctklib - CTKlib project helper
 
 =head1 VERSION
 
-$Id: ctklib 100 2013-02-01 08:38:03Z minus $
+Version 1.09
 
 =head1 SYNOPSIS
 
     ctklib [-dt] [PROJECTNAME]
+    ctklib-tiny [PROJECTNAME]
     ctklib [-di]
 
 =head1 OPTIONS
@@ -32,7 +34,9 @@ Interactive (shell) mode without creation of project
 
 =item B<-t, --tiny>
 
-Tiny project create
+Tiny project create. Alias for this call:
+
+    ctklib-tiny [PROJECTNAME]
 
 =item B<-v, --ver, --version>
 
@@ -54,7 +58,8 @@ Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+This program is free software; you can redistribute it and/or modify it under the same terms and 
+conditions as Perl itself.
 
 This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
 
@@ -138,52 +143,59 @@ say "Creating ".($OPT{tiny} ? 'tiny ' : '')."project \"$projectname\"...";
 # Preparing directories and Log Clear 
 my $ds = DIRS;
 my $cd = cwd();
+my %files;
+my $overwrite = 'yes';
 my $pdir = CTK::catdir($cd,$projectname);
 foreach (@$ds) { $_ = CTK::catdir($cd,$projectname,$_) }
 push @$ds, $pdir;
 CTK::preparedir($ds,DIRMODE) unless $OPT{tiny};
+my $h = new CTK::Helper ( -ff => { PROJECTNAME => $projectname } );
 
-my %replace = (
-    PROJECTNAME  => $projectname,
-    PODSIG       => '=',
-    GMT          => scalar(gmtime)." GMT",
-);
-
-# Пишем сам файл
-my $data = $OPT{tiny} ? get_projectcontent_tiny() : get_projectcontent();
-my $f = $OPT{tiny} 
-    ? CTK::catfile($cd,$projectname.'.pl')
-    : CTK::catfile($cd,$projectname,$projectname.'.pl');
-my $overwrite = 'yes';
-$overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;
-if ($overwrite =~ /^y/i) {
-    CTK::fsave($f,_ff($data,\%replace)) ;
-    chmod(EXEMODE,$f);
+# Пишем tiny файл и выходим
+if ($OPT{tiny}) {
+    my $tinyf = CTK::catfile($cd,$projectname.'.pl');
+    $overwrite = $c->cli_prompt("File \"$tinyf\" already exists. Overwrite?:", $overwrite) if -e $tinyf;
+    if ($overwrite =~ /^y/i) {
+        $h->build('tiny', { tiny => $tinyf });
+        say "The tiny project \"$projectname\" ($tinyf) was successfully created.";
+    } else {
+        say "Skipped!";
+    }
+    
+    goto FINISH
 }
-say "The tiny project \"$projectname\" was successfully created." and goto FINISH if $OPT{tiny};
 
-# Пишем библиотеку
-$f = CTK::catfile($cd,$projectname,'inc',$projectname.'.pm');
-$overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;
-CTK::fsave($f,_ff(get_projectcontent_inc(),\%replace)) if $overwrite =~ /^y/i;
-
-# пишем файл конфигурации
-$f = CTK::catfile($cd,$projectname,$projectname.'.conf');
-$overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;
-CTK::fsave($f,_ff(get_projectcontent_conf(),\%replace)) if $overwrite =~ /^y/i;
-
+# Пишем основной проект
+%files = (
+        regular     => CTK::catfile($cd,$projectname,$projectname.'.pl'),
+        inc         => CTK::catfile($cd,$projectname,'inc',$projectname.'.pm'),
+        conf        => CTK::catfile($cd,$projectname,$projectname.'.conf'),
+        conf_arc    => CTK::catfile($cd,$projectname,'conf','ctklib-arc.conf'),
+        conf_store  => CTK::catfile($cd,$projectname,'conf','ctklib-store.conf'),
+        conf_sendmail => CTK::catfile($cd,$projectname,'conf','ctklib-sendmail.conf'),
+        readme      => CTK::catfile($cd,$projectname,'README'),
+        todo        => CTK::catfile($cd,$projectname,'TODO'),
+        license     => CTK::catfile($cd,$projectname,'LICENSE'),
+        changes     => CTK::catfile($cd,$projectname,'CHANGES'),
+        install     => CTK::catfile($cd,$projectname,'INSTALL'),
+    );
+while (my ($k, $f) = each %files) {
+    $overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;
+    if ($overwrite =~ /^y/i) {
+        $overwrite = 'yes';
+    } else {
+        $overwrite = 'no';
+        delete $files{$k};   # This is safe
+    }
+}
+$h->files(\%files);
+$h->build;
 say "The project \"$projectname\" was successfully created.";
+
 #########################
 ### FINISH
 #########################
 FINISH: debug "-"x16, " FINISH ", tms," ","-"x16;
 exit(0);
-sub _ff {
-    my $d = shift || '';
-    my $h = shift || {};
-    $d =~ s/\%(\w+?)\%/(defined $h->{$1} ? $h->{$1} : '')/eg;
-    return $d
-}
 1;
-
 __END__

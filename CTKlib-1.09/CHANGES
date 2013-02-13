@@ -50,3 +50,12 @@
     * CTK::Util: Added eqtime function from ExtUtils::Command module
     * Added interactive mode in bin/ctklib helper script
 
+1.09 Fri Feb  1 12:12:08 2013 GMT
+
+    * Documentation modified
+    * Modified CTK::Util functions: ls, getlist and getdirlist
+    * Modified CTK::Util functions: ftptest, procexec
+    * CTK::Util: Added dtf function and aliases: timef, datef and datetimef
+    * CTK::Helper: Added documentstion
+    * CTK::Helper: OOP Style supported
+    * ctklib-tiny: Added functional subroutines
