@@ -7,7 +7,7 @@
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 02-version.t 101 2013-02-01 09:25:37Z minus $
+# $Id: 02-version.t 114 2013-02-19 13:33:55Z minus $
 #
 #########################################################################
 use strict;
@@ -47,7 +47,7 @@ my $ctkcontent = CTK::fload($filectk);
 my $vsec;
 $vsec = $1 if $ctkcontent =~ /version\:?\s*([0-9.]+)/is;
 ok $vsec, "Version from section VERSION";
-is $vsec, $ctk_version, "CTK Version";
+is $vsec+0, $ctk_version+0, "CTK Version";
 #CTK::debug "VSEC: $vsec";
 
 # Reading README File
@@ -57,7 +57,7 @@ my $readmecontent = CTK::fload($filereadme);
 my $vsecreadme;
 $vsecreadme = $1 if $readmecontent =~ /version\:?\s*([0-9.]+)/is;
 ok $vsecreadme, "Version from README";
-is $vsecreadme, $ctk_version, "README Version";
+is $vsecreadme+0, $ctk_version+0, "README Version";
 
 # Reading META.yml
 my $filemeta = _find('META.yml');
@@ -70,7 +70,7 @@ if ($META && ref($META) eq 'HASH') {
     }
 }
 ok $vmeta, "Version from META.yml";
-is $vmeta, $ctk_version, "META.yml Version";
+is $vmeta+0, $ctk_version+0, "META.yml Version";
 
 done_testing();
 

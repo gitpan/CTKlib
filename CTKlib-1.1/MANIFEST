@@ -14,8 +14,14 @@ lib/CTK/Log.pm
 lib/CTK/Net.pm
 lib/CTK/Status.pm
 lib/CTK/Util.pm
+lib/CTK/XS/Util.pm
 t/01-use.t
 t/02-version.t
+t/03-xsutil.t
+xs/Makefile.PL
+xs/MANIFEST
+xs/README
+xs/Util.xs
 CHANGES
 LICENSE
 Makefile.PL

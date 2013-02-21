@@ -59,3 +59,11 @@
     * CTK::Helper: Added documentstion
     * CTK::Helper: OOP Style supported
     * ctklib-tiny: Added functional subroutines
+
+1.10 Mon Feb 18 07:05:40 2013 GMT
+
+    * Documentation modified
+    * CTK::Util: POD-error fixed
+    * CTK::XS::Util added
+    * CTK::XS::Util: added shred function (XS)
+

@@ -7,11 +7,10 @@
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 01-use.t 103 2013-02-01 12:13:48Z minus $
+# $Id: 01-use.t 114 2013-02-19 13:33:55Z minus $
 #
 #########################################################################
-
 use Test::More tests => 2;
 BEGIN { use_ok('CTK'); };
-is(CTK->VERSION,'1.09','Version checking');
+is(CTK->VERSION,1.10,'Version checking');
 

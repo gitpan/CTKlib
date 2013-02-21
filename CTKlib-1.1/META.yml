@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name: CTKlib
-version: 1.09
+version: 1.10
 abstract: 'CTKlib - Command-line ToolKit library (CTK). Command line interface (CLI)'
 author:
   - 'Lepenkov Sergey (Serz Minus) <minus@mail333.com>'
@@ -39,6 +39,7 @@ requires:
   Time::Local:            1.20
   URI:                    1.60
   YAML:                   0.73
+  XSLoader:               0.01
   namespace::autoclean:   0.13
   perl:                   5.008001
 recommends:

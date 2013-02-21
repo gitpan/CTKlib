@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 110 2013-02-13 12:58:06Z minus $
+package CTK::Util; # $Id: Util.pm 115 2013-02-20 14:30:35Z minus $
 use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK::Util - CTK Utilities
 
 =head1 VERSION
 
-Version 1.00
+Version 2.11
 
 =head1 REVISION 
 
-$Revision: 110 $
+$Revision: 115 $
 
 =head1 SYNOPSIS
 
@@ -406,6 +406,13 @@ format: [$path, $name]
 A function returns all files of directory $dir by $mask (regexp or scalar string) in 
 format: [$path, $name]
 
+=head3 shred
+
+    $stat = shred( $file );
+
+Do a more secure overwrite of given files or devices, to make it harder for even very 
+expensive hardware probing to recover the data.
+
 =head3 shuffle
 
     @cards = shuffle(0..51); # 0..51 in a random order
@@ -627,7 +634,7 @@ See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"cachedir">
 
 For example value can be set as: /usr/share/doc
 
-See <Sys::Path/"docdir">
+See L<Sys::Path/"docdir">
 
 =head3 localstatedir
 
@@ -1090,6 +1097,7 @@ L</"scandirs">,
 L</"scanfiles">,
 L</"sharedir">,
 L</"sharedstatedir">,
+L</"shred">,
 L</"shuffle">,
 L</"slash">,
 L</"splitdir">,
@@ -1183,6 +1191,7 @@ L</"preparedir">,
 C<save_file>,
 L</"scandirs">,
 L</"scanfiles">,
+L</"shred">,
 L</"touch">
 
 =head3 UTIL
@@ -1236,6 +1245,7 @@ L</"scandirs">,
 L</"scanfiles">,
 C<send_mail>,
 C<sendmail>,
+L</"shred">,
 L</"touch">
 
 =head3 API
@@ -1315,7 +1325,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 110 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 115 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw/
@@ -1329,6 +1339,7 @@ use File::Path; # mkpath / rmtree
 use IPC::Open3;
 use Symbol;
 use Cwd;
+use CTK::XS::Util;
 
 use Carp qw/carp croak cluck confess/;
 # carp    -- просто пишем
@@ -1359,7 +1370,7 @@ my @est_datetime = qw(
         dtf datetimef timef datef
     );
 my @est_file = qw(
-        load_file save_file file_load file_save fsave fload bsave bload touch eqtime
+        load_file save_file file_load file_save fsave fload bsave bload touch eqtime shred
     );
 my @est_dir = qw(
         ls scandirs scanfiles getlist getfilelist getdirlist 
@@ -1792,15 +1803,15 @@ sub randomize {
 }
 sub randchars {
     # Вычисление случайного символьного значения с заданным количеством знаков и заданным массивом
-	my $l = shift || return '';
-	return '' unless $l =~/^\d+$/;
+    my $l = shift || return '';
+    return '' unless $l =~/^\d+$/;
     my $arr = shift;
 
-	my $result = '';
-	my @chars = ($arr && ref($arr) eq 'ARRAY') ? (@$arr) : (0..9,'a'..'z','A'..'Z');
-	$result .= $chars[(int(rand($#chars+1)))] for (1..$l);
+    my $result = '';
+    my @chars = ($arr && ref($arr) eq 'ARRAY') ? (@$arr) : (0..9,'a'..'z','A'..'Z');
+    $result .= $chars[(int(rand($#chars+1)))] for (1..$l);
 
-	return $result;
+    return $result;
 }
 sub shuffle {
     # Процедура шаффлинга взятая из удаленного модуля List::Util::PP
@@ -1939,7 +1950,7 @@ sub eqtime {
     return 1;
 }
 sub preparedir {
-	# Подготовка директории к работе
+    # Подготовка директории к работе
     # Ссоздание каталога, если его нет, выставление прав на запись 0777
     my $din = shift || return 0;
     my $chmod = shift || undef; #0777
@@ -1951,7 +1962,7 @@ sub preparedir {
         @dirs = @$din;
     } else { push @dirs, $din }
     my $stat = 1;
-	foreach my $dir (@dirs) {
+    foreach my $dir (@dirs) {
         mkpath( $dir, {verbose => 0} ) unless -e $dir; # mkdir $dir unless -e $dir;
         #CTK::say("!!!! ",$dir);
         chmod($chmod,$dir) if defined($chmod) && -e $dir;
@@ -2081,7 +2092,7 @@ sub send_mail {
         To       => $to,
         Cc       => $cc,
         Subject  => to_base64($subject),
-	    Type     => $type,
+        Type     => $type,
         Encoding => 'base64',
         Data     => Encode::encode('UTF-8',$message)
     );
@@ -2176,29 +2187,29 @@ sub ftp {
     if ( $cmd eq "connect" ){
         # Возвращаем хэндлер на коннект
         return $ftp;
-	} elsif ( $cmd eq "ls" ){
-		# получаем список в виде массива
-		(my @out = $ftp->ls(WIN ? "" : "-1a" )) 
-			or _debug( "FTP: Can't get directory listing (\"$ftpdir\") from remote FTP server $ftphost: ", $ftp->message );
-	    $ftp->quit;
-	    return [@out];
+    } elsif ( $cmd eq "ls" ){
+        # получаем список в виде массива
+        (my @out = $ftp->ls(WIN ? "" : "-1a" )) 
+            or _debug( "FTP: Can't get directory listing (\"$ftpdir\") from remote FTP server $ftphost: ", $ftp->message );
+        $ftp->quit;
+        return [@out];
     } elsif (!$lfile) {
         # не выбран файл - ошибка
-		_debug("FTP: No filename given as parameter to FTP command $cmd");
+        _debug("FTP: No filename given as parameter to FTP command $cmd");
     } elsif ($cmd eq "delete") {
         # удаляем файл
-		$ftp->delete($lfile) 
-			or _debug( "FTP: Can't delete file \"$lfile\" on remote FTP server $ftphost: ", $ftp->message );
+        $ftp->delete($lfile) 
+            or _debug( "FTP: Can't delete file \"$lfile\" on remote FTP server $ftphost: ", $ftp->message );
     } elsif ($cmd eq "get") {
         # получаем файл
-		$ftp->binary;
-		$ftp->get($rfile,$lfile) 
-			or _debug("FTP: Can't get file \"$lfile\" from remote FTP server $ftphost: ", $ftp->message);
+        $ftp->binary;
+        $ftp->get($rfile,$lfile) 
+            or _debug("FTP: Can't get file \"$lfile\" from remote FTP server $ftphost: ", $ftp->message);
     } elsif ($cmd eq "put") {
         # отправляем файл
-		$ftp->binary;
-		$ftp->put($lfile,$rfile) 
-			or _debug("FTP: Can't put file \"$lfile\" on remote FTP server $ftphost: ", $ftp->message );
+        $ftp->binary;
+        $ftp->put($lfile,$rfile) 
+            or _debug("FTP: Can't put file \"$lfile\" on remote FTP server $ftphost: ", $ftp->message );
     }
 
     $ftp->quit; # закрываем соединение и выходим
@@ -2255,12 +2266,12 @@ sub procexec {
     my ($in,$out,$err) = ('','',''); 
     local (*IN, *OUT, *ERR);
     my $pid	= open3(\*IN, \*OUT, \*ERR, $scmd);
-	close IN;
-	while (<OUT>) { $out .= $_ }
-	close OUT;
+    close IN;
+    while (<OUT>) { $out .= $_ }
+    close OUT;
     while (<ERR>) { $err .= $_ }
-	close ERR;
-	waitpid($pid, 0);
+    close ERR;
+    waitpid($pid, 0);
     _debug("Executable error ($scmd): $err") if $err;
     
     return $out;
@@ -2294,11 +2305,11 @@ sub localstatedir {
     } elsif ($pfx eq '/usr/local') {
         return '/var';
     }
-	return catdir($pfx, 'var');
+    return catdir($pfx, 'var');
 }
 sub sysconfdir {
     my $pfx = prefixdir();
-	return $pfx eq '/usr' ? '/etc' : catdir($pfx, 'etc');
+    return $pfx eq '/usr' ? '/etc' : catdir($pfx, 'etc');
 }
 sub srvdir {
     my $pfx = prefixdir();
@@ -2307,7 +2318,7 @@ sub srvdir {
     } elsif ($pfx eq '/usr/local') {
         return '/srv';
     }
-	return catdir($pfx, 'srv');
+    return catdir($pfx, 'srv');
 }
 sub webdir {
     my $pfx = prefixdir();
@@ -2342,7 +2353,7 @@ sub read_attributes {
     return () unless @param;
 
     if (ref($param[0]) eq 'HASH') {
-	@param = %{$param[0]};
+    @param = %{$param[0]};
     } else {
         return @param unless (defined($param[0]) && substr($param[0],0,1) eq '-');
     }
@@ -2351,22 +2362,22 @@ sub read_attributes {
     my ($i,%pos);
     $i = 0;
     foreach (@$order) {
-	foreach (ref($_) eq 'ARRAY' ? @$_ : $_) {
+    foreach (ref($_) eq 'ARRAY' ? @$_ : $_) {
             $pos{lc($_)} = $i;
         }
-	$i++;
+    $i++;
     }
 
     my (@result,%leftover);
     $#result = $#$order;  # preextend
     while (@param) {
-	my $key = lc(shift(@param));
-	$key =~ s/^\-//;
+    my $key = lc(shift(@param));
+    $key =~ s/^\-//;
         if (exists $pos{$key}) {
-	    $result[$pos{$key}] = shift(@param);
-	} else {
-	    $leftover{$key} = shift(@param);
-	}
+        $result[$pos{$key}] = shift(@param);
+    } else {
+        $leftover{$key} = shift(@param);
+    }
     }
 
     push (@result,_make_attributes(\%leftover,1)) if %leftover;
@@ -2378,11 +2389,11 @@ sub _make_attributes {
     my $escape = shift || 0;
     my(@att);
     foreach (keys %{$attr}) {
-	my($key) = $_;
+    my($key) = $_;
         $key=~s/^\-//;
-	($key="\L$key") =~ tr/_/-/; # parameters are lower case, use dashes
-	my $value = $escape ? $attr->{$_} : $attr->{$_};
-	push(@att,defined($attr->{$_}) ? qq/$key="$value"/ : qq/$key/);
+    ($key="\L$key") =~ tr/_/-/; # parameters are lower case, use dashes
+    my $value = $escape ? $attr->{$_} : $attr->{$_};
+    push(@att,defined($attr->{$_}) ? qq/$key="$value"/ : qq/$key/);
     }
     return @att;
 }

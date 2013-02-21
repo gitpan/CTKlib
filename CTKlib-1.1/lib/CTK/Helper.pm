@@ -1,4 +1,4 @@
-package CTK::Helper; # $Id: Helper.pm 109 2013-02-13 11:42:09Z minus $
+package CTK::Helper; # $Id: Helper.pm 112 2013-02-18 07:29:14Z minus $
 
 =head1 NAME
 
@@ -6,11 +6,11 @@ CTK::Helper - Helper for building CTK scripts
 
 =head1 VIRSION
 
-Version 1.01
+Version 1.02
 
 =head1 REVISION
 
-$Revision: 109 $
+$Revision: 112 $
 
 =head1 HISTORY
 
@@ -23,6 +23,10 @@ Init version
 =item B<1.01>
 
 Added documentation
+
+=item B<1.02>
+
+Documentation modified
 
 =back
 
@@ -113,7 +117,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 109 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 112 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use base qw/Exporter/;
 our @EXPORT = qw(

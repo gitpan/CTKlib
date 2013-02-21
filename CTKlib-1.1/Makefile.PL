@@ -39,6 +39,7 @@ my $prereq_pm = {
         'Time::HiRes'           => 1.97,
         'Time::Local'           => 1.20,
         'URI'                   => 1.60,
+        'XSLoader'              => 0.01,
         'YAML'                  => 0.73,
         'namespace::autoclean'  => 0.13,
     };
@@ -54,6 +55,7 @@ WriteMakefile(
     'NAME'                  => 'CTK',
     'DISTNAME'              => 'CTKlib',
     'MIN_PERL_VERSION'      => 5.008001,
+    'DIR'                   => ['xs'],
     'VERSION_FROM'          => 'lib/CTK.pm', 
     'ABSTRACT_FROM'         => 'lib/CTK.pm',
     'BUILD_REQUIRES'        => $build_requires,
