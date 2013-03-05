@@ -2,9 +2,9 @@
 #
 # Module   : CTK::DBI
 # Style    : OOP
-# DATE     : 28.12.2012
-# Revision : $Revision: 69 $
-# Id       : $Id: DBI.pm 69 2012-12-28 19:26:44Z minus $
+# DATE     : 03.03.2013
+# Revision : $Revision: 124 $
+# Id       : $Id: DBI.pm 124 2013-03-03 11:51:25Z minus $
 #
 # Досутп к базам данных на основе модуля DBI. модуль облегчает доступ к данным и несколько схож
 # с модулем multistore в проекте MPMinus
@@ -16,7 +16,7 @@
 #
 #
 ################################################
-package CTK::DBI; # $Id: DBI.pm 69 2012-12-28 19:26:44Z minus $
+package CTK::DBI; # $Id: DBI.pm 124 2013-03-03 11:51:25Z minus $
 use strict;
 
 =head1 NAME
@@ -25,11 +25,11 @@ CTK::DBI - Database independent interface for CTKlib
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 REVISION
 
-$Revision: 69 $
+$Revision: 124 $
 
 =head1 SYNOPSIS
 
@@ -37,10 +37,12 @@ $Revision: 69 $
 
     # MySQL connect
     my $mso = new CTK::DBI(
-            -dsn  => 'DBI:mysql:database=TEST;host=192.168.1.1',
-            -user => 'login',
-            -pass => 'password',
-            #-attr => {},
+            -dsn        => 'DBI:mysql:database=TEST;host=192.168.1.1',
+            -user       => 'login',
+            -pass       => 'password',
+            -connect_to => 5,
+            -request_to => 60
+            #-attr      => {},
         );
     
     my $dbh = $mso->connect;
@@ -75,7 +77,7 @@ Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -90,28 +92,28 @@ See C<LICENSE> file
 use CTK::Util qw( :API );
 
 use constant {
+    WIN             => $^O =~ /mswin/i ? 1 : 0,
     TIMEOUT_CONNECT => 5,  # timeout connect
     TIMEOUT_REQUEST => 60, # timeout request
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 124 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 my $LOAD_SigAction = 0;
 eval 'use Sys::SigAction';
 my $es = $@;
 if ($es) {
     eval '
-        package  # hide me from PAUSE
+        package # hide me from PAUSE
             Sys::SigAction;
         sub set_sig_handler($$;$$) { 1 };
         1;
     ';
-    _error("Package Sys::SigAction don't installed! Please install this package") unless CTK::WIN;
+    _error("Package Sys::SigAction don't installed! Please install this package") unless WIN;
 } else {
     $LOAD_SigAction = 1;
 }
-
 
 use DBI();
 
@@ -121,20 +123,24 @@ sub new {
           ['DSN','STRING','STR'],
           ['USER','USERNAME','LOGIN'],
           ['PASSWORD','PASS'],
+          ['TIMEOUT_CONNECT','CONNECT_TIMEOUT','CNT_TIMEOUT','TIMEOUT_CNT','TO_CONNECT','CONNECT_TO'],
+          ['TIMEOUT_REQUEST','REQUEST_TIMEOUT','REQ_TIMEOUT','TIMEOUT_REQ','TO_REQUEST','REQUEST_TO'],
           ['ATTRIBUTES','ATTR','ATTRHASH','PARAMS'],
         ],@_);
 
     # Основные атрибуты соединения
     my %args = (
-            dsn      => $in[0] || '',
-            user     => $in[1] || '',
-            password => $in[2] || '',
-            attr     => $in[3] || undef,
-            dbh      => undef,
+            dsn         => $in[0] || '',
+            user        => $in[1] || '',
+            password    => $in[2] || '',
+            connect_to  => $in[3] || TIMEOUT_CONNECT,
+            request_to  => $in[4] || TIMEOUT_REQUEST,
+            attr        => $in[5] || undef,
+            dbh         => undef,
         );
     
     # Инициализируем соединение 
-    $args{dbh} = DBI_CONNECT(@args{qw/dsn user password attr/});
+    $args{dbh} = DBI_CONNECT(@args{qw/dsn user password attr connect_to/});
 
     # Коннект СОСТОЯЛСЯ
     _debug("--- DBI CONNECT {".$args{dsn}."} ---");
@@ -156,28 +162,28 @@ sub disconnect {
 }
 sub field {
     my $self = shift;
-    DBI_EXECUTE_FIELD($self->{dbh},@_)
+    DBI_EXECUTE_FIELD($self->{dbh},$self->{request_to},@_)
 }
 sub record {
     my $self = shift;
-    DBI_EXECUTE_RECORD($self->{dbh},@_)
+    DBI_EXECUTE_RECORD($self->{dbh},$self->{request_to},@_)
 }
 sub recordh {
     my $self = shift;
-    DBI_EXECUTE_RECORDH($self->{dbh},@_)
+    DBI_EXECUTE_RECORDH($self->{dbh},$self->{request_to},@_)
 }
 sub table {
     my $self = shift;
-    DBI_EXECUTE_TABLE($self->{dbh},@_)
+    DBI_EXECUTE_TABLE($self->{dbh},$self->{request_to},@_)
 }
 sub tableh {
     my $self = shift;
     my $key_field = shift; # Ключи конструктора (http://search.cpan.org/~timb/DBI-1.607/DBI.pm#fetchall_hashref)
-    DBI_EXECUTE_TABLEH($self->{dbh},$key_field,@_)
+    DBI_EXECUTE_TABLEH($self->{dbh},$key_field,$self->{request_to},@_)
 }
 sub execute {
     my $self = shift;
-    DBI_EXECUTE($self->{dbh},@_)
+    DBI_EXECUTE($self->{dbh},$self->{request_to},@_)
 }
 sub DESTROY {
     my $self = shift;
@@ -199,6 +205,7 @@ sub DBI_CONNECT {
     my $db_user     = shift || ''; # Имя пользователя базы данных
     my $db_password = shift || ''; # пароль пользователя базы данных
     my $db_attr     = shift || {}; # атрибуты - например {ORACLE_enable_utf8 => 1}
+    my $db_tocnt    = shift || TIMEOUT_CONNECT; # Таймаут для коннекта
 
     my $dbh;
     
@@ -208,7 +215,7 @@ sub DBI_CONNECT {
         local $SIG{ALRM} = sub { die "Connecting timeout \"$db_dsn\"" } unless $LOAD_SigAction;
         my $h = Sys::SigAction::set_sig_handler( 'ALRM' ,sub { die "Connecting timeout \"$db_dsn\"" ; } );
         eval {
-            alarm(TIMEOUT_CONNECT); #implement 2 second time out
+            alarm($db_tocnt); #implement 2 second time out
             unless ($dbh = DBI->connect($db_dsn, "$db_user", "$db_password", $db_attr)) {
                 $count_connect     = 0; # FALSE
                 $count_connect_msg = $DBI::errstr;
@@ -327,12 +334,14 @@ sub DBI_EXECUTE {
     # $sth = DBI_EXECUTE($dbh, $sql, @inargs)
     # IN:
     #   $dbh - DataBase Handler Object
+    #   $tor - TimeOut of Request
     #   $sql - SQL запрос
     #   [@inargs] - Аргументы для биндинга
     # OUT:
     #   $sth_ex - Объект выполнения для дальнейшего финиширования результата
     
     my $dbh = shift || return 0;
+    my $tor = shift || TIMEOUT_REQUEST; # Таймаут для выполнения запроса
     my $sql = shift || return 0;
  
     my @inargs = ();
@@ -352,7 +361,7 @@ sub DBI_EXECUTE {
         local $SIG{ALRM} = sub { die "Executing timeout" } unless $LOAD_SigAction;
         my $h = Sys::SigAction::set_sig_handler( 'ALRM' ,sub { die "Executing timeout" ; } );
         eval {
-            alarm(TIMEOUT_REQUEST);
+            alarm($tor);
             unless ($sth_ex->execute(@inargs)) {
                 $count_execute     = 0; # FALSE
                 $count_execute_msg = $dbh->errstr;  # FALSE
@@ -374,9 +383,6 @@ sub DBI_EXECUTE {
     
     return $sth_ex || undef;
 }
-sub _debug { 
-    #CTK::debug(@_) 
-    1;
-}
+sub _debug { 1 }
 sub _error { carp(@_) }
 1;

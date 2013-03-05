@@ -4,6 +4,7 @@ bin/ctklib-tiny
 lib/CTK.pm
 lib/CTK/Arc.pm
 lib/CTK/CLI.pm
+lib/CTK/ConfGenUtil.pm
 lib/CTK/CPX.pm
 lib/CTK/Crypt.pm
 lib/CTK/DBI.pm

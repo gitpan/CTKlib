@@ -67,3 +67,9 @@
     * CTK::XS::Util added
     * CTK::XS::Util: added shred function (XS)
 
+1.11 Thu Feb 21 10:08:47 2013 GMT
+
+    * Documentation modified
+    * CTK::DBI: Added timeouts attributes
+    * Added CTK::ConfGenUtil module
+

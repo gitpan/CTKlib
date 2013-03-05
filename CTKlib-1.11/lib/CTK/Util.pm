@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 115 2013-02-20 14:30:35Z minus $
+package CTK::Util; # $Id: Util.pm 128 2013-03-04 10:50:58Z minus $
 use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -11,7 +11,7 @@ Version 2.11
 
 =head1 REVISION 
 
-$Revision: 115 $
+$Revision: 128 $
 
 =head1 SYNOPSIS
 
@@ -223,6 +223,12 @@ For example:
 
 Returns date (or current) from format yyyymmdd in format dd.mm.yyyy
 
+=head3 dig2date_time
+
+    $datetime = dig2date_time( $dtd );
+
+Returns date (or current) from format yyyymmddhhmmss in format dd.mm.yyyy hh.mm.ss
+
 =head3 dtf (datetimef, timef, datef)
 
     $datetime = dtf( $format, $time );
@@ -274,12 +280,6 @@ Examples:
     $dt = dtf("%w, %DD-%MON-%YYYY %hh:%mm:%ss %G", time, 1); # Tue, 12-Feb-2013 13:35:04 GMT
 
 For more features please use L<Date::Format> and L<DateTime>
-
-=head3 dig2date_time
-
-    $datetime = dig2date_time( $dtd );
-
-Returns date (or current) from format yyyymmddhhmmss in format dd.mm.yyyy hh.mm.ss
 
 =head3 eqtime
 
@@ -1325,7 +1325,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 115 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 128 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw/
