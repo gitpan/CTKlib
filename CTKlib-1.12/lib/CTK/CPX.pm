@@ -1,4 +1,4 @@
-package CTK::CPX; # $Id: CPX.pm 87 2013-01-23 14:07:18Z minus $
+package CTK::CPX; # $Id: CPX.pm 132 2013-03-12 14:45:50Z minus $
 use Moose;
 =head1 NAME
 
@@ -10,7 +10,7 @@ Version 1.01
 
 =head1 REVISION
 
-$Revision: 87 $
+$Revision: 132 $
 
 =head1 SYNOPSIS
 
@@ -24,10 +24,6 @@ Converter between windows-1251 and your terminal encoding.
 
 No public subroutines
 
-=head1 AUTHOR
-
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
-
 =head1 SEE ALSO
 
 C<perl>, L<Moose>
@@ -36,9 +32,13 @@ C<perl>, L<Moose>
 
 The usual warnings if it can't read or write the files involved.
 
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 

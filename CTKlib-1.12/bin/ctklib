@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: ctklib 110 2013-02-13 12:58:06Z minus $
+# $Id: ctklib 130 2013-03-07 08:45:32Z minus $
 use strict;
 
 =head1 NAME
@@ -8,7 +8,7 @@ ctklib - CTKlib project helper
 
 =head1 VERSION
 
-Version 1.09
+Version 1.12
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ use constant {
     PROJECTNAME => 'foo',
     EXEMODE     => 0755,
     DIRMODE     => 0777,
-    DIRS        => [qw/log inc conf data src/],
+    DIRS        => [qw/log inc conf data src lib bin/],
 };
 use Getopt::Long;
 use Pod::Usage;
@@ -149,7 +149,10 @@ my $pdir = CTK::catdir($cd,$projectname);
 foreach (@$ds) { $_ = CTK::catdir($cd,$projectname,$_) }
 push @$ds, $pdir;
 CTK::preparedir($ds,DIRMODE) unless $OPT{tiny};
-my $h = new CTK::Helper ( -ff => { PROJECTNAME => $projectname } );
+my $h = new CTK::Helper ( -ff => { 
+        PROJECTNAME => $projectname,
+        CTKVERSION  => $c->VERSION,
+    } );
 
 # Пишем tiny файл и выходим
 if ($OPT{tiny}) {
@@ -178,6 +181,9 @@ if ($OPT{tiny}) {
         license     => CTK::catfile($cd,$projectname,'LICENSE'),
         changes     => CTK::catfile($cd,$projectname,'CHANGES'),
         install     => CTK::catfile($cd,$projectname,'INSTALL'),
+        bin         => CTK::catfile($cd,$projectname,'bin',$projectname),
+        manifest    => CTK::catfile($cd,$projectname,'MANIFEST'),
+        makefile    => CTK::catfile($cd,$projectname,'Makefile.PL'),
     );
 while (my ($k, $f) = each %files) {
     $overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;

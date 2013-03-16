@@ -1,4 +1,4 @@
-package CTK::Status; # $Id: Status.pm 69 2012-12-28 19:26:44Z minus $
+package CTK::Status; # $Id: Status.pm 132 2013-03-12 14:45:50Z minus $
 use strict;
 
 =head1 NAME
@@ -11,7 +11,7 @@ Version 1.22
 
 =head1 REVISION
 
-$Revision: 69 $
+$Revision: 132 $
 
 =head1 HISTORY
 
@@ -30,6 +30,10 @@ On base BeeCDR
 Documentation modified
 
 =item B<1.22>
+
+Documentation modified
+
+=item B<1.23>
 
 Documentation modified
 
@@ -55,10 +59,6 @@ Documentation modified
 
 Progressbar's system of your transactions and processes
 
-=head1 AUTHOR
-
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
-
 =head1 SEE ALSO
 
 C<perl>, L<Moose>
@@ -67,9 +67,13 @@ C<perl>, L<Moose>
 
 The usual warnings if it can't read or write the files involved.
 
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -81,7 +85,7 @@ See C<LICENSE> file
 
 =cut
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 use Time::HiRes qw(time);
 use Term::ReadKey qw(GetTerminalSize);
 use IO::Handle;

@@ -73,3 +73,8 @@
     * CTK::DBI: Added timeouts attributes
     * Added CTK::ConfGenUtil module
 
+1.12 Tue Mar  5 09:53:02 2013 GMT
+
+    * Documentation modified
+    * Added function CTK::Util::to_cp1251 as alias of CTK::Util::to_windows1251
+    * Interface modified for CTK::Util::execute function

@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 128 2013-03-04 10:50:58Z minus $
+package CTK::Util; # $Id: Util.pm 136 2013-03-16 15:47:57Z minus $
 use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -11,7 +11,7 @@ Version 2.11
 
 =head1 REVISION 
 
-$Revision: 128 $
+$Revision: 136 $
 
 =head1 SYNOPSIS
 
@@ -48,13 +48,13 @@ This function returns result of expression:
 
     time() - $^T
 
-=head3 bload, file_load
+=head3 bload
 
     $bindata = bload( $file_or_fh, $onutf8 );
 
 Reading file in binary mode as ':raw:utf8' layer (if $onutf8 is true) or regular binary layer.
 
-=head3 bsave, file_save
+=head3 bsave
 
     $status = bsave( $file_or_fh, $bindata, $onutf8 );
 
@@ -193,6 +193,10 @@ Returns time from date format dd.mm.yyyy in time() value in seconds since the sy
 
 See L<Time::Local/"timelocal">
 
+=head3 datef
+
+See L</"dtf">
+
 =head3 datetime2localtime
 
     $time = datetime2localtime( $datetime );
@@ -201,6 +205,10 @@ Returns time from datetime format dd.mm.yyyy hh.mm.ss in time() value in seconds
 (Midnight, January 1, 1970 GMT on Unix, for example).
 
 See L<Time::Local/"timelocal">
+
+=head3 datetimef
+
+See L</"dtf">
 
 =head3 dformat
 
@@ -217,6 +225,8 @@ For example:
                 EXT  => 'baz',
             } );
 
+See also L</"fformat"> for working with files
+
 =head3 dig2date
 
     $date = dig2date_time( $dd );
@@ -229,7 +239,7 @@ Returns date (or current) from format yyyymmdd in format dd.mm.yyyy
 
 Returns date (or current) from format yyyymmddhhmmss in format dd.mm.yyyy hh.mm.ss
 
-=head3 dtf (datetimef, timef, datef)
+=head3 dtf
 
     $datetime = dtf( $format, $time );
     $datetime = dtf( $format, $time, 1 ); # in GMT context
@@ -297,7 +307,7 @@ be a string of bytes.
 
 See also L<URI::Escape>
 
-=head3 fformat, splitformat
+=head3 fformat
 
     $file = fformat( $mask, $filename );
 
@@ -314,25 +324,27 @@ For example:
 
     $file = fformat( "01-[NAME]-bar.[EXT].tgz", "foo.baz" ); # -> 01-foo-bar.baz.tgz
 
-=head3 fload, load_file
+See also L</"dformat">
+
+=head3 file_load
+
+See L</"bload">
+
+=head3 file_save
+
+See L</"bsave">
+
+=head3 fload
 
     $textdata = fload( $file );
 
 Reading file in regular text mode
 
-=head3 fsave, save_file
+=head3 fsave
 
     $status = fsave( $file, $textdata );
 
 Saving file in regular text mode
-
-=head3 getlist, getfilelist
-
-    $listref = getlist( $dir, $mask );
-
-Returns reference to array files of directory $dir by $mask (regexp or scalar string).
-
-See L</"ls">
 
 =head3 getdirlist
 
@@ -340,7 +352,23 @@ See L</"ls">
 
 Returns reference to array directories of directory $dir by $mask (regexp or scalar string).
 
-See L</"ls">
+See also L</"ls">
+
+=head3 getfilelist
+
+    $listref = getlist( $dir, $mask );
+
+Returns reference to array files of directory $dir by $mask (regexp or scalar string).
+
+See also L</"ls">
+
+=head3 getlist
+
+See L</"getfilelist">
+
+=head3 load_file
+
+See L</"fload">
 
 =head3 localtime2date
 
@@ -392,6 +420,10 @@ For example:
 
 Returns random number of the set amount of characters
 
+=head3 save_file
+
+See L</"fsave">
+
 =head3 scandirs
 
     @dirs = scandirs( $dir, $mask );
@@ -436,11 +468,19 @@ Escaping symbols \ and ' and returns strings \\ and \'
 
 <, >, " and ' chars convert to &lt;, &gt;, &quot; and &#39; strings.
 
+=head3 splitformat
+
+See L</"fformat">
+
 =head3 tag_create
 
     $string = tag_create( $detagged );
 
 Reverse function L</"tag">
+
+=head3 timef
+
+See L</"dtf">
 
 =head3 to_base64
 
@@ -455,7 +495,11 @@ enabling 6 bits to be represented per printable character.
 
 See also L<MIME::Base64>
 
-=head3 to_utf8 (CP1251toUTF8)
+=head3 to_cp1251
+
+See L</"to_windows1251">
+
+=head3 to_utf8
 
     $utf8_text = to_utf8( $win1251_text )
     $utf8_text = to_utf8( $win1251_text, "Windows-1251" )
@@ -465,7 +509,9 @@ internal form and returns the resulting string.  As in encode(),
 ENCODING can be either a canonical name or an alias. For encoding names
 and aliases, see L<Encode>.
 
-=head3 to_windows1251 (UTF8toCP1251)
+Obsolete alias: B<CP1251toUTF8>
+
+=head3 to_windows1251
 
     $win1251_text = to_windows1251( $utf8_text )
     $win1251_text = to_windows1251( $utf8, "Windows-1251" )
@@ -473,6 +519,8 @@ and aliases, see L<Encode>.
 Encodes a string from Perl's internal form into I<ENCODING> (Windows-1251) and returns
 a sequence of octets ($win1251_text).  ENCODING can be either a canonical name or
 an alias. For encoding names and aliases, see L<Encode>.
+
+Obsolete alias: B<UTF8toCP1251>
 
 =head3 touch
 
@@ -513,6 +561,28 @@ Returns a leap-year or not
 
 =head2 UTILITY SUBROUTINES
 
+=head3 com
+
+See L</"execute">
+
+=head3 exe
+
+See L</"execute">
+
+=head3 execute
+
+    $out = execute( "ls -la" );
+    $out = execute( "ls -la", $in, \$err, $binmode );
+
+Executing external (system) command with IPC::Open3 using.
+
+Variables $in, $err and $binmode is OPTIONAL.
+
+$binmode set up binary mode layer as ':raw:utf8' layer (if $binmode is ':raw:utf8', for example) or 
+regular binary layer (if $binmode is true).
+
+See also L<IPC::Open3>
+
 =head3 ftp
 
     %ftpct = (
@@ -536,14 +606,6 @@ Simple working with FTP.
 
 See also L<Net::FTP>
 
-=head3 ftptest
-
-    $status = ftptest( \%ftpct );
-
-FTP connect testing. 
-
-See L</"ftp">
-
 =head3 ftpgetlist
 
     $rfiles = ftpgetlist( \%ftpct, $mask);
@@ -552,15 +614,15 @@ Returns reference to array of remote source listing by mask (as regexp, optional
 
 See L</"ftp">
 
-=head3 procexec (procexe, proccommand, proccmd, procrun, exe, com, execute)
+=head3 ftptest
 
-    $outputdata = procexec( "ls -la" );
+    $status = ftptest( \%ftpct );
 
-Executing external (system) command.
+FTP connect testing. 
 
-See also L<IPC::Open3>
+See L</"ftp">
 
-=head3 sendmail, send_mail
+=head3 sendmail
 
     my $sent = sendmail(
         -to       => 'to@example.com',
@@ -607,6 +669,10 @@ See also L<IPC::Open3>
 
 Send mail. See L<MIME::Lite> for details
 
+=head3 send_mail
+
+See L</"sendmail">
+
 =head2 EXTENDED SUBROUTINES
 
 =head3 cachedir
@@ -636,6 +702,15 @@ For example value can be set as: /usr/share/doc
 
 See L<Sys::Path/"docdir">
 
+=head3 localedir
+
+    my $value = localedir();
+    my $value = $c->localedir();
+
+For example value can be set as: /usr/share/locale
+
+See L<Sys::Path/"localedir">
+
 =head3 localstatedir
 
     my $value = localstatedir();
@@ -662,15 +737,6 @@ Applications must generally not add directories to the top level of /var. Such d
 they have some system-wide implication, and in consultation with the FHS mailing list.
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"localstatedir">
-
-=head3 localedir
-
-    my $value = localedir();
-    my $value = $c->localedir();
-
-For example value can be set as: /usr/share/locale
-
-See L<Sys::Path/"localedir">
 
 =head3 lockdir
 
@@ -866,17 +932,9 @@ Die of errors with stack backtrace
 
 =back
 
-=head3 getsyscfg, syscfg 
+=head3 getsyscfg
 
-Returns all hash %Config from system module L<Config> or one value of this hash
-
-    my %syscfg = getsyscfg();
-    my $prefix = getsyscfg("prefix");
-    # or
-    my %syscfg = $c->getsyscfg();
-    my $prefix = $c->getsyscfg("prefix");
-
-See L<Config> module for details
+See L</"syscfg">
 
 =head3 isos
 
@@ -923,6 +981,18 @@ We do the rearrangement if the first parameter begins with a -
 
 See L<CGI::Util>
 
+=head3 syscfg
+
+Returns all hash %Config from system module L<Config> or one value of this hash
+
+    my %syscfg = syscfg();
+    my $prefix = syscfg( "prefix" );
+    # or
+    my %syscfg = $c->syscfg();
+    my $prefix = $c->syscfg( "prefix" );
+
+See L<Config> module for details
+
 =head2 TAGS
 
 =head3 ALL, DEFAULT
@@ -932,15 +1002,15 @@ Export all subroutines, default:
 C<CP1251toUTF8>,
 C<UTF8toCP1251>,
 L</"basetime">,
-C<bload>,
-C<bsave>,
+L</"bload">,
+L</"bsave">,
 L</"cachedir">,
 L</"carp">,
 L</"catdir">,
 L</"catfile">,
 L</"cdata">,
 L</"cluck">,
-C<com>,
+L</"com">,
 L</"confess">,
 L</"correct_date">,
 L</"correct_dig">,
@@ -952,9 +1022,9 @@ L</"current_date_time">,
 L</"date2dig">,
 L</"date2localtime">,
 L</"date_time2dig">,
-C<datef>,
+L</"datef">,
 L</"datetime2localtime">,
-C<datetimef>,
+L</"datetimef">,
 L</"dformat">,
 L</"dig2date">,
 L</"dig2date_time">,
@@ -962,23 +1032,23 @@ L</"docdir">,
 L</"dtf">,
 L</"eqtime">,
 L</"escape">,
-C<exe>,
-C<execute>,
-C<fformat>,
-C<file_load>,
-C<file_save>,
-C<fload>,
-C<fsave>,
+L</"exe">,
+L</"execute">,
+L</"fformat">,
+L</"file_load">,
+L</"file_save">,
+L</"fload">,
+L</"fsave">,
 L</"ftp">,
 L</"ftpgetlist">,
 L</"ftptest">,
 L</"getdirlist">,
-C<getfilelist>,
-C<getlist>,
-C<getsyscfg>,
+L</"getfilelist">,
+L</"getlist">,
+L</"getsyscfg">,
 L</"isos">,
 L</"isostype">,
-C<load_file>,
+L</"load_file">,
 L</"localedir">,
 L</"localstatedir">,
 L</"localtime2date">,
@@ -988,38 +1058,34 @@ L</"ls">,
 L</"path">,
 L</"prefixdir">,
 L</"preparedir">,
-C<proccmd>,
-C<proccommand>,
-C<procexe>,
-L</"procexec">,
-C<procrun>,
 L</"randchars">,
 L</"randomize">,
 L</"read_attributes">,
 L</"rootdir">,
 L</"rundir">,
-C<save_file>,
+L</"save_file">,
 L</"scandirs">,
 L</"scanfiles">,
-C<send_mail>,
-C<sendmail>,
+L</"send_mail">,
+L</"sendmail">,
 L</"sharedir">,
 L</"sharedstatedir">,
 L</"shuffle">,
 L</"slash">,
 L</"splitdir">,
-C<splitformat>,
+L</"splitformat">,
 L</"splitpath">,
 L</"spooldir">,
 L</"srvdir">,
-C<syscfg>,
+L</"syscfg">,
 L</"sysconfdir">,
 L</"syslogdir">,
 L</"tag">,
 L</"tag_create">,
-C<timef>,
+L</"timef">,
 L</"tmpdir">,
 L</"to_base64">,
+L</"to_cp1251">,
 L</"to_utf8">,
 L</"to_windows1251">,
 L</"touch">,
@@ -1037,8 +1103,8 @@ Export only base subroutines:
 C<CP1251toUTF8>,
 C<UTF8toCP1251>,
 L</"basetime">,
-C<bload>,
-C<bsave>,
+L</"bload">,
+L</"bsave">,
 L</"cachedir">,
 L</"carp">,
 L</"catdir">,
@@ -1056,9 +1122,9 @@ L</"current_date_time">,
 L</"date2dig">,
 L</"date2localtime">,
 L</"date_time2dig">,
-C<datef>,
+L</"datef">,
 L</"datetime2localtime">,
-C<datetimef>,
+L</"datetimef">,
 L</"dformat">,
 L</"dig2date">,
 L</"dig2date_time">,
@@ -1066,18 +1132,18 @@ L</"docdir">,
 L</"dtf">,
 L</"eqtime">,
 L</"escape">,
-C<fformat>,
-C<file_load>,
-C<file_save>,
-C<fload>,
-C<fsave>,
+L</"fformat">,
+L</"file_load">,
+L</"file_save">,
+L</"fload">,
+L</"fsave">,
 L</"getdirlist">,
-C<getfilelist>,
-C<getlist>,
-C<getsyscfg>,
+L</"getfilelist">,
+L</"getlist">,
+L</"getsyscfg">,
 L</"isos">,
 L</"isostype">,
-C<load_file>,
+L</"load_file">,
 L</"localedir">,
 L</"localstatedir">,
 L</"localtime2date">,
@@ -1092,7 +1158,7 @@ L</"randomize">,
 L</"read_attributes">,
 L</"rootdir">,
 L</"rundir">,
-C<save_file>,
+L</"save_file">,
 L</"scandirs">,
 L</"scanfiles">,
 L</"sharedir">,
@@ -1101,18 +1167,19 @@ L</"shred">,
 L</"shuffle">,
 L</"slash">,
 L</"splitdir">,
-C<splitformat>,
+L</"splitformat">,
 L</"splitpath">,
 L</"spooldir">,
 L</"srvdir">,
-C<syscfg>,
+L</"syscfg">,
 L</"sysconfdir">,
 L</"syslogdir">,
 L</"tag">,
 L</"tag_create">,
-C<timef>,
+L</"timef">,
 L</"tmpdir">,
 L</"to_base64">,
+L</"to_cp1251">,
 L</"to_utf8">,
 L</"to_windows1251">,
 L</"touch">,
@@ -1134,15 +1201,16 @@ L</"correct_dig">,
 L</"correct_number">,
 L</"dformat">,
 L</"escape">,
-C<fformat>,
+L</"fformat">,
 L</"randchars">,
 L</"randomize">,
 L</"shuffle">,
 L</"slash">,
-C<splitformat>,
+L</"splitformat">,
 L</"tag">,
 L</"tag_create">,
 L</"to_base64">,
+L</"to_cp1251">,
 L</"to_utf8">,
 L</"to_windows1251">,
 L</"translate">,
@@ -1160,35 +1228,35 @@ L</"current_date_time">,
 L</"date2dig">,
 L</"date2localtime">,
 L</"date_time2dig">,
-C<datef>,
+L</"datef">,
 L</"datetime2localtime">,
-C<datetimef>,
+L</"datetimef">,
 L</"dig2date">,
 L</"dig2date_time">,
 L</"dtf">,
 L</"localtime2date">,
 L</"localtime2date_time">,
-C<timef>,
+L</"timef">,
 L</"visokos">
 
 =head3 FILE
 
 Export only file and directories subroutines:
 
-C<bload>,
-C<bsave>,
+L</"bload">,
+L</"bsave">,
 L</"eqtime">,
-C<file_load>,
-C<file_save>,
-C<fload>,
-C<fsave>,
+L</"file_load">,
+L</"file_save">,
+L</"fload">,
+L</"fsave">,
 L</"getdirlist">,
-C<getfilelist>,
-C<getlist>,
-C<load_file>,
+L</"getfilelist">,
+L</"getlist">,
+L</"load_file">,
 L</"ls">,
 L</"preparedir">,
-C<save_file>,
+L</"save_file">,
 L</"scandirs">,
 L</"scanfiles">,
 L</"shred">,
@@ -1198,53 +1266,43 @@ L</"touch">
 
 Export only utility subroutines:
 
-C<com>,
-C<exe>,
-C<execute>,
+L</"com">,
+L</"exe">,
+L</"execute">,
 L</"ftp">,
 L</"ftpgetlist">,
 L</"ftptest">,
-C<proccmd>,
-C<proccommand>,
-C<procexe>,
-L</"procexec">,
-C<procrun>,
-C<send_mail>,
-C<sendmail>
+L</"send_mail">,
+L</"sendmail">
 
 =head3 ATOM
 
 Export only processing subroutines:
 
-C<bload>,
-C<bsave>,
-C<com>,
+L</"bload">,
+L</"bsave">,
+L</"com">,
 L</"eqtime">,
-C<exe>,
-C<execute>,
-C<file_load>,
-C<file_save>,
-C<fload>,
-C<fsave>,
+L</"exe">,
+L</"execute">,
+L</"file_load">,
+L</"file_save">,
+L</"fload">,
+L</"fsave">,
 L</"ftp">,
 L</"ftpgetlist">,
 L</"ftptest">,
 L</"getdirlist">,
-C<getfilelist>,
-C<getlist>,
-C<load_file>,
+L</"getfilelist">,
+L</"getlist">,
+L</"load_file">,
 L</"ls">,
 L</"preparedir">,
-C<proccmd>,
-C<proccommand>,
-C<procexe>,
-L</"procexec">,
-C<procrun>,
-C<save_file>,
+L</"save_file">,
 L</"scandirs">,
 L</"scanfiles">,
-C<send_mail>,
-C<sendmail>,
+C</"send_mail">,
+C</"sendmail">,
 L</"shred">,
 L</"touch">
 
@@ -1261,7 +1319,7 @@ L</"confess">,
 L</"croak">,
 L</"curdir">,
 L</"docdir">,
-C<getsyscfg>,
+L</"getsyscfg">,
 L</"isos">,
 L</"isostype">,
 L</"localedir">,
@@ -1278,7 +1336,7 @@ L</"splitdir">,
 L</"splitpath">,
 L</"spooldir">,
 L</"srvdir">,
-C<syscfg>,
+L</"syscfg">,
 L</"sysconfdir">,
 L</"syslogdir">,
 L</"tmpdir">,
@@ -1325,7 +1383,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 128 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 136 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw/
@@ -1357,7 +1415,7 @@ my @est_core = qw(
         read_attributes
     );
 my @est_encoding = qw(
-        to_utf8 to_windows1251 CP1251toUTF8 UTF8toCP1251 to_base64
+        to_utf8 to_windows1251 to_cp1251 CP1251toUTF8 UTF8toCP1251 to_base64
     );
 my @est_format = qw(
         escape unescape slash tag tag_create cdata dformat fformat splitformat
@@ -1435,6 +1493,7 @@ sub to_windows1251 {
     my $ch = shift || 'Windows-1251'; # Перекодировка
     return Encode::encode($ch,$ss)
 }
+sub to_cp1251 { goto &to_windows1251 };
 sub CP1251toUTF8 { goto &to_utf8 };
 sub UTF8toCP1251 { goto &to_windows1251 };
 sub to_base64 {
@@ -1733,33 +1792,33 @@ sub datetimef { goto &dtf }
 # Специфические преобразования и вычисления
 # 
 sub translate {
-  # Транслитерация русских букв в латинские (польскобуквенный вариант)
-  my $text = shift || '';
+    # Транслитерация русских букв в латинские (польскобуквенный вариант)
+    my $text = shift || '';
 
-  #$text=~tr/\xA8\xC0-\xDF/\xB8\xE0-\xFF/; # UP -> down
-  $text=~tr/\xA8\xC0-\xC5\xC7-\xD6\xDB\xDD/EABWGDEZIJKLMNOPRSTUFHCYE/; # UP
-  $text=~s/\xC6/Rz/g;
-  $text=~s/\xD7/Cz/g;
-  $text=~s/\xD8/Sz/g;
-  $text=~s/\xD9/Sz/g;
-  $text=~s/\xDA//g;
-  $text=~s/\xDC//g;
-  $text=~s/\xDE/Ju/g;
-  $text=~s/\xDF/Ja/g;
+    #$text=~tr/\xA8\xC0-\xDF/\xB8\xE0-\xFF/; # UP -> down
+    $text=~tr/\xA8\xC0-\xC5\xC7-\xD6\xDB\xDD/EABWGDEZIJKLMNOPRSTUFHCYE/; # UP
+    $text=~s/\xC6/Rz/g;
+    $text=~s/\xD7/Cz/g;
+    $text=~s/\xD8/Sz/g;
+    $text=~s/\xD9/Sz/g;
+    $text=~s/\xDA//g;
+    $text=~s/\xDC//g;
+    $text=~s/\xDE/Ju/g;
+    $text=~s/\xDF/Ja/g;
 
-  $text=~tr/\xB8\xE0-\xE5\xE7-\xF6\xFB\xFD/eabwgdezijklmnoprstufhcye/; # down
-  $text=~s/\xE6/rz/g;
-  $text=~s/\xF7/cz/g;
-  $text=~s/\xF8/sz/g;
-  $text=~s/\xF9/sz/g;
-  $text=~s/\xFA//g;
-  $text=~s/\xFC//g;
-  $text=~s/\xFE/ju/g;
-  $text=~s/\xFF/ja/g;
-  #$text=~tr/\x00-\x1F/_/;
-  #$text=~s/[,!?:;'<>=*'"`~ ]/_/g; # Замена знаков препинания
-  
-  return $text;
+    $text=~tr/\xB8\xE0-\xE5\xE7-\xF6\xFB\xFD/eabwgdezijklmnoprstufhcye/; # down
+    $text=~s/\xE6/rz/g;
+    $text=~s/\xF7/cz/g;
+    $text=~s/\xF8/sz/g;
+    $text=~s/\xF9/sz/g;
+    $text=~s/\xFA//g;
+    $text=~s/\xFC//g;
+    $text=~s/\xFE/ju/g;
+    $text=~s/\xFF/ja/g;
+    #$text=~tr/\x00-\x1F/_/;
+    #$text=~s/[,!?:;'<>=*'"`~ ]/_/g; # Замена знаков препинания
+
+    return $text;
 }
 sub variant_stf {
     my $S = shift || '';
@@ -2020,11 +2079,11 @@ sub ls {
     }
     return @fds;
 }
-sub getlist {
+sub getfilelist {
     # Получение списка ФАЙЛОВ в указанной директории по маске (отличие только в возврате вывода)
     return [map {$_->[1]} scanfiles(@_)];
 }
-sub getfilelist { goto &getlist }
+sub getlist { goto &getfilelist }
 sub getdirlist {
     # Получение списка ПАПОК в указанной директории по маске (отличие только в возврате вывода)
     return [map {$_->[1]} scandirs(@_)];
@@ -2252,37 +2311,55 @@ sub ftpgetlist {
     my @files = grep {$_ =~ $mask} ($rfile ? @$rfile : ());
     return [@files];
 }
-sub procexec {
+sub execute {
     # Выполнение внешней команды IPC
-    my $icmd = shift || '';     # команда и аргументы (ссылка на массив или строка)
-    my $scmd;
+    my $icmd = shift || ''; # команда и аргументы (ссылка на массив или строка)
+    my $in   = shift;
+    my $out  = '';
+    my $err  = shift; # !! REFERENCE TO SCALAR
+    my $bm   = shift;
     
-    if ($icmd && ref($icmd) eq 'ARRAY') {
-        $scmd = join " ", @$icmd;;
-    } else {
-        $scmd = $icmd;
-    }
-   
-    my ($in,$out,$err) = ('','',''); 
+    my @scmd;
+    if ($icmd && ref($icmd) eq 'ARRAY') { @scmd = @$icmd } else { push @scmd, $icmd }
+    
     local (*IN, *OUT, *ERR);
-    my $pid	= open3(\*IN, \*OUT, \*ERR, $scmd);
+    my $pid	= open3(\*IN, \*OUT, \*ERR, @scmd);
+
+    # 0 Input
+    binmode(IN) if defined($bm) && $bm && $bm =~ /^\d+$/;
+    binmode(IN, $bm) if defined($bm) && $bm =~ /\:/;
+    print IN $in if defined $in;
     close IN;
+    
+    # 1 Output
+    binmode(OUT) if defined($bm) && $bm && $bm =~ /^\d+$/;
+    binmode(OUT, $bm) if defined($bm) && $bm =~ /\:/;
     while (<OUT>) { $out .= $_ }
     close OUT;
-    while (<ERR>) { $err .= $_ }
+    
+    # 2 Error
+    my $ierr = '';
+    binmode(ERR) if defined($bm) && $bm && $bm =~ /^\d+$/;
+    binmode(ERR, $bm) if defined($bm) && $bm =~ /\:/;
+    while (<ERR>) { $ierr .= $_ }
     close ERR;
+    
     waitpid($pid, 0);
-    _debug("Executable error ($scmd): $err") if $err;
+    if ($err && ref($err) eq 'SCALAR') {
+        $$err = $ierr
+    } else {
+        _debug("Executable error (".join(" ",@scmd)."): $ierr") if $ierr;
+    }
     
     return $out;
 }
-sub procexe { goto &procexec }
-sub proccommand { goto &procexec }
-sub proccmd { goto &procexec }
-sub procrun { goto &procexec }
-sub exe { goto &procexec }
-sub com { goto &procexec }
-sub execute { goto &procexec }
+sub exe { goto &execute }
+sub com { goto &execute }
+sub procexec { goto &execute }
+sub procexe { goto &execute }
+sub proccommand { goto &execute }
+sub proccmd { goto &execute }
+sub procrun { goto &execute }
 
 #
 # Расширенный утилитарий (Extended)
@@ -2436,6 +2513,5 @@ sub ext_isos {
     return $cos && (lc($os) eq lc($cos)) && Perl::OSType::os_type($os) ? 1 : 0;
 }
 1;
-
 
 __END__
