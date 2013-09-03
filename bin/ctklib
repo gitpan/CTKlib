@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: ctklib 130 2013-03-07 08:45:32Z minus $
+# $Id: ctklib 138 2013-03-16 15:53:08Z minus $
 use strict;
 
 =head1 NAME
@@ -8,7 +8,7 @@ ctklib - CTKlib project helper
 
 =head1 VERSION
 
-Version 1.12
+Version 1.13
 
 =head1 SYNOPSIS
 

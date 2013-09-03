@@ -31,7 +31,7 @@ my $prereq_pm = {
         'Moose'                 => 2.00,
         'Net::FTP'              => 2.60,
         'Perl::OSType'          => 1.00,
-        'Symbol'                => 1.07,
+        'Symbol'                => 1.05,
         'Term::ReadKey'         => 2.10,
         'Term::ReadLine'        => 1.04,
         'Test::More'            => 0.94,
@@ -63,7 +63,6 @@ WriteMakefile(
     'EXE_FILES'             => $exefiles,
     'AUTHOR'                => 'Lepenkov Sergey (Serz Minus) <minus@mail333.com>',
     'LICENSE'               => 'lgpl',
-    'NO_META'               => $MSWIN ? 1 : 0,
     'META_MERGE' => {
         recommends => {
             'DBI'           => 0,

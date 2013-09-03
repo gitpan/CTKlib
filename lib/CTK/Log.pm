@@ -1,4 +1,4 @@
-package CTK::Log; # $Id: Log.pm 69 2012-12-28 19:26:44Z minus $
+package CTK::Log; # $Id: Log.pm 143 2013-05-22 14:00:23Z minus $
 use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 use Moose::Util::TypeConstraints;
 
@@ -12,7 +12,7 @@ Version 1.00
 
 =head1 REVISION
 
-$Revision: 69 $
+$Revision: 143 $
 
 =head1 SYNOPSIS
 
@@ -24,7 +24,7 @@ $Revision: 69 $
         
     $c->log( INFO => " ... Blah-Blah-Blah ... " );
 
-    $c->log_ecept()   # 9 exception
+    $c->log_except()  # 9 exception
     $c->log_fatal()   # 8 fatal
     $c->log_emerg()   # 7 system is unusable
     $c->log_alert()   # 6 action must be taken immediately
@@ -75,7 +75,7 @@ use constant {
 use Data::Dumper;
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 143 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 subtype 'LogLevels'
     => as 'Int'

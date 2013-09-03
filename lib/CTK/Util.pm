@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 136 2013-03-16 15:47:57Z minus $
+package CTK::Util; # $Id: Util.pm 145 2013-09-03 10:27:19Z minus $
 use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK::Util - CTK Utilities
 
 =head1 VERSION
 
-Version 2.11
+Version 2.12
 
 =head1 REVISION 
 
-$Revision: 136 $
+$Revision: 145 $
 
 =head1 SYNOPSIS
 
@@ -48,17 +48,23 @@ This function returns result of expression:
 
     time() - $^T
 
+Tags: BASE, DATE
+
 =head3 bload
 
     $bindata = bload( $file_or_fh, $onutf8 );
 
 Reading file in binary mode as ':raw:utf8' layer (if $onutf8 is true) or regular binary layer.
 
+Tags: BASE, FILE, ATOM
+
 =head3 bsave
 
     $status = bsave( $file_or_fh, $bindata, $onutf8 );
 
 Saving file in binary mode as ':raw:utf8' layer (if $onutf8 is true) or regular binary layer.
+
+Tags: BASE, FILE, ATOM
 
 =head3 catdir, catfile, rootdir, tmpdir, updir, curdir, path, splitpath, splitdir
 
@@ -136,11 +142,15 @@ Returns a string representation of the parent directory.
 
 =back
 
+Tags: API, BASE
+
 =head3 cdata
 
     $cdatatext = cdata( $text );
 
 Returns a string "<![CDATA[$text]]>" for plain XML documents.
+
+Tags: BASE, FORMAT
 
 =head3 correct_date
 
@@ -148,11 +158,15 @@ Returns a string "<![CDATA[$text]]>" for plain XML documents.
 
 Returns date in format dd.mm.yyyy or null ('') if $date is wrongly.
 
+Tags: BASE, DATE
+
 =head3 correct_dig
 
     $mydig = correct_dig( $string );
 
 Returns digits only from string or 0 if string is not correctly.
+
+Tags: BASE, FORMAT
 
 =head3 correct_number
 
@@ -160,11 +174,15 @@ Returns digits only from string or 0 if string is not correctly.
 
 Placement of separators discharges among digits. For example 1`234`567 if $sep is char "`" (default)
 
+Tags: BASE, FORMAT
+
 =head3 current_date
 
     $date = current_date();
 
 Returns current date in format dd.mm.yyyy
+
+Tags: BASE, DATE
 
 =head3 current_date_time
 
@@ -172,17 +190,23 @@ Returns current date in format dd.mm.yyyy
 
 Returns current date in format dd.mm.yyyy hh.mm.ss
 
+Tags: BASE, DATE
+
 =head3 date_time2dig
 
     $dtd = date_time2dig( $datetime );
 
 Returns $datetime (or current) in format yyyymmddhhmmss
 
+Tags: BASE, DATE
+
 =head3 date2dig
 
     $dd = date2dig( $date );
 
 Returns $date (or current) in format yyyymmdd
+
+Tags: BASE, DATE
 
 =head3 date2localtime
 
@@ -193,9 +217,13 @@ Returns time from date format dd.mm.yyyy in time() value in seconds since the sy
 
 See L<Time::Local/"timelocal">
 
+Tags: BASE, DATE
+
 =head3 datef
 
 See L</"dtf">
+
+Tags: BASE, DATE
 
 =head3 datetime2localtime
 
@@ -206,9 +234,13 @@ Returns time from datetime format dd.mm.yyyy hh.mm.ss in time() value in seconds
 
 See L<Time::Local/"timelocal">
 
+Tags: BASE, DATE
+
 =head3 datetimef
 
 See L</"dtf">
+
+Tags: BASE, DATE
 
 =head3 dformat
 
@@ -227,17 +259,23 @@ For example:
 
 See also L</"fformat"> for working with files
 
+Tags: BASE, FORMAT
+
 =head3 dig2date
 
     $date = dig2date_time( $dd );
 
 Returns date (or current) from format yyyymmdd in format dd.mm.yyyy
 
+Tags: BASE, DATE
+
 =head3 dig2date_time
 
     $datetime = dig2date_time( $dtd );
 
 Returns date (or current) from format yyyymmddhhmmss in format dd.mm.yyyy hh.mm.ss
+
+Tags: BASE, DATE
 
 =head3 dtf
 
@@ -291,11 +329,15 @@ Examples:
 
 For more features please use L<Date::Format> and L<DateTime>
 
+Tags: BASE, DATE
+
 =head3 eqtime
 
     eqtime("source/file", "destination/file");
 
 Sets modified time of destination to that of source.
+
+Tags: BASE, FILE, ATOM
 
 =head3 escape
 
@@ -306,6 +348,8 @@ escape sequence and returns the result. The string argument should
 be a string of bytes.
 
 See also L<URI::Escape>
+
+Tags: BASE, FORMAT
 
 =head3 fformat
 
@@ -326,13 +370,19 @@ For example:
 
 See also L</"dformat">
 
+Tags: BASE, FORMAT
+
 =head3 file_load
 
 See L</"bload">
 
+Tags: BASE, FILE, ATOM
+
 =head3 file_save
 
 See L</"bsave">
+
+Tags: BASE, FILE, ATOM
 
 =head3 fload
 
@@ -340,11 +390,15 @@ See L</"bsave">
 
 Reading file in regular text mode
 
+Tags: BASE, FILE, ATOM
+
 =head3 fsave
 
     $status = fsave( $file, $textdata );
 
 Saving file in regular text mode
+
+Tags: BASE, FILE, ATOM
 
 =head3 getdirlist
 
@@ -354,6 +408,8 @@ Returns reference to array directories of directory $dir by $mask (regexp or sca
 
 See also L</"ls">
 
+Tags: BASE, FILE, ATOM
+
 =head3 getfilelist
 
     $listref = getlist( $dir, $mask );
@@ -362,13 +418,19 @@ Returns reference to array files of directory $dir by $mask (regexp or scalar st
 
 See also L</"ls">
 
+Tags: BASE, FILE, ATOM
+
 =head3 getlist
 
 See L</"getfilelist">
 
+Tags: BASE, FILE, ATOM
+
 =head3 load_file
 
 See L</"fload">
+
+Tags: BASE, FILE, ATOM
 
 =head3 localtime2date
 
@@ -376,11 +438,15 @@ See L</"fload">
 
 Returns time in format dd.mm.yyyy
 
+Tags: BASE, DATE
+
 =head3 localtime2date_time
 
     $datetime = localtime2date_time( time() )
 
 Returns time in format dd.mm.yyyy hh.mm.ss
+
+Tags: BASE, DATE
 
 =head3 ls
 
@@ -388,6 +454,8 @@ Returns time in format dd.mm.yyyy hh.mm.ss
     @list = ls( $dir, $mask );
 
 A function returns list content of directory $dir by $mask (regexp or scalar string)
+
+Tags: BASE, FILE, ATOM
 
 =head3 preparedir
 
@@ -403,6 +471,8 @@ The $chmode argument should be a octal value, for example:
 
     $status = preparedir( [qw/ foo bar baz /], 0777 );
 
+Tags: BASE, FILE, ATOM
+
 =head3 randchars
 
     $rand = randchars( $n ); # default chars collection: 0..9,'a'..'z','A'..'Z'
@@ -414,15 +484,21 @@ For example:
 
     $rand = randchars( 8, [qw/a b c d e f/]); # -> cdeccfdf
 
+Tags: BASE, FORMAT
+
 =head3 randomize
 
     $rand = randomize( $n );
 
 Returns random number of the set amount of characters
 
+Tags: BASE, FORMAT
+
 =head3 save_file
 
 See L</"fsave">
+
+Tags: BASE, FILE, ATOM
 
 =head3 scandirs
 
@@ -431,6 +507,8 @@ See L</"fsave">
 A function returns all directories of directory $dir by $mask (regexp or scalar string) in 
 format: [$path, $name]
 
+Tags: BASE, FILE, ATOM
+
 =head3 scanfiles
 
     @files = scanfiles( $dir, $mask );
@@ -438,12 +516,16 @@ format: [$path, $name]
 A function returns all files of directory $dir by $mask (regexp or scalar string) in 
 format: [$path, $name]
 
+Tags: BASE, FILE, ATOM
+
 =head3 shred
 
     $stat = shred( $file );
 
 Do a more secure overwrite of given files or devices, to make it harder for even very 
 expensive hardware probing to recover the data.
+
+Tags: BASE, FILE, ATOM
 
 =head3 shuffle
 
@@ -456,11 +538,21 @@ Pure-Perl implementation of Function List::Util::PP::shuffle
 
 See also L<List::Util>
 
+Tags: BASE, FORMAT
+
 =head3 slash
 
     $slashed = slash( $string );
 
 Escaping symbols \ and ' and returns strings \\ and \'
+
+Tags: BASE, FORMAT
+
+=head3 splitformat
+
+See L</"fformat">
+
+Tags: BASE, FORMAT
 
 =head3 tag
 
@@ -468,9 +560,7 @@ Escaping symbols \ and ' and returns strings \\ and \'
 
 <, >, " and ' chars convert to &lt;, &gt;, &quot; and &#39; strings.
 
-=head3 splitformat
-
-See L</"fformat">
+Tags: BASE, FORMAT
 
 =head3 tag_create
 
@@ -478,9 +568,13 @@ See L</"fformat">
 
 Reverse function L</"tag">
 
+Tags: BASE, FORMAT
+
 =head3 timef
 
 See L</"dtf">
+
+Tags: BASE, DATE
 
 =head3 to_base64
 
@@ -495,9 +589,13 @@ enabling 6 bits to be represented per printable character.
 
 See also L<MIME::Base64>
 
+Tags: BASE, FORMAT
+
 =head3 to_cp1251
 
 See L</"to_windows1251">
+
+Tags: BASE, FORMAT
 
 =head3 to_utf8
 
@@ -511,6 +609,8 @@ and aliases, see L<Encode>.
 
 Obsolete alias: B<CP1251toUTF8>
 
+Tags: BASE, FORMAT
+
 =head3 to_windows1251
 
     $win1251_text = to_windows1251( $utf8_text )
@@ -522,17 +622,23 @@ an alias. For encoding names and aliases, see L<Encode>.
 
 Obsolete alias: B<UTF8toCP1251>
 
+Tags: BASE, FORMAT
+
 =head3 touch
 
     touch( "file" );
 
 Makes file exist, with current timestamp
 
+Tags: BASE, FILE, ATOM
+
 =head3 translate
 
     $string = translate( $rus_string );
 
 Translation russian (windows-1251/CP-1251) chars in latin symbols (poland transcription)
+
+Tags: BASE, FORMAT
 
 =head3 unescape
 
@@ -546,6 +652,8 @@ This does the same as:
 
 See also L<URI::Escape>
 
+Tags: BASE, FORMAT
+
 =head3 variant_stf
 
     $fixlenstr = variant_stf( "qwertyuiop", 3 ); # -> q.p
@@ -553,11 +661,15 @@ See also L<URI::Escape>
 
 Returns a line the fixed length from 3 to the n chars
 
+Tags: BASE, FORMAT
+
 =head3 visokos
 
     $lybool = visokos( 2012 );
 
 Returns a leap-year or not
+
+Tags: BASE, DATE
 
 =head2 UTILITY SUBROUTINES
 
@@ -565,9 +677,13 @@ Returns a leap-year or not
 
 See L</"execute">
 
+Tags: UTIL, ATOM
+
 =head3 exe
 
 See L</"execute">
+
+Tags: UTIL, ATOM
 
 =head3 execute
 
@@ -582,6 +698,8 @@ $binmode set up binary mode layer as ':raw:utf8' layer (if $binmode is ':raw:utf
 regular binary layer (if $binmode is true).
 
 See also L<IPC::Open3>
+
+Tags: UTIL, ATOM
 
 =head3 ftp
 
@@ -606,6 +724,8 @@ Simple working with FTP.
 
 See also L<Net::FTP>
 
+Tags: UTIL, ATOM
+
 =head3 ftpgetlist
 
     $rfiles = ftpgetlist( \%ftpct, $mask);
@@ -614,6 +734,8 @@ Returns reference to array of remote source listing by mask (as regexp, optional
 
 See L</"ftp">
 
+Tags: UTIL, ATOM
+
 =head3 ftptest
 
     $status = ftptest( \%ftpct );
@@ -621,6 +743,8 @@ See L</"ftp">
 FTP connect testing. 
 
 See L</"ftp">
+
+Tags: UTIL, ATOM
 
 =head3 sendmail
 
@@ -669,9 +793,13 @@ See L</"ftp">
 
 Send mail. See L<MIME::Lite> for details
 
+Tags: UTIL, ATOM
+
 =head3 send_mail
 
 See L</"sendmail">
+
+Tags: UTIL, ATOM
 
 =head2 EXTENDED SUBROUTINES
 
@@ -693,6 +821,8 @@ a disk space shortage). No other requirements are made on the data format of the
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"cachedir">
 
+Tags: API, BASE
+
 =head3 docdir
 
     my $value = docdir();
@@ -702,6 +832,8 @@ For example value can be set as: /usr/share/doc
 
 See L<Sys::Path/"docdir">
 
+Tags: API, BASE
+
 =head3 localedir
 
     my $value = localedir();
@@ -710,6 +842,8 @@ See L<Sys::Path/"docdir">
 For example value can be set as: /usr/share/locale
 
 See L<Sys::Path/"localedir">
+
+Tags: API, BASE
 
 =head3 localstatedir
 
@@ -738,6 +872,8 @@ they have some system-wide implication, and in consultation with the FHS mailing
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"localstatedir">
 
+Tags: API, BASE
+
 =head3 lockdir
 
     my $value = lockdir();
@@ -758,6 +894,8 @@ one, two, three, zero, and newline.
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"lockdir">
 
+Tags: API, BASE
+
 =head3 prefixdir
 
     my $value = prefixdir();
@@ -777,6 +915,8 @@ Large software packages must not use a direct subdirectory under the /usr hierar
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"prefix">
 
+Tags: API, BASE
+
 =head3 rundir
 
     my $value = rundir();
@@ -792,6 +932,8 @@ convention for PID files is <program-name>.pid. For example, the crond PID file 
 /var/run/crond.pid.
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"rundir">
+
+Tags: API, BASE
 
 =head3 sharedir
 
@@ -814,6 +956,8 @@ Game data stored in /usr/share/games must be purely static data. Any modifiable 
 game play logs, and so forth, should be placed in /var/games.
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"datadir">
+
+Tags: API, BASE
 
 =head3 sharedstatedir
 
@@ -839,6 +983,8 @@ distributions may use different names, of course.
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"sharedstatedir">
 
+Tags: API, BASE
+
 =head3 spooldir
 
     my $value = spooldir();
@@ -852,6 +998,8 @@ processed.
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"spooldir">
 
+Tags: API, BASE
+
 =head3 srvdir
 
     my $value = srvdir();
@@ -862,6 +1010,8 @@ For example value can be set as: /srv
 /srv contains site-specific data which is served by this system.
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"srvdir">
+
+Tags: API, BASE
 
 =head3 sysconfdir
 
@@ -875,6 +1025,8 @@ of a program; it must be static and cannot be an executable binary.
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"sysconfdir">
 
+Tags: API, BASE
+
 =head3 syslogdir
 
     my $value = syslogdir();
@@ -887,6 +1039,8 @@ subdirectory.
 
 See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"logdir">
 
+Tags: API, BASE
+
 =head3 webdir
 
     my $value = webdir();
@@ -897,6 +1051,8 @@ For example value can be set as: /var/www
 Directory where distribution put static web files.
 
 See L<Sys::Path/"webdir">
+
+Tags: API, BASE
 
 =head2 CORE SUBROUTINES
 
@@ -932,9 +1088,13 @@ Die of errors with stack backtrace
 
 =back
 
+Tags: API, BASE
+
 =head3 getsyscfg
 
 See L</"syscfg">
+
+Tags: API, BASE
 
 =head3 isos
 
@@ -945,6 +1105,8 @@ Returns true or false if the OS name is of the current value of C<$^O>
     $c->isos('mswin32') ? "OK" : "NO";
 
 See L<Perl::OSType> for details
+
+Tags: API, BASE
 
 =head3 isostype
 
@@ -958,6 +1120,8 @@ given type.
     $c->isostype('Unix', 'dragonfly') ? "OK" : "NO";
 
 See L<Perl::OSType/"is_os_type">
+
+Tags: API, BASE
 
 =head3 read_attributes
 
@@ -981,6 +1145,8 @@ We do the rearrangement if the first parameter begins with a -
 
 See L<CGI::Util>
 
+Tags: API, BASE
+
 =head3 syscfg
 
 Returns all hash %Config from system module L<Config> or one value of this hash
@@ -992,6 +1158,8 @@ Returns all hash %Config from system module L<Config> or one value of this hash
     my $prefix = $c->syscfg( "prefix" );
 
 See L<Config> module for details
+
+Tags: API, BASE
 
 =head2 TAGS
 
@@ -1301,8 +1469,8 @@ L</"preparedir">,
 L</"save_file">,
 L</"scandirs">,
 L</"scanfiles">,
-C</"send_mail">,
-C</"sendmail">,
+L</"send_mail">,
+L</"sendmail">,
 L</"shred">,
 L</"touch">
 
@@ -1383,7 +1551,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 136 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 145 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use Time::Local;
 use File::Spec::Functions qw/
@@ -2304,11 +2472,19 @@ sub ftptest {
 }
 sub ftpgetlist {
     # Получение списка файлов на удаленном ресурсе по маске
-    my $connect  = shift || {};  # Данные соединения
-    my $mask     = shift || qr//; # Маска файлов
+    my $connect  = shift || {}; # Данные соединения
+    my $mask     = shift || ''; # Маска файлов
     
     my $rfile = ftp($connect, 'ls'); 
-    my @files = grep {$_ =~ $mask} ($rfile ? @$rfile : ());
+    my @files = (($rfile && ref($rfile) eq 'ARRAY') ? @$rfile : ());
+
+    # выкидываем все файлы не по маске!
+    if ($mask && ref($mask) eq 'Regexp') {
+        @files = grep {$_ =~ $mask} @files; 
+    } else {
+        @files = grep {/$mask/} @files if $mask;
+    }
+
     return [@files];
 }
 sub execute {
