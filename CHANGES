@@ -83,3 +83,13 @@
 
     * Documentation modified
     * CTK::Util: Fixed bug in ftpgetlist function. Incorrect mask defaults
+
+1.14 Tue Sep  3 10:56:16 2013 GMT
+
+    * Documentation modified
+    * CTK::Util: Added new examples for dtf() function
+    * CTK::Util: Added "use Encode" by default
+    * Added "syspaths" flag in constructor
+    * Added CTKx extension
+    * Fixed bug where loghandler closed in destroy (DEMOLISH) phase
+    * Added Helper's skeletons for Regular, Tiny and Module types of projects

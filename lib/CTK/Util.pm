@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 145 2013-09-03 10:27:19Z minus $
+package CTK::Util; # $Id: Util.pm 164 2013-10-17 10:48:00Z minus $
 use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK::Util - CTK Utilities
 
 =head1 VERSION
 
-Version 2.12
+Version 2.14
 
 =head1 REVISION 
 
-$Revision: 145 $
+$Revision: 164 $
 
 =head1 SYNOPSIS
 
@@ -303,10 +303,22 @@ Each conversion specification is replaced by appropriate characters as described
 
 Examples:
 
+    # RFC822 (RSS)
+    $dt = dtf("%w, %D %MON %YY %hh:%mm:%ss %G", time(), 1); # Tue, 3 Sep 2013 12:31:40 GMT
+    
+    # RFC850
+    $dt = dtf("%W, %DD-%MON-%YY %hh:%mm:%ss %G", time(), 1); # Tuesday, 03-Sep-13 12:38:41 GMT
+    
+    # RFC1036
+    $dt = dtf("%w, %D %MON %YY %hh:%mm:%ss %G", time(), 1); # Tue, 3 Sep 13 12:44:08 GMT
+    
+    # RFC1123
+    $dt = dtf("%w, %D %MON %YYYY %hh:%mm:%ss %G", time(), 1); # Tue, 3 Sep 2013 12:50:42 GMT
+    
     # RFC2822
     $dt = dtf("%w, %DD %MON %YYYY %hh:%mm:%ss +0400"); # Tue, 12 Feb 2013 16:07:05 +0400
     
-    # W3CDTF (ISO 8601) -- Mail format
+    # W3CDTF, ATOM (Same as RFC 3339/ISO 8601) -- Mail format
     $dt = dtf("%YYYY-%MM-%DDT%hh:%mm:%ss+04:00"); # 2013-02-12T16:10:28+04:00
     
     # CTIME
@@ -317,7 +329,7 @@ Examples:
     
     # Russian date and time format
     $dt = dtf("%DD.%MM.%YYYY %hh:%mm:%ss"); # 12.02.2013 16:16:53
-
+    
     # DIG form
     $dt = dtf("%YYYY%MM%DD%hh%mm%ss"); # 20130212161844
     
@@ -326,6 +338,9 @@ Examples:
     
     # HTTP/cookie format (See CGI::Util::expires)
     $dt = dtf("%w, %DD-%MON-%YYYY %hh:%mm:%ss %G", time, 1); # Tue, 12-Feb-2013 13:35:04 GMT
+    
+    # COOKIE (RFC2616 as rfc1123-date)
+    $dt = dtf("%w, %DD %MON %YYYY %hh:%mm:%ss %G", time, 1); # Tue, 12 Feb 2013 13:35:04 GMT
 
 For more features please use L<Date::Format> and L<DateTime>
 
@@ -1517,7 +1532,7 @@ L<MIME::Lite>, L<CGI::Util>, L<Time::Local>, L<Net::FTP>, L<IPC::Open3>, L<List:
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
@@ -1551,8 +1566,9 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 145 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 164 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
+use Encode;
 use Time::Local;
 use File::Spec::Functions qw/
         catdir catfile rootdir tmpdir updir curdir 

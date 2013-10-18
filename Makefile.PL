@@ -12,6 +12,8 @@ my $prereq_pm = {
         'Archive::Extract'      => 0.58,
         'Archive::Tar'          => 1.80,
         'Archive::Zip'          => 1.30,
+        'Class::C3::Adopt::NEXT'=> 0.13,
+        'Class::Singleton'      => 1.40,
         'Config::General'       => 2.00,
         'ExtUtils::MakeMaker'   => 6.60,
         'File::Copy'            => 2.00,
@@ -69,7 +71,7 @@ WriteMakefile(
             'Data::Dumper'  => 0,
         },
         resources => {
-            homepage        => 'http://serzik.ru',
+            homepage        => 'http://www.serzik.ru',
             repository      => 'http://svn.serzik.ru/CTKlib/trunk',
             license         => 'http://opensource.org/licenses/lgpl-license.php',
         },

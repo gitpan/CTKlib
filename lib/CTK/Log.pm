@@ -1,4 +1,4 @@
-package CTK::Log; # $Id: Log.pm 143 2013-05-22 14:00:23Z minus $
+package CTK::Log; # $Id: Log.pm 158 2013-10-15 11:22:26Z minus $
 use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 use Moose::Util::TypeConstraints;
 
@@ -8,11 +8,11 @@ CTK::Log - CTK Logging methods
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 REVISION
 
-$Revision: 143 $
+$Revision: 158 $
 
 =head1 SYNOPSIS
 
@@ -72,10 +72,10 @@ use constant {
     },
 };
 
-use Data::Dumper;
+#use Data::Dumper;
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 143 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 158 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 subtype 'LogLevels'
     => as 'Int'
@@ -95,9 +95,16 @@ has 'loglevel' => (
 );
 
 has 'logfile' => (
-    is         => 'ro', 
-    isa        => 'Str', 
+    is         => 'rw',
+    isa        => 'Str',
     default    => '',
+    trigger => sub {
+            my $self = shift;
+            my $val = shift || '';
+            my $old_val = shift || '';
+            $self->handle($val) if $val && $val ne $old_val;
+        },
+
 );
 
 subtype 'LogSeparators'
@@ -122,7 +129,7 @@ coerce 'LogHandler'
     => via { FileHandle->new($_,'a') };
 
 has 'handle'   => (
-    is         => 'ro',
+    is         => 'rw', # 'ro',
     isa        => 'LogHandler',
     coerce     => 1,
     predicate  => 'sethandle',
@@ -160,13 +167,12 @@ around BUILDARGS => sub {
 
 after DEMOLISH => sub {
     my $self = shift;
-
     #CTK::debug("DEMOLISH called");
     
     if ($self->sethandle()) {
-        #CTK::debug("DEMOLISH called: handle set !!");
         my $fh = $self->handle;
-        $fh->close();
+        $fh->close() if $fh;
+        #warn("DEMOLISH called: handle cleaned !!") if $fh;
     }
 };
 

@@ -5,16 +5,13 @@ use strict;
 use constant {
     PROJECTNAME => 'foo',
 };
-use Cwd;
 use CTK;
+use CTKx;
 use CTK::Helper;
 
-START:  debug "-"x16, " START ", tms," ","-"x16;
-#########################
-### START
-#########################
-my $c = new CTK;
-my $cd = cwd();
+my $c = new CTK( syspaths => 1 );
+my $ctkx = CTKx->instance( c => $c );
+
 my $projectname = @ARGV ? shift @ARGV : ''; # имя проекта
 $projectname =~ s/[^a-z0-9_\-]//ig;
 unless ($projectname) {
@@ -25,20 +22,14 @@ exception("Invalid project's name!") if $projectname =~ /[^a-z0-9_\-]/i;
 exception("Invalid project's name. Name must not be begun with a number!") if $projectname =~ /^\d/;
 say "Creating tiny project \"$projectname\"...";
 
-my %files;
-my $overwrite = 'yes';
-my $tinyf = CTK::catfile($cd,$projectname.'.pl');
-$overwrite = $c->cli_prompt("File \"$tinyf\" already exists. Overwrite?:", $overwrite) if -e $tinyf;
-$files{tiny} = $tinyf if $overwrite =~ /^y/i;
+my $h = new CTK::Helper (
+        -type           => 'tiny',
+        -projectname    => $projectname,
+    );
+$h->build();
 
-my $h = new CTK::Helper ( -ff => { PROJECTNAME  => $projectname }, -files => {%files} );
-$h->build('tiny');
+say "The tiny project \"$projectname\" was successfully created.";
 
-say "The tiny project \"$projectname\" ($tinyf) was successfully created.";
-#########################
-### FINISH
-#########################
-FINISH: debug "-"x16, " FINISH ", tms," ","-"x16;
 exit(0);
 
 1;

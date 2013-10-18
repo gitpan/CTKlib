@@ -1,0 +1,31 @@
+INSTALLATION INSTRUCTIONS
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    make clean
+
+DIST CREATING
+
+    perl Makefile.PL
+    make
+    make test
+    make tardist
+    make clean
+
+DEVELOPING RUNNING
+
+    perl -Ilib bin\ctklib -d 
+
+for testing new fetures:
+
+    ctklib.pl -d test
+
+CREATE NEW VERSION (FOR DEVELOPER ONLY)
+
+    * README         -- In documentation
+    * CHANGES        -- Result of command: gmtime | gclip
+    * lib/CTK.pm     -- In documentation (VERSION) & in code $VERSION
+    * bin/ctklib     -- In documentation (VERSION)
+    * t/01-use.t     -- In test case

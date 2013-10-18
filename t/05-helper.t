@@ -7,10 +7,21 @@
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 01-use.t 149 2013-09-03 11:00:23Z minus $
+# $Id$
 #
 #########################################################################
+use strict;
+use warnings;
+
 use Test::More tests => 2;
-BEGIN { use_ok('CTK'); };
-is(CTK->VERSION,1.14,'Version checking');
+use CTK;
+use CTKx;
+BEGIN { use_ok('CTK::Helper') };
+
+my $c = new CTK( syspaths => 1 );
+my $ctkx = CTKx->instance(c => $c);
+my $h = new CTK::Helper ( -t => 'regular' );
+is($h->{class}, 'CTK::Helper::SkelRegular', 'Class for "regular" type');
+
+1;
 

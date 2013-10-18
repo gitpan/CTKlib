@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: ctklib 138 2013-03-16 15:53:08Z minus $
+# $Id: ctklib 164 2013-10-17 10:48:00Z minus $
 use strict;
 
 =head1 NAME
@@ -8,13 +8,13 @@ ctklib - CTKlib project helper
 
 =head1 VERSION
 
-Version 1.13
+Version 1.14
 
 =head1 SYNOPSIS
 
-    ctklib [-dt] [PROJECTNAME]
-    ctklib-tiny [PROJECTNAME]
+    ctklib [-d] [-t regular|tiny|module] [PROJECTNAME]
     ctklib [-di]
+    ctklib-tiny [PROJECTNAME]
 
 =head1 OPTIONS
 
@@ -22,7 +22,7 @@ Version 1.13
 
 =item B<-d, --debug>
 
-Debug mode without logging in log-file
+Enable debug mode
 
 =item B<-h, --help>
 
@@ -32,9 +32,10 @@ Help page
 
 Interactive (shell) mode without creation of project
 
-=item B<-t, --tiny>
+=item B<-t TYPE, --type=TYPE>
 
-Tiny project create. Alias for this call:
+Select output's type your project. Supported types: "regular" (as default), "tiny" and "module".
+For tiny projects please use follow command:
 
     ctklib-tiny [PROJECTNAME]
 
@@ -50,7 +51,7 @@ Creating PROJECTNAME project with CTK
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
@@ -69,19 +70,23 @@ See C<LICENSE> file
 
 use constant {
     PROJECTNAME => 'foo',
-    EXEMODE     => 0755,
-    DIRMODE     => 0777,
-    DIRS        => [qw/log inc conf data src lib bin/],
+    TYPES       => [qw/regular tiny module/],
 };
 use Getopt::Long;
 use Pod::Usage;
-use Cwd;
 use Term::ReadLine ();
 use Text::ParseWords qw(shellwords);
 
 # Packages
 use CTK;
+use CTKx;
 use CTK::Helper;
+
+BEGIN {
+    sub start { local $| = 1; print CTK::CTKCP @_ ? @_ : '' }
+    sub finish { say(@_) }
+    sub _{my $s=shift||'';my $l=length $s;$s.($l<70?('.'x(70-$l)):'').' '}
+}
 
 # Режимы команд
 Getopt::Long::Configure ("bundling");
@@ -89,7 +94,7 @@ GetOptions(\%OPT,
     "help|usage|h|u|man|?", # Помощь
     "version|ver|v",        # Текущая версия CTK
     "debug|d",              # Отладка
-    "tiny|simple|t",        # Tiny
+    "type|t=s",             # Regular | Tiny | Module
     "interactive|shell|i",  # Interactive
 ) || pod2usage(-exitval => 1, -verbose => 0);
 pod2usage(-exitval => 0, -verbose => 2) if $OPT{help};
@@ -101,12 +106,15 @@ if ($OPT{version}) {
 
 # Arguments
 my $projectname   = @ARGV ? shift @ARGV : ''; # имя проекта
+my $type = $OPT{type} || 'regular';
+pod2usage(-exitval => 1, -verbose => 0) unless grep {$_ eq $type} @{(TYPES)};
 
 START: debug "-"x16, " START ", tms," ","-"x16;
 #########################
 ### START
 #########################
-my $c = new CTK;
+my $c = new CTK( syspaths => 1 );
+my $ctkx = CTKx->instance( c => $c );
 if ($OPT{interactive}) {
     $ENV{TERM} = "dumb" if CTK::WIN;
     my $term = new Term::ReadLine('CTKlib');
@@ -133,70 +141,22 @@ if ($OPT{interactive}) {
 
 $projectname =~ s/[^a-z0-9_\-]//ig;
 unless ($projectname) {
-    goto FINISH if $c->cli_prompt("Are you sure you want to create a new ".($OPT{tiny} ? 'tiny ' : '')."project?:", "yes") =~ /^n/i;
+    goto FINISH if $c->cli_prompt("Are you sure you want to create a new $type project?:", "yes") =~ /^n/i;
     $projectname = $c->cli_prompt("Please enter name of Your project in unix style:", PROJECTNAME);
 }
 exception("Invalid project's name!") if $projectname =~ /[^a-z0-9_\-]/i;
 exception("Invalid project's name. Name must not be begun with a number!") if $projectname =~ /^\d/;
-say "Creating ".($OPT{tiny} ? 'tiny ' : '')."project \"$projectname\"...";
 
-# Preparing directories and Log Clear 
-my $ds = DIRS;
-my $cd = cwd();
-my %files;
-my $overwrite = 'yes';
-my $pdir = CTK::catdir($cd,$projectname);
-foreach (@$ds) { $_ = CTK::catdir($cd,$projectname,$_) }
-push @$ds, $pdir;
-CTK::preparedir($ds,DIRMODE) unless $OPT{tiny};
-my $h = new CTK::Helper ( -ff => { 
-        PROJECTNAME => $projectname,
-        CTKVERSION  => $c->VERSION,
-    } );
-
-# Пишем tiny файл и выходим
-if ($OPT{tiny}) {
-    my $tinyf = CTK::catfile($cd,$projectname.'.pl');
-    $overwrite = $c->cli_prompt("File \"$tinyf\" already exists. Overwrite?:", $overwrite) if -e $tinyf;
-    if ($overwrite =~ /^y/i) {
-        $h->build('tiny', { tiny => $tinyf });
-        say "The tiny project \"$projectname\" ($tinyf) was successfully created.";
-    } else {
-        say "Skipped!";
-    }
-    
-    goto FINISH
-}
-
-# Пишем основной проект
-%files = (
-        regular     => CTK::catfile($cd,$projectname,$projectname.'.pl'),
-        inc         => CTK::catfile($cd,$projectname,'inc',$projectname.'.pm'),
-        conf        => CTK::catfile($cd,$projectname,$projectname.'.conf'),
-        conf_arc    => CTK::catfile($cd,$projectname,'conf','ctklib-arc.conf'),
-        conf_store  => CTK::catfile($cd,$projectname,'conf','ctklib-store.conf'),
-        conf_sendmail => CTK::catfile($cd,$projectname,'conf','ctklib-sendmail.conf'),
-        readme      => CTK::catfile($cd,$projectname,'README'),
-        todo        => CTK::catfile($cd,$projectname,'TODO'),
-        license     => CTK::catfile($cd,$projectname,'LICENSE'),
-        changes     => CTK::catfile($cd,$projectname,'CHANGES'),
-        install     => CTK::catfile($cd,$projectname,'INSTALL'),
-        bin         => CTK::catfile($cd,$projectname,'bin',$projectname),
-        manifest    => CTK::catfile($cd,$projectname,'MANIFEST'),
-        makefile    => CTK::catfile($cd,$projectname,'Makefile.PL'),
+my $h = new CTK::Helper (
+        -type           => $type,
+        -projectname    => $projectname,
     );
-while (my ($k, $f) = each %files) {
-    $overwrite = $c->cli_prompt("File \"$f\" already exists. Overwrite?:", $overwrite) if -e $f;
-    if ($overwrite =~ /^y/i) {
-        $overwrite = 'yes';
-    } else {
-        $overwrite = 'no';
-        delete $files{$k};   # This is safe
-    }
-}
-$h->files(\%files);
-$h->build;
-say "The project \"$projectname\" was successfully created.";
+
+start _ "Creating $type project \"$projectname\"...";
+my $hstat = $h->build();
+finish $hstat ? "OK" : "ERROR";
+
+debug "The project \"$projectname\" was successfully created." if $hstat;
 
 #########################
 ### FINISH

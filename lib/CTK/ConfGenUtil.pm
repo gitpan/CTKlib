@@ -1,4 +1,4 @@
-package CTK::ConfGenUtil; # $Id: ConfGenUtil.pm 127 2013-03-04 09:45:50Z minus $
+package CTK::ConfGenUtil; # $Id: ConfGenUtil.pm 164 2013-10-17 10:48:00Z minus $
 use strict;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK::ConfGenUtil - Config::General structure utility functions
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 REVISION
 
-$Revision: 127 $
+$Revision: 164 $
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ L<Config::General::Extended>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
@@ -167,7 +167,7 @@ See C<LICENSE> file
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 127 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 164 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use base qw/Exporter/;
 our @EXPORT = qw/ node value array hash is_value is_scalar is_array is_hash exists /;

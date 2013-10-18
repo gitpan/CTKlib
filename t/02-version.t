@@ -7,7 +7,7 @@
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 02-version.t 114 2013-02-19 13:33:55Z minus $
+# $Id: 02-version.t 152 2013-09-10 12:33:41Z minus $
 #
 #########################################################################
 use strict;
@@ -21,11 +21,9 @@ use CTK;
 #$OPT{debug} = 1;
 my $MSWIN = $^O =~ /mswin/i ? 1 : 0;
 
-if ($MSWIN) {
-    plan tests => 10;      
-} else {
-    plan skip_all => 'test only for MSWin32';
-}
+plan skip_all => "Currently a NO developer test" if -d '.svn' || -d ".git";
+plan skip_all => 'Test only for MSWin32' unless $MSWIN;
+plan tests => 10;      
 
 # Go!
 

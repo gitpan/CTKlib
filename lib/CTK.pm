@@ -1,4 +1,4 @@
-package CTK; # $Id: CTK.pm 138 2013-03-16 15:53:08Z minus $
+package CTK; # $Id: CTK.pm 170 2013-10-18 11:52:18Z minus $
 use Moose; #use strict;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK - Command-line ToolKit
 
 =head1 VERSION
 
-Version 1.13
+Version 1.14
 
 =head1 REVISION
 
-$Revision: 138 $
+$Revision: 170 $
 
 =head1 SYNOPSIS
 
@@ -24,6 +24,7 @@ $Revision: 138 $
     my $c = new CTK (
         prefix       => 'myprogram',
         suffix       => 'sample',
+        syspaths     => 0, # need use system paths
         cfgfile      => '/path/to/conf/file.conf',
         voidfile     => '/path/to/void/file.txt',
         needconfig   => 1, # need creating empty config file
@@ -108,7 +109,7 @@ The usual warnings if it can't read or write the files involved.
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.ru> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
@@ -128,7 +129,7 @@ use vars qw/
         $VERSION
         $TM $EXEDIR $DATADIR $CONFDIR $CONFFILE $LOGDIR $LOGFILE %ARGS %OPT @OPTSYSDEF
     /;
-$VERSION = 1.13;
+$VERSION = '1.14';
 
 use constant {
     DEBUG     => 1, # 0 - off, 1 - on, 2 - all (+ http headers and other)
@@ -278,7 +279,7 @@ with 'CTK::CLI' => {
 has 'revision'  => ( # Ревизия
         is      => 'ro',
         isa     => 'Str',
-        default => q/$Revision: 138 $/ =~ /(\d+\.?\d*)/ ? $1 : '0',
+        default => q/$Revision: 170 $/ =~ /(\d+\.?\d*)/ ? $1 : '0',
         lazy    => 1,
         init_arg=> undef,
     );
@@ -346,6 +347,11 @@ has 'needconfig'=> ( # Нужно ли создавать пустой конфиг в случае отсутствия данн
         isa     => 'Bool', 
         default => 0,
     ); 
+has 'syspaths'=> ( # Использовать ли системные пути по умолчанию, вместо "домашних"?
+        is      => 'rw', 
+        isa     => 'Bool', 
+        default => 0,
+    ); 
 has 'exedir'    => ( # Возврат значения глобального параметра директории исполнения
         is      => 'ro', 
         isa     => 'Str', 
@@ -388,6 +394,7 @@ has 'logdir'    => ( # Возврат значения глобального параметра директории логов
                 my $val = shift || '';
                 # debug "TRIGGER: $self, $val";
                 $LOGDIR = $val;
+                $LOGFILE = catfile($val,sprintf("%s.log",$self->prefix()));
             },
 
     );
@@ -402,7 +409,20 @@ sub BUILD { # new
     
     # Пробегаемся по опциям и строим пути исходя из масок конфигурации
     my $oldcfgfile = $self->cfgfile();
-    $oldcfgfile = ($oldcfgfile eq CFGFILE) ? catfile($EXEDIR,$self->cfgfile()) : $self->cfgfile();
+    if ($self->syspaths()) {
+        # Используются системные пути
+        $self->datadir(catdir(tmpdir(),$prefix));
+        $self->confdir(catdir(sysconfdir(),$prefix,CONFDIRD));
+        my $t_logdir = syslogdir();
+        $t_logdir = tmpdir() unless -e $t_logdir;
+        $self->logdir($t_logdir);
+        $oldcfgfile = catfile(sysconfdir(),$prefix,$prefix.'.conf');
+    } else {
+        # Используются базовые пути (относительно $EXEDIR)
+        $oldcfgfile = catfile($EXEDIR,CFGFILE) if $oldcfgfile eq CFGFILE;
+    }
+
+    # Paths rebuilding
     $self->cfgfile($oldcfgfile); # CFGFILE rebuilding
     $self->voidfile($self->voidfile()); # VOIDFILE rebuilding
     
