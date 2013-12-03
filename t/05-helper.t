@@ -7,7 +7,7 @@
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id$
+# $Id: 05-helper.t 173 2013-10-29 16:05:21Z minus $
 #
 #########################################################################
 use strict;

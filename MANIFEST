@@ -26,6 +26,7 @@ t/02-version.t
 t/03-xsutil.t
 t/04-ctkx.t
 t/05-helper.t
+t/06-format.t
 xs/Makefile.PL
 xs/MANIFEST
 xs/README

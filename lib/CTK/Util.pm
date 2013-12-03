@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 164 2013-10-17 10:48:00Z minus $
+package CTK::Util; # $Id: Util.pm 174 2013-10-30 09:37:29Z minus $
 use strict; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -11,7 +11,7 @@ Version 2.14
 
 =head1 REVISION 
 
-$Revision: 164 $
+$Revision: 174 $
 
 =head1 SYNOPSIS
 
@@ -1566,7 +1566,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 164 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = q/$Revision: 174 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
 
 use Encode;
 use Time::Local;
@@ -1668,12 +1668,17 @@ sub to_utf8 {
     # Конвертирование строки в UTF-8 из указанной кодировки
     # to_utf8( $string, $charset ) # charset is 'Windows-1251' as default
 
-    my $ss = shift || return ''; # Сообщение
+    my $ss = shift; # Сообщение
+    return '' unless defined($ss);
     my $ch = shift || 'Windows-1251'; # Перекодировка
     return Encode::decode($ch,$ss)
 }
 sub to_windows1251 {
-    my $ss = shift || return ''; # Сообщение
+    # Конвертирование строки из UTF-8 в указанную кодировку
+    # to_windows1251( $string, $charset ) # charset is 'Windows-1251' as default
+    
+    my $ss = shift; # Сообщение
+    return '' unless defined($ss);
     my $ch = shift || 'Windows-1251'; # Перекодировка
     return Encode::encode($ch,$ss)
 }
@@ -1681,10 +1686,11 @@ sub to_cp1251 { goto &to_windows1251 };
 sub CP1251toUTF8 { goto &to_utf8 };
 sub UTF8toCP1251 { goto &to_windows1251 };
 sub to_base64 {
-    # Конвертирование строки UTF-8 в base64
+    # Конвертирование строки UTF-8 в base64 (RFC 2047)
     # to_base64( $utf8_string )
 
-    my $ss = shift || ''; # Сообщение
+    my $ss = shift; # Сообщение
+    return '=?UTF-8?B??=' unless defined($ss);
     return '=?UTF-8?B?'.MIME::Base64::encode(Encode::encode('UTF-8',$ss),'').'?=';
 }
 
@@ -1695,7 +1701,8 @@ sub slash {
     #
     # Процедура удаляет системные данные из строки заменяя их 
     #
-    my $data_staring = shift || '';
+    my $data_staring = shift;
+    return '' unless defined($data_staring);
 
     $data_staring =~ s/\\/\\\\/g;
     $data_staring =~ s/'/\\'/g;
@@ -1708,7 +1715,8 @@ sub tag {
     # 
     # <, >, " and ' chars convert to &lt;, &gt;, &quot; and &#39; strings
     #
-    my $data_staring = shift || '';
+    my $data_staring = shift;
+    return '' unless defined($data_staring);
 
     $data_staring =~ s/</&lt;/g;
     $data_staring =~ s/>/&gt;/g;
@@ -1721,7 +1729,8 @@ sub tag_create {
     #
     # Процедура восстанавливает теги
     #
-    my $data_staring = shift || '';
+    my $data_staring = shift;
+    return '' unless defined($data_staring);
 
     $data_staring =~ s/\&#39\;/\'/g;
     $data_staring =~ s/\&lt\;/\</g;
@@ -1841,7 +1850,7 @@ sub correct_date {
     #
     # Приведение даты в корректный правильный формат dd.mm.yyyy
     #
-    my $date=shift;
+    my $date = shift;
 
     if ($date  =~/^\s*(\d{1,2})\D+(\d{1,2})\D+(\d{4})\s*$/) {
         my $dd = (($1<10)?('0'.($1/1)):$1);
@@ -1977,7 +1986,8 @@ sub datetimef { goto &dtf }
 # 
 sub translate {
     # Транслитерация русских букв в латинские (польскобуквенный вариант)
-    my $text = shift || '';
+    my $text = shift;
+    return '' unless defined($text);
 
     #$text=~tr/\xA8\xC0-\xDF/\xB8\xE0-\xFF/; # UP -> down
     $text=~tr/\xA8\xC0-\xC5\xC7-\xD6\xDB\xDD/EABWGDEZIJKLMNOPRSTUFHCYE/; # UP
@@ -2005,7 +2015,8 @@ sub translate {
     return $text;
 }
 sub variant_stf {
-    my $S = shift || '';
+    my $S = shift;
+    $S = '' unless defined($S);
     my $length_s = shift || 0;
     my $countpoints;
 

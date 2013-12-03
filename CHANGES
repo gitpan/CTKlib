@@ -93,3 +93,9 @@
     * Added CTKx extension
     * Fixed bug where loghandler closed in destroy (DEMOLISH) phase
     * Added Helper's skeletons for Regular, Tiny and Module types of projects
+
+1.15 Mon Oct 21 07:24:47 2013 GMT
+
+    * Documentation modified
+    * In *format* functions fixed bug with "0" values
+
