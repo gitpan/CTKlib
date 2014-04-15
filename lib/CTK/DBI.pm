@@ -3,8 +3,8 @@
 # Module   : CTK::DBI
 # Style    : OOP
 # DATE     : 03.03.2013
-# Revision : $Revision: 124 $
-# Id       : $Id: DBI.pm 124 2013-03-03 11:51:25Z minus $
+# Revision : $Revision: 180 $
+# Id       : $Id: DBI.pm 180 2014-04-14 19:59:32Z minus $
 #
 # ƒосутп к базам данных на основе модул€ DBI. модуль облегчает доступ к данным и несколько схож
 # с модулем multistore в проекте MPMinus
@@ -16,7 +16,7 @@
 #
 #
 ################################################
-package CTK::DBI; # $Id: DBI.pm 124 2013-03-03 11:51:25Z minus $
+package CTK::DBI; # $Id: DBI.pm 180 2014-04-14 19:59:32Z minus $
 use strict;
 
 =head1 NAME
@@ -25,11 +25,11 @@ CTK::DBI - Database independent interface for CTKlib
 
 =head1 VERSION
 
-Version 1.02
+Version 2.25
 
 =head1 REVISION
 
-$Revision: 124 $
+$Revision: 180 $
 
 =head1 SYNOPSIS
 
@@ -73,11 +73,11 @@ For example: debug($oracle->field("select sysdate() from dual"));
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -98,7 +98,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 124 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = '2.25';
 
 my $LOAD_SigAction = 0;
 eval 'use Sys::SigAction';

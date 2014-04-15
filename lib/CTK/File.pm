@@ -1,4 +1,4 @@
-package CTK::File; # $Id: File.pm 69 2012-12-28 19:26:44Z minus $
+package CTK::File; # $Id: File.pm 180 2014-04-14 19:59:32Z minus $
 use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK::File - Files and direcries working
 
 =head1 VERSION
 
-Version 1.00
+Version 1.70
 
 =head1 REVISION
 
-$Revision: 69 $
+$Revision: 180 $
 
 =head1 SYNOPSIS
 
@@ -80,11 +80,11 @@ For TEMP dirs/files working: use File::Temp qw/tempfile tempdir/;
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -97,7 +97,7 @@ See C<LICENSE> file
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 69 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = '1.70';
 
 use CTK::Util qw(:API :FORMAT :ATOM);
 use File::Copy;

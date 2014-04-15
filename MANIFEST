@@ -16,6 +16,7 @@ lib/CTK/Helper.pm
 lib/CTK/Log.pm
 lib/CTK/Net.pm
 lib/CTK/Status.pm
+lib/CTK/TFVals.pm
 lib/CTK/Util.pm
 lib/CTK/XS/Util.pm
 lib/CTK/Helper/SkelModule.pm
@@ -27,6 +28,8 @@ t/03-xsutil.t
 t/04-ctkx.t
 t/05-helper.t
 t/06-format.t
+t/07-cgu_void.t
+t/08-tfvals.t
 xs/Makefile.PL
 xs/MANIFEST
 xs/README

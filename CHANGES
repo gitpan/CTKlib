@@ -99,3 +99,9 @@
     * Documentation modified
     * In *format* functions fixed bug with "0" values
 
+1.16 Tue Apr 15 11:02:34 2014 GMT
+
+    * Documentation modified
+    * CTK::ConfGenUtil: array and value functions - problem with 
+      null-context (not undef) fixed
+    * CTK::TFVals modle added

@@ -1,4 +1,4 @@
-package CTK::Status; # $Id: Status.pm 132 2013-03-12 14:45:50Z minus $
+package CTK::Status; # $Id: Status.pm 180 2014-04-14 19:59:32Z minus $
 use strict;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK::Status - Progressbar's system
 
 =head1 VIRSION
 
-Version 1.22
+Version 1.24
 
 =head1 REVISION
 
-$Revision: 132 $
+$Revision: 180 $
 
 =head1 HISTORY
 
@@ -69,11 +69,11 @@ The usual warnings if it can't read or write the files involved.
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -85,7 +85,7 @@ See C<LICENSE> file
 
 =cut
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 use Time::HiRes qw(time);
 use Term::ReadKey qw(GetTerminalSize);
 use IO::Handle;

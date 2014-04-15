@@ -1,9 +1,9 @@
 # TODO Wed Oct 24 10:31:28 2012 GMT 
-# $Id: TODO 145 2013-09-03 10:27:19Z minus $
+# $Id: TODO 181 2014-04-15 11:09:41Z minus $
 
 # GENERAL
 
-    * CTK::Util: –еаоизовать функции:
+    * CTK::Util: –еализовать функции:
       - expand: утилита преобразующа€ табул€ции в пробелы, сохран€€ форматированность текста.
                 expand( $data, $spt, $firstonly )
                 Convert tabs in $data to spaces and returns result.

@@ -1,4 +1,4 @@
-package CTK::ConfGenUtil; # $Id: ConfGenUtil.pm 164 2013-10-17 10:48:00Z minus $
+package CTK::ConfGenUtil; # $Id: ConfGenUtil.pm 180 2014-04-14 19:59:32Z minus $
 use strict;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK::ConfGenUtil - Config::General structure utility functions
 
 =head1 VERSION
 
-Version 1.01
+Version 2.65
 
 =head1 REVISION
 
-$Revision: 164 $
+$Revision: 180 $
 
 =head1 SYNOPSIS
 
@@ -150,11 +150,11 @@ L<Config::General::Extended>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://www.serzik.ru> E<lt>minus@mail333.comE<gt>
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -167,7 +167,7 @@ See C<LICENSE> file
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 164 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = '2.65';
 
 use base qw/Exporter/;
 our @EXPORT = qw/ node value array hash is_value is_scalar is_array is_hash exists /;
@@ -234,7 +234,7 @@ sub value {
     $node = node($node,@_) if defined $_[0];
     if ($node && ref($node) eq 'ARRAY') {
         return exists $node->[0] ? $node->[0] : undef;
-    } elsif ($node && !ref($node)) {
+    } elsif (defined($node) && !ref($node)) {
         return $node
     } else {
         return undef
@@ -242,11 +242,11 @@ sub value {
 }
 sub array {
     # Получение смассива значениий или пустой массив (ссылка на него)
-    my $node = shift || [];
+    my $node = shift;
     $node = node($node,@_) if defined $_[0];
     if ($node && ref($node) eq 'ARRAY') {
         return $node;
-    } elsif ($node && !ref($node)) {
+    } elsif (defined($node) && !ref($node)) {
         return [$node];
     } else {
         return [];

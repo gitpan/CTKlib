@@ -1,4 +1,4 @@
-package CTK::Helper; # $Id: Helper.pm 166 2013-10-17 11:25:57Z minus $
+package CTK::Helper; # $Id: Helper.pm 180 2014-04-14 19:59:32Z minus $
 use strict;
 
 =head1 NAME
@@ -7,11 +7,11 @@ CTK::Helper - Helper for building CTK scripts
 
 =head1 VIRSION
 
-Version 1.03
+Version 2.67
 
 =head1 REVISION
 
-$Revision: 166 $
+$Revision: 180 $
 
 =head1 HISTORY
 
@@ -63,11 +63,11 @@ L<ctklib>, L<ctklib-tiny>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://www.serzik.ru> E<lt>minus@mail333.comE<gt>
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -103,7 +103,7 @@ use constant {
 };
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 166 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = '2.67';
 
 sub new {
     my $class = shift;

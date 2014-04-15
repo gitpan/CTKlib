@@ -1,4 +1,4 @@
-package CTK::Log; # $Id: Log.pm 158 2013-10-15 11:22:26Z minus $
+package CTK::Log; # $Id: Log.pm 180 2014-04-14 19:59:32Z minus $
 use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
 use Moose::Util::TypeConstraints;
 
@@ -8,11 +8,11 @@ CTK::Log - CTK Logging methods
 
 =head1 VERSION
 
-Version 1.01
+Version 2.59
 
 =head1 REVISION
 
-$Revision: 158 $
+$Revision: 180 $
 
 =head1 SYNOPSIS
 
@@ -41,11 +41,11 @@ All of methods are returned by log-records
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -75,7 +75,7 @@ use constant {
 #use Data::Dumper;
 
 use vars qw/$VERSION/;
-$VERSION = q/$Revision: 158 $/ =~ /(\d+\.?\d*)/ ? sprintf("%.2f",($1+100)/100) : '1.00';
+$VERSION = '2.59';
 
 subtype 'LogLevels'
     => as 'Int'
